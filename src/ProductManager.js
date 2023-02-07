@@ -9,10 +9,8 @@ class ProductManager {
     #fileSystem;
     constructor(filePath){
         try {
-            //let file = path.split('\\').pop().split('/').pop();
             this.#dirPath = path.parse(filePath).dir
-            this.#filePath = filePath;
-            //console.log(this.#filePath) 
+            this.#filePath = filePath; 
             this.#fileSystem = fs;
         }
         catch (e) {
