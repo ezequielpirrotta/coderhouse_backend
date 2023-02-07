@@ -1,0 +1,23 @@
+{
+  "name": "coderhouse_backend",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ezequielpirrotta/coderhouse_backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ezequielpirrotta/coderhouse_backend/issues"
+  },
+  "homepage": "https://github.com/ezequielpirrotta/coderhouse_backend#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
