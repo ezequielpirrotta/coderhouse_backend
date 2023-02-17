@@ -1,4 +1,3 @@
-import { Console } from 'console';
 import fs  from 'fs' // tener el campo "type":"module", en el package.json para correcto funcionamiento
 import path from 'path';
 import Product from './Product.js';
@@ -14,24 +13,27 @@ class ProductManager {
             this.#fileSystem = fs;
         }
         catch (e) {
-            console.log(e.code)
+            throw Error(e.message)
         }
     }
     getProducts = async () => {
         try {
-            
+            let products = [];
             await this.#fileSystem.promises.mkdir(this.#dirPath, { recursive: true });
-            if(!this.#fileSystem.existsSync(this.#filePath)) {
+            if(this.#fileSystem.existsSync(this.#filePath)) {
+                products = await this.#fileSystem.promises.readFile(this.#filePath, "utf-8")
+                if(products === '') {
+                    await this.#fileSystem.promises.writeFile(this.#filePath, JSON.stringify([]));
+                }
+            }
+            else {
                 await this.#fileSystem.promises.writeFile(this.#filePath, JSON.stringify([]));
             }
-            let products = await this.#fileSystem.promises.readFile(this.#filePath, "utf-8");
+            products = await this.#fileSystem.promises.readFile(this.#filePath, "utf-8");
             products = JSON.parse(products)
             return Object.values(products);
         } catch (error) {
-            console.error(`Error consultando los productos por archivo, valide el archivo: ${this.#dirPath}, 
-                detalle del error: ${error}`);
-            throw Error(`Error consultando los productos por archivo, valide el archivo: ${this.#dirPath},
-             detalle del error: ${error}`);
+            throw Error(`Error consultando los productos por archivo, valide el archivo: ${this.#dirPath} , detalle del error: ${error}`);
         }
     }
      
@@ -50,15 +52,16 @@ class ProductManager {
             throw Error(`Error consiguiendo producto con id: ${id}, detalle del error: ${error}`);
         }
     }
-    addProduct = async (title, description, price, thumbnail, code, stock) => {
-        let newProduct = new Product(title, description, price, thumbnail, code, stock);
+    addProduct = async (title, description, price, code, stock, category, thumbnail) => {
+        let status = true;
+        let newProduct = new Product(title, description, price, code, status, stock, category, thumbnail);
 
         try {
             let products = await this.getProducts();
             if(products.length !== 0) {
                 let result = products.find(element => element.code === code)
                 if(result) {
-                    return "Error: código repetido";
+                    throw Error("Código repetido"); 
                 }
             } 
             let id = 0;
@@ -77,7 +80,10 @@ class ProductManager {
             await this.#fileSystem.promises.writeFile(this.#filePath, JSON.stringify(products));
             return true;
         } catch (error) {
-            throw Error(`Error creando producto nuevo: ${JSON.stringify(newProduct)}, detalle del error: ${error}`);
+            throw {
+                message: `Error creando producto nuevo: ${newProduct.title}`,
+                detail: `Detalle del error: ${error.message}`
+            };
         }
        
     }
@@ -110,27 +116,40 @@ class ProductManager {
     deleteProduct = async (id) =>{
         try {
             let products = await this.getProducts();
+            id = parseInt(id)
             if(id) {
                 if(products.find(element => element.id === id)) {
+                    let current_amount = products.length;
                     products = products.filter(element => element.id !== id);
-                    if(products.length === 0) {
+                    let after_amount = products.length;
+                    if(after_amount === current_amount) {
                         throw Error ("No se pudo eliminar el producto");
                     }
                     else {
-                        this.#fileSystem.writeFileSync(this.#filePath, JSON.stringify({"products": products}));
+                        this.#fileSystem.writeFileSync(this.#filePath, JSON.stringify(products));
                         if (!this.#fileSystem.existsSync(this.#filePath)) throw Error("No se pudo escribir el archivo")
                     }
                 }
                 else {
-                    throw Error ("No se encontró el producto!")
+                    throw {
+                        code: 404,
+                        detail: "No se encontró el producto!"
+                    } 
                 }
             }
             else {
-                return false;
+                throw {
+                    code: 400,
+                    detail: "Valor id vacío"
+                }
             }
         }
         catch (e) {
-            throw Error(`Error eliminando producto, detalle del error: ${error}`);
+            throw {
+                code: e.code,
+                message: e.message? e.message : 'Error eliminando producto',
+                detail: e.detail? e.detail : e.message 
+            }
         }
     }
 }
