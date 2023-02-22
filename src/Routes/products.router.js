@@ -1,17 +1,21 @@
 import { Router } from "express";
-import ProductManager from "../ProductManager.js";
+import ProductManager from "../Managers/ProductManager.js";
 
 const pm = new ProductManager("./files/products.json");
 const router = Router()
 
 router.get('/', async (req, res) => {
     try {
+        //console.log(req.app.get("socket"))
         let {limit} = req.query
         let products = await pm.getProducts();
         if(limit !== undefined) {
             limit = parseInt(limit);
             products = limit > 0? products.slice(0, limit) : []; 
         }
+        req.app.get('socket').emit('products', data => {
+            
+        })
         res.status(200).send(products);
     }
     catch(e) {

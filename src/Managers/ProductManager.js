@@ -1,6 +1,6 @@
 import fs  from 'fs' // tener el campo "type":"module", en el package.json para correcto funcionamiento
 import path from 'path';
-import Product from './Product.js';
+import Product from '../models/Product.js';
 
 class ProductManager {
     #dirPath;
