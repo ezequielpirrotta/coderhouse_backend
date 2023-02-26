@@ -59,7 +59,7 @@ body {
     justify-content: space-between;
 }
   
-#products {
+#main {
     display: flex;
     flex-wrap: wrap;
 }

@@ -1,32 +1,26 @@
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" 
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <link rel="stylesheet" href="/css/styles.css">
-        <title>Document</title>
-    </head>
-    <body>
-        <div id="products" className="container-fluid justify-content-center">
-                <div className="row justify-content-center">
-                    {{#each products}}
-                        <div key = {{this.id}} > 
-                            <div className="card" width= "18rem" >
-                                
-                                <img src={{this.thumbnail}} className="card-img-top img-fluid btn" alt={product.name} />
-                                
-                                <div className="card-body">
-                                    <h5 className="card-title">{{product.name}}</h5>
-                                    <p className="card-text">Precio: {{product.currency}} {{product.price}}</p>
-                                </div>
-                            </div>
-                        </div>
-                    {{/each}}
+<div id="main" class="container-fluid justify-content-center">
+    <div id="products" class="row justify-content-center">
+        {{#each products}}
+            <div id={{this.id}} key = {{this.id}} class="product"> 
+                <div class="card" width= "18rem" >
+                    <img src={{this.thumbnail}} class="card-img-top img-fluid btn" alt={{this.title}} />
+                    <div class="card-body">
+                        <h5 id="title_{{this.id}}" class="card-title">{{this.title}}</h5>
+                        <label for="price_{{this.id}}">Precio: $</label>
+                        <p id="price_{{this.id}}" class="card-text">{{this.price}}</p>
+                        <label for="stock_{{this.id}}">Stock:</label>
+                        <p id="stock_{{this.id}}" class="card-text">{{this.stock}}</p>
+                        <label for="description_{{this.id}}">Descripción</label>
+                        <p id="description_{{this.id}}" class="card-text">{{this.description}}</p> 
+                    </div>
                 </div>
-        </div>
-    </body>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" 
-    integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
-</html>
+            </div>
+        {{/each}}
+    </div>
+    <div class="formButtons">
+        <button id="create" class="btn btn-outline-primary">Crear</button>
+        <button id="update" class="btn btn-outline-warning">Actualizar</button> 
+        <button id="delete" class="btn btn-outline-danger">Eliminar</button>
+    </div>
+</div>
+<script src="/js/static.js"></script>

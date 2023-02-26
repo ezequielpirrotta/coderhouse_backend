@@ -1,19 +1,25 @@
 import { Router } from "express";
-import ProductManager from "../Managers/ProductManager.js";
+import socketServer from "../app.js";
 
 const router = Router()
-const pm = new ProductManager("./files/products.json");
+const endpoint = 'http://localhost:8080'
 
-router.get('/', async (req, res) => {
+router.get('/', async  (req, res) => {
     let data = {
-        products: await pm.getProducts()
-    }
-    res.render('home',data);
+        products: [],
+    };
+    data.products = await fetch(endpoint+'/api/products')
+    .then( (response) => response.json());
+    res.render('home', data);
 })
 router.get('/realTimeProducts', async (req, res) => {
+    
     let data = {
-        products: await pm.getProducts()
-    }
-    res.render('realTimeProducts',data);
+        products: [],
+    };
+    data.products = await fetch(endpoint+'/api/products')
+    .then( (response) => response.json());
+    res.render('realTimeProducts', data);
 })
+
 export default router

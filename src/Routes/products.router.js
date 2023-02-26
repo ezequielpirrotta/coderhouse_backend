@@ -6,16 +6,12 @@ const router = Router()
 
 router.get('/', async (req, res) => {
     try {
-        //console.log(req.app.get("socket"))
         let {limit} = req.query
         let products = await pm.getProducts();
         if(limit !== undefined) {
             limit = parseInt(limit);
             products = limit > 0? products.slice(0, limit) : []; 
         }
-        req.app.get('socket').emit('products', data => {
-            
-        })
         res.status(200).send(products);
     }
     catch(e) {
@@ -47,7 +43,7 @@ router.get('/:pid', async (req, res) => {
 router.post('/', async (req, res) => {
     let product = req.body;
     try {
-        await pm.addProduct(
+        product = await pm.addProduct(
             product.title,
             product.description,
             product.price,
@@ -56,7 +52,11 @@ router.post('/', async (req, res) => {
             product.category,
             product.thumbnail
         )
-        res.status(200).send(product);
+        res.status(200).send({
+            status: 'OK',
+            message: "Producto creado correctamente",
+            data: product
+        });
     }
     catch (e) {
         res.status(409).send({
@@ -70,13 +70,16 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     let id = req.params.id
+    console.log(req.body)
     let new_product = {
         id: id,
         field: req.body.field,
         newValue: req.body.newValue
     }
+    console.log(new_product)
     try {
-        await pm.updateProduct(new_product)
+        let result = await pm.updateProduct(new_product)
+        console.log(result)
         res.status(200).send({
             status: 'OK',
             message: "Producto actualizado correctamente",
@@ -84,9 +87,10 @@ router.put('/:id', async (req, res) => {
         })
     }
     catch(e) {
-
-        res.status(200).send({
-            message: "Producto actualizado correctamente",
+        res.status(e.code).send({
+            status: 'WRONG',
+            message: e.message,
+            detail: e.detail,
             data: new_product
         })
     }
