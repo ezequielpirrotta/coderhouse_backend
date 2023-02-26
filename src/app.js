@@ -28,7 +28,7 @@ const socketServer = new Server(httpServer);
 app.set("socket", socketServer);
 
 socketServer.on("connection",socket  => {
-
+    console.log(`Cliente ${socket.id} conectado!!`)
     socket.on("event_update_product", async (data) => {
         let change = {
             field: data.field,

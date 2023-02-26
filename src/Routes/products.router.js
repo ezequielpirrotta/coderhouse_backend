@@ -1,6 +1,6 @@
 import { Router } from "express";
 import ProductManager from "../Managers/ProductManager.js";
-
+import socketServer from "../app.js";
 const pm = new ProductManager("./files/products.json");
 const router = Router()
 
@@ -52,6 +52,7 @@ router.post('/', async (req, res) => {
             product.category,
             product.thumbnail
         )
+        socketServer.emit("event_product_created", product)
         res.status(200).send({
             status: 'OK',
             message: "Producto creado correctamente",
@@ -79,7 +80,7 @@ router.put('/:id', async (req, res) => {
     console.log(new_product)
     try {
         let result = await pm.updateProduct(new_product)
-        console.log(result)
+        socketServer.emit("event_product_updated", result)
         res.status(200).send({
             status: 'OK',
             message: "Producto actualizado correctamente",
@@ -101,6 +102,7 @@ router.delete('/:id', async (req, res) => {
     try {
         id = parseInt(id)
         await pm.deleteProduct(id);
+        socketServer.emit("event_product_deleted", id)
         res.status(200).send({
             status: 'OK',
             message: "Producto eliminado correctamente",

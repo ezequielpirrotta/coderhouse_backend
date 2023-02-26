@@ -89,7 +89,6 @@ class ProductManager {
     }
     updateProduct = async (data) => {
         try {
-            //data = JSON.parse(data)
             let products = await this.getProducts();
             if(data.id && data.field && data.field !== 'id') {
                 data.id = parseInt(data.id)
@@ -138,6 +137,7 @@ class ProductManager {
                     else {
                         this.#fileSystem.writeFileSync(this.#filePath, JSON.stringify(products));
                         if (!this.#fileSystem.existsSync(this.#filePath)) throw Error("No se pudo escribir el archivo")
+                        return {id}
                     }
                 }
                 else {
