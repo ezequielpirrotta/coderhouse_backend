@@ -1,6 +1,6 @@
 import fs  from 'fs' // tener el campo "type":"module", en el package.json para correcto funcionamiento
 import path from 'path';
-import Product from './Product.js';
+import Product from '../models/Product.js';
 
 class ProductManager {
     #dirPath;
@@ -78,7 +78,7 @@ class ProductManager {
             }
             products.push({id: id, ...newProduct});
             await this.#fileSystem.promises.writeFile(this.#filePath, JSON.stringify(products));
-            return true;
+            return {id: id, ...newProduct};
         } catch (error) {
             throw {
                 message: `Error creando producto nuevo: ${newProduct.title}`,
@@ -91,7 +91,9 @@ class ProductManager {
         try {
             let products = await this.getProducts();
             if(data.id && data.field && data.field !== 'id') {
+                data.id = parseInt(data.id)
                 if(products.find(element => element.id === data.id)) {
+                    
                     let index = products.findIndex(element => element.id === data.id) >= 0? products.findIndex(element => element.id === data.id) : null;
                     let result = index !== -1? products[index][data.field] = data.newValue : null;
                     if(result){
@@ -104,13 +106,20 @@ class ProductManager {
                         throw Error("No se pudo cambiar el valor.")
                     } 
                 }
+                else {
+                    throw Error("No se encontró el producto.")
+                }
             }
             else {
-                return false;
+                throw Error("Error en datos enviados.")
             }
         }
         catch (error) {
-            throw Error(`Error actualizando producto, detalle del error: ${error}`);
+            throw {
+                code: 404,
+                message: "Error actualizando producto.",
+                detail: `${error.message}`
+            } 
         }
     }
     deleteProduct = async (id) =>{
@@ -128,6 +137,7 @@ class ProductManager {
                     else {
                         this.#fileSystem.writeFileSync(this.#filePath, JSON.stringify(products));
                         if (!this.#fileSystem.existsSync(this.#filePath)) throw Error("No se pudo escribir el archivo")
+                        return {id}
                     }
                 }
                 else {

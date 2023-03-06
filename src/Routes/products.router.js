@@ -1,6 +1,6 @@
 import { Router } from "express";
-import ProductManager from "../ProductManager.js";
-
+import ProductManager from "../Managers/ProductManager.js";
+import socketServer from "../app.js";
 const pm = new ProductManager("./files/products.json");
 const router = Router()
 
@@ -43,7 +43,7 @@ router.get('/:pid', async (req, res) => {
 router.post('/', async (req, res) => {
     let product = req.body;
     try {
-        await pm.addProduct(
+        product = await pm.addProduct(
             product.title,
             product.description,
             product.price,
@@ -52,7 +52,12 @@ router.post('/', async (req, res) => {
             product.category,
             product.thumbnail
         )
-        res.status(200).send(product);
+        socketServer.emit("event_product_created", product)
+        res.status(200).send({
+            status: 'OK',
+            message: "Producto creado correctamente",
+            data: product
+        });
     }
     catch (e) {
         res.status(409).send({
@@ -66,13 +71,16 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     let id = req.params.id
+    console.log(req.body)
     let new_product = {
         id: id,
         field: req.body.field,
         newValue: req.body.newValue
     }
+    console.log(new_product)
     try {
-        await pm.updateProduct(new_product)
+        let result = await pm.updateProduct(new_product)
+        socketServer.emit("event_product_updated", result)
         res.status(200).send({
             status: 'OK',
             message: "Producto actualizado correctamente",
@@ -80,9 +88,10 @@ router.put('/:id', async (req, res) => {
         })
     }
     catch(e) {
-
-        res.status(200).send({
-            message: "Producto actualizado correctamente",
+        res.status(e.code).send({
+            status: 'WRONG',
+            message: e.message,
+            detail: e.detail,
             data: new_product
         })
     }
@@ -93,6 +102,7 @@ router.delete('/:id', async (req, res) => {
     try {
         id = parseInt(id)
         await pm.deleteProduct(id);
+        socketServer.emit("event_product_deleted", id)
         res.status(200).send({
             status: 'OK',
             message: "Producto eliminado correctamente",
