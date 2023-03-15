@@ -93,7 +93,8 @@ btnUpdate.addEventListener("click", async () => {
     let options = {}; 
     for(let i=0; i < products.length;i++) {
         let id = products[i].id;
-        options[id] = id 
+        let title = document.getElementById("title_"+products[i].id).innerHTML
+        options[id] = title
     }
     const { value: id } = await Swal.fire({
         title: 'Select an ID',
@@ -140,14 +141,12 @@ btnUpdate.addEventListener("click", async () => {
         inputValidator: (value) =>{
             if (!value){
                 return "Debes ingresar un valor."
-            } else{
-                socketServer.emit("userConnected", {user: value});
             }
         }
     })
     if (newValue && field && id) {
         const data = {
-            id: parseInt(id),
+            id: id,
             field: field,
             newValue: newValue
         }
@@ -158,7 +157,8 @@ btnDelete.addEventListener("click", async () => {
     let options = {}; 
     for(let i=0; i < products.length;i++) {
         let id = products[i].id;
-        options[id] = id 
+        let title = document.getElementById("title_"+products[i].id).innerHTML
+        options[id] = title 
     }
     const { value: id } = await Swal.fire({
         title: 'Select an ID',
@@ -184,12 +184,13 @@ btnDelete.addEventListener("click", async () => {
     }
 })
 socketServer.on("event_product_updated", data => {
-    
-    let fieldToUpdate= document.getElementById(`${data.field}_${data.id}`)
+    let fieldToUpdate= document.getElementById(`${data.fieldUpdated}_${data._id}`)
     fieldToUpdate.innerHTML = data.newValue;
     Swal.fire({
-        title: `Producto ${data.id} actualizado`,
+        title: `Producto ${data._id} actualizado`,
         toast: true,
+        timer: 2500,
+        timerProgressBar: true,
         position: 'top-end',
         color: '#716add'
     })
@@ -208,6 +209,8 @@ socketServer.on("event_product_deleted", data => {
     Swal.fire({
         title: `Producto ${data.id} eliminado`,
         toast: true,
+        timer: 2500,
+        timerProgressBar: true,
         position: 'top-end',
         color: '#716add'
     })
@@ -222,33 +225,35 @@ socketServer.on("event_product_created", data => {
     let fieldToUpdate= document.getElementById("products")
     const newProductDiv = document.createElement("div")
     newProductDiv.innerHTML = `
-        <div id=${data.id} key = ${data.id} class="product"> 
+        <div id=${data._id} key = ${data._id} class="product"> 
             <div class="card" width= "18rem" >
                 <img src=${data.thumbnail} class="card-img-top img-fluid btn" alt=${data.title} />
                 <div class="card-body">
-                    <h5 id="title_${data.id}" class="card-title">${data.title}</h5>
-                    <label for="price_${data.id}">Precio: $</label>
-                    <p id="price_${data.id}" class="card-text">${data.price}</p>
-                    <label for="stock_${data.id}">Stock:</label>
-                    <p id="stock_${data.id}" class="card-text">${data.stock}</p>
-                    <label for="description_${data.id}">Descripción</label>
-                    <p id="description_${data.id}" class="card-text">${data.description}</p> 
+                    <h5 id="title_${data._id}" class="card-title">${data.title}</h5>
+                    <label for="price_${data._id}">Precio: $</label>
+                    <p id="price_${data._id}" class="card-text">${data.price}</p>
+                    <label for="stock_${data._id}">Stock:</label>
+                    <p id="stock_${data._id}" class="card-text">${data.stock}</p>
+                    <label for="description_${data._id}">Descripción</label>
+                    <p id="description_${data._id}" class="card-text">${data.description}</p> 
                 </div>
             </div>
         </div>
     ` 
     fieldToUpdate.appendChild(newProductDiv);
     Swal.fire({
-        title: `Producto ${data.id} creado exitosamente`,
+        title: `Producto ${data._id} creado exitosamente`,
         toast: true,
+        timer: 2500,
+        timerProgressBar: true,
         position: 'top-end',
         color: '#716add'
     })
 })
-socketServer.on("event_creating_error", data => {
+socketServer.on("event_creating_error", error => {
     Swal.fire({
-        title: `Error en la creación del producto ${data.id}`,
-        text: data.e
+        icon: 'error',
+        title: `Error en la creación del producto`,
+        text: 'Detalle de error: '+error.message
     })
 })
-//socketServer.emit('event_get_products', products)

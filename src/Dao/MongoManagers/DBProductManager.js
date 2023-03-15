@@ -52,17 +52,20 @@ class DBProductManager {
         } catch (error) {
             throw {
                 message: `Error creando producto nuevo: ${newProduct.title}`,
-                detail: `Detalle del error: ${error.message}`
+                detail: `Detalle del error: ${error.message}`,
+                data: newProduct
             };
         }
        
     }
     updateProduct = async (pid, data) => {
         try {
-            
-            let result = await productModel.updateOne({_id: pid}, data);
+            let productUpdated = {}
+            productUpdated[data.field] = data.newValue;
+            let result = await productModel.updateOne({_id: pid}, {...productUpdated});
             if(result.modifiedCount > 0){
-                return await this.getProductById(pid);
+                let product = await this.getProductById(pid);
+                return {fieldUpdated: data.field, newValue: data.newValue, ...product._doc};
             }
             else {
                 throw Error("El valor elegido es el mismo al que intenta cambiar, intente con uno diferente.")
@@ -73,7 +76,8 @@ class DBProductManager {
             throw {
                 code: 409,
                 message: "Error actualizando producto.",
-                detail: error.message
+                detail: error.message,
+                data: {id: pid, ...data}
             } 
         }
     }

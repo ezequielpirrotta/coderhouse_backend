@@ -17,7 +17,7 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:pid', async (req, res, next) => {
     try {
-        let id = parseInt(req.params.id);
+        let id = req.params.id;
         let product = await dbPm.getProductById(id);
         res.status(200).send(product);
     }
@@ -31,7 +31,9 @@ router.post('/', async (req, res, next) => {
     
     try {
         product = await dbPm.addProduct(product.title, product.description, product.price, product.code, product.stock, product.category, product.thumbnail)
-        socketServer.emit("event_product_created", ...product)
+        if(!req.body.front) {
+            socketServer.emit("event_product_created", {...product})
+        }
         res.status(200).send({
             status: 'OK',
             message: "Producto creado correctamente",
@@ -52,6 +54,7 @@ router.put('/:id', async (req, res, next) => {
         res.status(200).send({
             status: 'OK',
             message: "Producto actualizado correctamente",
+            data: result
         })
     }
     catch(error) {
