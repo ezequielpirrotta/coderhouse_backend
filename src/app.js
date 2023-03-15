@@ -5,7 +5,21 @@ import carts_router from "./Routes/carts.router.js";
 import views_router from "./Routes/view.router.js";
 import __dirname from "./util.js";
 import {Server} from 'socket.io'
+import mongoose from "mongoose";
 
+const connectToMongoDB = async () => {
+    try {
+        await mongoose.connect("mongodb+srv://ezequielpdesarrollo:DhLxBaXZaUYdyqwP@e-commerce.uelsobh.mongodb.net/e-commerce?retryWrites=true&w=majority");
+    }
+    catch(error){
+        throw {
+            code: 404,
+            message: "Error encontrando/creando la base de datos.",
+            detail: `${error.message}`
+        }
+    }
+}
+connectToMongoDB();
 const endpoint = 'http://localhost:8080'
 const SERVER_PORT = 8080;
 const app = Express()
@@ -19,13 +33,27 @@ app.engine('handlebars', handlebars.engine())
 app.set('views',__dirname + '/views');
 app.set('view engine', 'handlebars');
 
+const error_middleware = (error, req, res, next) => {
+    let code = error.code? error.code : 400;
+    res.status(code).send({
+        status: 'WRONG',
+        message: error.message,
+        detail: error.detail,
+        data: error.data
+    })
+    next()
+}
+
 app.use('/', views_router);
 app.use('/api/products', product_router);
 app.use('/api/carts', carts_router);
+product_router.use(error_middleware);
+carts_router.use(error_middleware);
 
 const httpServer = app.listen(SERVER_PORT);
 const socketServer = new Server(httpServer);
 app.set("socket", socketServer);
+
 
 socketServer.on("connection",socket  => {
     console.log(`Cliente ${socket.id} conectado!!`)
@@ -83,11 +111,8 @@ socketServer.on("connection",socket  => {
             socketServer.emit("event_creating_error", {id: data.id, e: result.detail})
         }
         else {
-            socketServer.emit("event_product_created", {id: data.id, ...result.data})
+            socketServer.emit("event_product_created", {id: data.id, ...result})
         }
     })
 })
 export default socketServer;
-/*const error_middleware = (req, res, next) => {
-    next()
-}*/

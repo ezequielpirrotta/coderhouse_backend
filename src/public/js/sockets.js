@@ -86,7 +86,7 @@ btnCreate.addEventListener("click", async () => {
             category: category,
             thumbnail: thumbnail
         }
-        socketServer.emit('event_create_product', product);
+        socketServer.emit('event_create_product', {...product});
     }
 })
 btnUpdate.addEventListener("click", async () => {
@@ -178,7 +178,7 @@ btnDelete.addEventListener("click", async () => {
     })
     if (id) {
         const data = {
-            id: parseInt(id),
+            id: id,
         }
         socketServer.emit('event_delete_product', data);
     }
@@ -219,7 +219,6 @@ socketServer.on("event_deleting_error", data => {
     })
 })
 socketServer.on("event_product_created", data => {
-    console.log(data)
     let fieldToUpdate= document.getElementById("products")
     const newProductDiv = document.createElement("div")
     newProductDiv.innerHTML = `

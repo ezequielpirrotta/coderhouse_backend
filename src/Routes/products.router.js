@@ -1,123 +1,78 @@
 import { Router } from "express";
-import ProductManager from "../Managers/ProductManager.js";
+import DBProductManager from "../Dao/MongoManagers/DBProductManager.js";
 import socketServer from "../app.js";
-const pm = new ProductManager("./files/products.json");
+const dbPm = new DBProductManager();
 const router = Router()
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
         let {limit} = req.query
-        let products = await pm.getProducts();
-        if(limit !== undefined) {
-            limit = parseInt(limit);
-            products = limit > 0? products.slice(0, limit) : []; 
-        }
+        let products = await dbPm.getProducts(limit); 
         res.status(200).send(products);
     }
-    catch(e) {
-        res.status(404).send({
-            status: 'WRONG',
-            code: 409,
-            message: e.message,
-            detail: e.detail
-        });
+    catch(error) {
+        next(error)
     }
 })
 
-router.get('/:pid', async (req, res) => {
+router.get('/:pid', async (req, res, next) => {
     try {
         let id = parseInt(req.params.id);
-        let product = await pm.getProductById(id);
+        let product = await dbPm.getProductById(id);
         res.status(200).send(product);
     }
-    catch(e) {
-        res.status(404).send({
-            status: 'WRONG',
-            code: e.code,
-            message: e.message,
-            detail: e.detail
-        });
+    catch(error) {
+        next(error)
     }
 })
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
     let product = req.body;
+    
     try {
-        product = await pm.addProduct(
-            product.title,
-            product.description,
-            product.price,
-            product.code,
-            product.stock,
-            product.category,
-            product.thumbnail
-        )
-        socketServer.emit("event_product_created", product)
+        product = await dbPm.addProduct(product.title, product.description, product.price, product.code, product.stock, product.category, product.thumbnail)
+        socketServer.emit("event_product_created", ...product)
         res.status(200).send({
             status: 'OK',
             message: "Producto creado correctamente",
             data: product
         });
     }
-    catch (e) {
-        res.status(409).send({
-            status: 'WRONG',
-            code: 409,
-            message: e.message,
-            detail: e.detail
-        });
+    catch(error) {
+        next(error);
     }
 })
 
-router.put('/:id', async (req, res) => {
-    let id = req.params.id
-    console.log(req.body)
-    let new_product = {
-        id: id,
-        field: req.body.field,
-        newValue: req.body.newValue
-    }
-    console.log(new_product)
+router.put('/:id', async (req, res, next) => {
+    let {id} = req.params
+    
     try {
-        let result = await pm.updateProduct(new_product)
+        let result = await dbPm.updateProduct(id, req.body)
         socketServer.emit("event_product_updated", result)
         res.status(200).send({
             status: 'OK',
             message: "Producto actualizado correctamente",
-            data: new_product
         })
     }
-    catch(e) {
-        res.status(e.code).send({
-            status: 'WRONG',
-            message: e.message,
-            detail: e.detail,
-            data: new_product
-        })
+    catch(error) {
+        next(error)
     }
 })
 
-router.delete('/:id', async (req, res) => {
-    let id = req.params.id;
+router.delete('/:id', async (req, res, next) => {
+    let {id} = req.params;
     try {
-        id = parseInt(id)
-        await pm.deleteProduct(id);
-        socketServer.emit("event_product_deleted", id)
+        await dbPm.deleteProduct(id)
+        socketServer.emit("event_product_deleted", {id: id})
         res.status(200).send({
             status: 'OK',
             message: "Producto eliminado correctamente",
             data: {id: id}
         })
     }
-    catch (e) {
-        res.status(409).send({
-            status: 'WRONG',
-            message: e.message,
-            detail: e.detail,
-            data: {id: id}
-        })
+    catch(error) {
+        next(error)
     }
-
 })
 
 export default router
