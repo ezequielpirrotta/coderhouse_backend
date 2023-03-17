@@ -1,17 +1,17 @@
 <div id="main" class="container-fluid justify-content-center">
     <div id="products" class="row justify-content-center">
         {{#each products}}
-            <div id={{this.id}} key = {{this.id}} class="product"> 
+            <div key={{this._id}} id={{this._id}}  class="product"> 
                 <div class="card" width= "18rem" >
                     <img src={{this.thumbnail}} class="card-img-top img-fluid btn" alt={{this.title}} />
                     <div class="card-body">
-                        <h5 id="title_{{this.id}}" class="card-title">{{this.title}}</h5>
-                        <label for="price_{{this.id}}">Precio: $</label>
-                        <p id="price_{{this.id}}" class="card-text">{{this.price}}</p>
-                        <label for="stock_{{this.id}}">Stock:</label>
-                        <p id="stock_{{this.id}}" class="card-text">{{this.stock}}</p>
-                        <label for="description_{{this.id}}">Descripción</label>
-                        <p id="description_{{this.id}}" class="card-text">{{this.description}}</p> 
+                        <h5 id="title_{{this._id}}" class="card-title">{{this.title}}</h5>
+                        <label for="price_{{this._id}}">Precio: $</label>
+                        <p id="price_{{this._id}}" class="card-text">{{this.price}}</p>
+                        <label for="stock_{{this._id}}">Stock:</label>
+                        <p id="stock_{{this._id}}" class="card-text">{{this.stock}}</p>
+                        <label for="description_{{this._id}}">Descripción</label>
+                        <p id="description_{{this._id}}" class="card-text">{{this.description}}</p> 
                     </div>
                 </div>
             </div>
