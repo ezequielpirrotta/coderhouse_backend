@@ -21,5 +21,8 @@ router.get('/realTimeProducts', async (req, res) => {
     .then( (response) => response.json());
     res.render('realTimeProducts', data);
 })
+router.get("/message", (req, res)=>{
+    res.render("messages");
+});
 
 export default router

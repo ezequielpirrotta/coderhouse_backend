@@ -10,7 +10,7 @@ const cartSchema = new mongoose.Schema({
                 type: String,
                 require: [true, "El id de producto es requerido."]
             },
-            quantity: Number
+            quantity: Number 
         }],
         require: [true, "El carrito es requerido."]
     },

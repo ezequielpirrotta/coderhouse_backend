@@ -1,8 +1,9 @@
 import Express from "express";
 import handlebars from 'express-handlebars';
-import product_router from "./Routes/products.router.js";
-import carts_router from "./Routes/carts.router.js";
-import views_router from "./Routes/view.router.js";
+import productRouter from "./Routes/products.router.js";
+import cartsRouter from "./Routes/carts.router.js";
+import viewsRouter from "./Routes/view.router.js";
+import messagesRouter from "./Routes/messages.router"
 import __dirname from "./util.js";
 import {Server} from 'socket.io'
 import mongoose from "mongoose";
@@ -36,11 +37,14 @@ app.engine('handlebars', handlebars.engine())
 app.set('views',__dirname + '/views');
 app.set('view engine', 'handlebars');
 /*** Routers ***/
-app.use('/', views_router);
-app.use('/api/products', product_router);
-app.use('/api/carts', carts_router);
-product_router.use(error_middleware);
-carts_router.use(error_middleware);
+app.use('/', viewsRouter);
+app.use('/api/products', productRouter);
+app.use('/api/carts', cartsRouter);
+app.use('/api/messages', messagesRouter)
+/*** Uso de Middlewares ***/
+productRouter.use(error_middleware);
+cartsRouter.use(error_middleware);
+messagesRouter.use(error_middleware);
 /*** Server ***/
 const httpServer = app.listen(SERVER_PORT);
 const socketServer = new Server(httpServer);
@@ -49,6 +53,7 @@ app.set("socket", socketServer);
 
 socketServer.on("connection",socket  => {
     console.log(`Cliente ${socket.id} conectado!!`)
+    /* Eventos de Products */
     socket.on("event_update_product", async (data) => {
         let change = {
             field: data.field,
@@ -107,5 +112,32 @@ socketServer.on("connection",socket  => {
             socketServer.emit("event_product_created", {...result.data})
         }
     })
+    /* Eventos de Messages */
+    socket.on("message", async (data) => {
+        let requestData = {
+            method:"POST",
+            body: JSON.stringify(data),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            }
+        }
+        let request = new Request(endpoint+'/api/products/', requestData) 
+        let result = await fetch(request)
+        .then( (response) => response.json());
+        if(result.status === "WRONG") {
+            socketServer.emit("event_creating_error", result)
+        }
+        else {
+            socketServer.emit("event_messageLogs", {...result.data})
+        }
+        messages.push(data);
+        console.log(data);
+        io.emit("messageLogs", messages);
+    });
+    //Parte 2
+    socket.on('userConnected', data => {
+        console.log("User connected: " + data.user);
+        socket.broadcast.emit("userConnected", data.user);
+    });
 })
 export default socketServer;
