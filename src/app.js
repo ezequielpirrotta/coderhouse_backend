@@ -23,7 +23,7 @@ const connectToMongoDB = async () => {
 }
 connectToMongoDB();
 
-const endpoint = 'http://localhost:8080'
+export const endpoint = 'http://localhost:8080';
 const SERVER_PORT = 8080;
 const app = Express()
 
@@ -45,7 +45,6 @@ carts_router.use(error_middleware);
 const httpServer = app.listen(SERVER_PORT);
 const socketServer = new Server(httpServer);
 app.set("socket", socketServer);
-
 
 socketServer.on("connection",socket  => {
     console.log(`Cliente ${socket.id} conectado!!`)

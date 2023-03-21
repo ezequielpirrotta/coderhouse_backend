@@ -1,5 +1,6 @@
 import { cartModel } from "../models/cart.model.js";
 import DBProductManager from "./DBProductManager.js";
+import mongoose from "mongoose";
 const dbPm = new DBProductManager;
 class DBCartManager {
     
@@ -21,7 +22,7 @@ class DBCartManager {
         }
     }
      
-    getCartById = async (id) => {
+    getCartById =  async (id) => {
         try {
             let cart = await cartModel.findById(id)
             if(cart) {
@@ -34,48 +35,108 @@ class DBCartManager {
         catch (error) {
             throw {
                 code: 404,
-                message: `Error getting product with ID: ${id}.`,
+                message: `Error getting Cart with ID: ${id}.`,
                 detail: error.message
             };
         }
     }
     addCart = async (products) => {
-        let newCart = {products: products};
+        let newCart = {wasPurchased: false};
         try {
-            let result = await cartModel.create(newCart);
-            if(result) {
-                return {id: result._id, ...newCart};
+            let cart = await cartModel.create(newCart);
+            if(cart){ 
+                for (const key in products) {
+                    let newProduct = products[key].quantity? {product: products[key].id, quantity: products[key].quantity}:{product: products[key].id};
+                    cart.products.push(newProduct);
+                }
+                let result = await cart.updateOne(cart);
+                if(result.modifiedCount > 0) {
+                    return await this.getCartById(cart._id);
+                }
             }
             else {
                 throw {
                     code: 404,
-                    message: "No se encuentra el carrito creado."
+                    message: "Couldn't find the created cart."
                 }
             }
         } catch (error) {
             throw {
                 code: error.code? error.code : 400,
-                message: "Error creando carrito nuevo",
-                detail: `Detalle del error: ${error.message}`
+                message: "Error creating new cart",
+                detail: error.message
             };
         }
        
     }
-    addToCart = async (cid, pid, quantity) => {
+    replaceCart = async (cid, products) => {
+        let productsList = products? products : null;
+        try {
+            if(!cid || !productsList) {
+                throw {
+                    code: 400,
+                    message: 'Missing parameters cid or products'
+                }
+            }
+
+            let cart = await this.getCartById(cid)
+            if(cart.products.length === 0 && productsList.length === 0){
+                throw {
+                    code: 404,
+                    message: "Couldn't update, the cart is already empty!"
+                }
+            }
+            cart.products = []
+            for (const key in productsList) {
+                let newProduct = productsList[key].quantity? {product: productsList[key].id, quantity: productsList[key].quantity}:{product: productsList[key].id};
+                cart.products.push(newProduct); 
+            }
+            
+            let result = await cart.updateOne(cart);
+            if(result.modifiedCount > 0) {
+                let cart = await this.getCartById(cid);
+                if(cart.products.length === 0) {
+                    cart.products = [];
+                    await cart.updateOne(cart);
+                    cart = await this.getCartById(cid);
+                }  
+                return cart;
+            }
+            else {
+                throw {
+                    code: 404,
+                    message: "Couldn't update the cart."
+                }
+            }
+        } catch (error) {
+            throw {
+                code: error.code? error.code : 400,
+                message: "Error replacing cart",
+                detail: error.message
+            };
+        }
+    }
+    updateProduct = async (cid, pid, quantity, newPdt = false) => {
 
         try {
             if(cid === undefined || pid === undefined) {
                 throw {
                     code: 400,
-                    message: `Detalle del error: faltan alguno de los parámetros cid o pid`
+                    message: 'Missing parameters cid or pid'
                 }
             }
             
             if(await dbPm.getProductById(pid)) {
-                let newProduct = {pid: pid, quantity: quantity}
-                let cart = await this.getCartById(cid);
-                cart.products.push(newProduct);
-                let result = await cart.save();
+                let newProduct = {product: pid, quantity: quantity}
+                let cart = await this.getCartById(cid)
+                if(newPdt) {
+                    cart.products.push(newProduct);
+                }
+                else {
+                    pid = new mongoose.Types.ObjectId(pid)
+                    cart.products.find(element => element.product._id.equals(pid)).quantity = quantity;
+                }
+                let result = await cart.updateOne(cart);
                 if(result) {
                     return await this.getCartById(cid);
                 }
@@ -90,6 +151,87 @@ class DBCartManager {
                 message: 'Error al agregar al carrito.',
                 detail: error.message
             } 
+        }
+    }
+    deleteProductFromCart = async (cid, pid=null, all=false) => {
+        try {
+            if(cid||pid) {
+                let newProductsList = [];
+                if(!all&&pid) {
+                    pid = new mongoose.Types.ObjectId(pid)
+                    newProductsList = (await this.getCartById(cid)).products.filter(element => !element.product.equals(pid));
+                }
+                let result = await this.replaceCart(cid, newProductsList);
+                if(result) {
+                    return true;
+                }
+                else {
+                    let cart = await this.getCartById(cid)
+                    if(cart) {
+                        if(cart.products.length > 0) {
+                            throw Error("No se pudo borrar el carrito.")
+                        } 
+                    }
+                    else {
+                        throw {
+                            code: 404,
+                            detail: "No se encontró el carrito!"
+                        } 
+                    }
+                }
+            }
+            else {
+                throw {
+                    code: 400,
+                    detail: "Valor id vacío"
+                }
+            }
+        }
+        catch (error) {
+            throw {
+                code: error.code,
+                message: error.message? error.message : 'Error eliminando carrito',
+                detail: error.detail? error.detail : error.message 
+            }
+        }
+    }
+    deleteAllProductsFromCart = async (id) => {
+        try {
+            if(id) {
+                let newProductsList = [];
+                let result = await this.replaceCart(cid, newProductsList);
+                if(result) {
+                    return true;
+                }
+                else {
+                    let cart = await this.getCartById(cid)
+                    if(cart) {
+                        if(cart.products.length > 0) {
+
+                            throw Error("No se pudo borrar el carrito.")
+                        } 
+                    }
+                    else {
+                        throw {
+                            code: 404,
+                            detail: "No se encontró el carrito!"
+                        } 
+                    }
+                }
+            }
+            else {
+                throw {
+                    code: 400,
+                    detail: "Valor id vacío"
+                }
+            }
+        }
+        catch (error) {
+            throw {
+                code: error.code,
+                message: error.message? error.message : 'Error eliminando carrito',
+                detail: error.detail? error.detail : error.message 
+            }
         }
     }
     deleteCart = async (id) => {

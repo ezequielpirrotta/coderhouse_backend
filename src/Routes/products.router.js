@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { query, Router } from "express";
 import DBProductManager from "../Dao/MongoManagers/DBProductManager.js";
 import socketServer from "../app.js";
 const dbPm = new DBProductManager();
@@ -6,8 +6,9 @@ const router = Router()
 
 router.get('/', async (req, res, next) => {
     try {
-        let {limit} = req.query
-        let products = await dbPm.getProducts(limit); 
+        console.log(req.query)
+        let products = await dbPm.getProducts(req.query);
+        console.log(products) 
         res.status(200).send(products);
     }
     catch(error) {
@@ -17,8 +18,8 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:pid', async (req, res, next) => {
     try {
-        let id = req.params.id;
-        let product = await dbPm.getProductById(id);
+        let {pid} = req.params;
+        let product = await dbPm.getProductById(pid);
         res.status(200).send(product);
     }
     catch(error) {
@@ -36,7 +37,7 @@ router.post('/', async (req, res, next) => {
         }
         res.status(200).send({
             status: 'OK',
-            message: "Producto creado correctamente",
+            message: "Product created succesfully. ",
             data: product
         });
     }
@@ -53,7 +54,7 @@ router.put('/:id', async (req, res, next) => {
         socketServer.emit("event_product_updated", result)
         res.status(200).send({
             status: 'OK',
-            message: "Producto actualizado correctamente",
+            message: "Product updated succesfully.",
             data: result
         })
     }
@@ -69,7 +70,7 @@ router.delete('/:id', async (req, res, next) => {
         socketServer.emit("event_product_deleted", {id: id})
         res.status(200).send({
             status: 'OK',
-            message: "Producto eliminado correctamente",
+            message: "Product deleted succesfully.",
             data: {id: id}
         })
     }

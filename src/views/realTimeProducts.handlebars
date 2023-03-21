@@ -1,6 +1,6 @@
 <div id="main" class="container-fluid justify-content-center">
     <div id="products" class="row justify-content-center">
-        {{#each products}}
+        {{#each products.payload}}
             <div key={{this._id}} id={{this._id}}  class="product"> 
                 <div class="card" width= "18rem" >
                     <img src={{this.thumbnail}} class="card-img-top img-fluid btn" alt={{this.title}} />

@@ -1,20 +1,38 @@
 import mongoose from "mongoose";
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 const productsCollection = "products"
 
+const stringSchemaUniqueRequired = {
+    type: String,
+    unique: true,
+    require: true
+}
+const stringSchemaNonUniqueRequired = {
+    type: String,
+    require: true
+}
+const stringSchemaIndexedNonUniqueRequired = {
+    type: String,
+    require: true,
+    index: true
+}
 const productSchema = new mongoose.Schema({
-    title: String,
-    description: String,
+    title: stringSchemaNonUniqueRequired,
+    description: stringSchemaNonUniqueRequired,
     price: Number,
-    code: {
-        type: String,
-        unique: true,
-        require: [true, "El código es requerido."]
-    },
-    status: Boolean,
+    code: stringSchemaUniqueRequired,
+    available: Boolean,
     stock: Number,
-    category: String,
-    thumbnail: String
-})
-
-export const productModel = mongoose.model(productsCollection, productSchema)
+    category: {
+        type: String,
+        enum: ["ropa", "comida", "otros"],
+        default: "comida",
+        require: true,
+        index: true
+    },
+    thumbnail: stringSchemaNonUniqueRequired
+});
+productSchema.plugin(mongoosePaginate);
+const productModel = mongoose.model(productsCollection, productSchema)
+export default productModel;

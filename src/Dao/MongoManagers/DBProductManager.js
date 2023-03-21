@@ -1,12 +1,41 @@
-import { productModel } from "../models/product.model.js";
+import productModel from "../models/product.model.js";
 import Product from "../models/Product.js";
+
 class DBProductManager {
     
-    getProducts = async (limit) => {
+    getProducts = async (params) => {
         try {
-            let products = limit? await productModel.find().limit({limit}) : await productModel.find();
-            if(products.length > 0) {
-                return products;
+            let limit =  params.limit? parseInt(params.limit) : 10;
+            let page = params.page? parseInt(params.page) : 1;
+            let category = params.category? params.category : null;
+            let available = params.available? params.available : null;
+            let sort = params.sort? params.sort==='asc'? 1 : params.sort==='desc'? -1 : null : null;
+            let result = null;
+            if(category||available||sort||page||limit) {
+                result = await productModel.paginate(
+                    category||available?
+                        category&&!available?{category: category}:
+                            !category&&available?{available:available}:
+                                {category: category, available: available}
+                    :{},
+                    sort?{price: sort, limit: limit, page: page}:{limit: limit, page: page}
+                );
+            }
+            //console.log(result)
+            if(result.totalDocs > 0) {
+                let response = {
+                    status: "success",
+                    payload: result.docs,
+                    totalPages: result.totalPages,
+                    prevPage: result.prevPage,
+                    nextPage: result.nextPage,
+                    page: result.page,
+                    hasPrevPage: result.hasPrevPage,
+                    hasNextPage: result.hasNextPage,
+                    prevLink: '',
+                    nextLink: ''
+                }
+                return response;
             }
             else {
                 throw Error("Products not found.");
@@ -15,7 +44,7 @@ class DBProductManager {
             throw {
                 code: 404,
                 message: 'Error getting products.',
-                detail: e.message
+                detail: error.message
             };
         }
     }
@@ -39,8 +68,8 @@ class DBProductManager {
         }
     }
     addProduct = async (title, description, price, code, stock, category, thumbnail) => {
-        let status = true;
-        let newProduct = new Product(title, description, price, code, status, stock, category, thumbnail);
+        let available = stock > 0? true : false;
+        let newProduct = new Product(title, description, price, code, available, stock, category, thumbnail);
         try {
             let result = await productModel.create(newProduct);
             if(result) {
@@ -61,10 +90,18 @@ class DBProductManager {
     updateProduct = async (pid, data) => {
         try {
             let productUpdated = {}
-            productUpdated[data.field] = data.newValue;
+            if(data.field === "stock") {
+                productUpdated[data.field] = data.newValue;
+                productUpdated["available"] = data.newValue > 0? true : false;
+            }
+            else {
+                productUpdated[data.field] = data.newValue;
+            }
+            console.log(productUpdated)
             let result = await productModel.updateOne({_id: pid}, {...productUpdated});
             if(result.modifiedCount > 0){
                 let product = await this.getProductById(pid);
+
                 return {fieldUpdated: data.field, newValue: data.newValue, ...product._doc};
             }
             else {
