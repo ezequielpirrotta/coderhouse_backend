@@ -45,9 +45,11 @@ carts_router.use(error_middleware);
 const httpServer = app.listen(SERVER_PORT);
 const socketServer = new Server(httpServer);
 app.set("socket", socketServer);
+app.set("enpoint".endpoint)
 
 socketServer.on("connection",socket  => {
     console.log(`Cliente ${socket.id} conectado!!`)
+    /**Products events */
     socket.on("event_update_product", async (data) => {
         let change = {
             field: data.field,
@@ -104,6 +106,38 @@ socketServer.on("connection",socket  => {
         }
         else {
             socketServer.emit("event_product_created", {...result.data})
+        }
+    })
+    /**Carts events */
+    socket.on("event_add_product_to_cart", async (data) => {
+        let request = {};
+        if(data.isNewCart) {
+            let requestData = {
+                method:"POST",
+                body: JSON.stringify(data.body),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                }
+            }
+            request = new Request(endpoint+'/api/carts', requestData)
+        }
+        else {
+            let requestData = {
+                method:"PUT",
+                body: JSON.stringify(data.body),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                }
+            }
+            request = new Request(endpoint+'/api/carts/'+data.cart_id+'/product', requestData) 
+        } 
+        let result = await fetch(request)
+        .then( (response) => response.json());
+        if(result.status === "WRONG") {
+            socketServer.emit("event_adding_cart_error",{...result})
+        }
+        else {
+            socketServer.emit("event_cart_added", {id: data.cart_id})
         }
     })
 })
