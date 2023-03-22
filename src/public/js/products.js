@@ -1,23 +1,58 @@
 
-const btnAddToCart = document.getElementById("addToCart")
+const btnsAddToCart = document.getElementsByClassName("add_button")
 const btnUpdate = document.getElementById("update")
 const btnDelete = document.getElementById("delete")
 const products = document.getElementsByClassName("product");
 
-btnAddToCart.addEventListener("click", async () => {
-    const { value: quantity } = await Swal.fire({
-        title: 'How old are you?',
-        icon: 'question',
-        input: 'range',
-        inputLabel: 'Camtidad de productos',
-        inputAttributes: {
-          min: 1,
-          max: 120,
-          step: 1
-        },
-        inputValue: 1
-      })
-});
+for(let i=0; i < products.length;i++) {
+    let id = products[i].id;
+    let button = document.getElementById("add_button_"+products[i].id)
+    console.log(button)
+    button.addEventListener("click", async () => {
+
+        console.log("holandaaa ")
+        /*const { value: quantity } = await Swal.fire({
+            title: 'How old are you?',
+            icon: 'question',
+            input: 'range',
+            inputLabel: 'Cantidad de productos',
+            inputAttributes: {
+              min: 1,
+              max: 120,
+              step: 1
+            },
+            inputValue: 1
+        })*/
+        let quantity = 1;
+        //let products = document.getElementById("products")
+        const data = {
+            id: id,
+        }
+        let requestData = {
+            method:"PUT",
+            body: JSON.stringify(product),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            }
+        }
+        let request = new Request(endpoint+'/api/carts/64191c9b2126fbebb493d06e/product'+data.id, requestData) 
+        let result = await fetch(request)
+        .then( (response) => response.json());
+        if(result.status === "WRONG") {
+            Swal.fire({
+                title: `Producto ${data.id} no creado`,
+                description: result.detail
+            })
+        }
+        else {
+            Swal.fire({
+                title: `Producto ${data.id} creado exitosamente`,
+                color: '#716add'
+            })
+        }
+    })
+}
+//btnAddToCart.addEventListener
 btnCreate.addEventListener("click", async () => {
     
     const { value: title } = await Swal.fire({

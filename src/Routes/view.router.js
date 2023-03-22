@@ -23,9 +23,8 @@ router.get('/realTimeProducts', async (req, res) => {
 })
 router.get('/products', async (req, res) => {
     
-    let data = {
-        products: [],
-    };
+    let data = {};
+    let paramsObj = {};
     let params = '';
     if(req.query) {
         
@@ -39,19 +38,38 @@ router.get('/products', async (req, res) => {
     } 
     data.products = await fetch(endpoint+'/api/products'+params)
     .then( (response) => response.json());
-    
-    data.products.prevLink = data.products.hasPrevPage? `${endpoint}/products?page=${data.products.prevPage}`:'';
-
-    data.products.nextLink = data.products.hasNextPage? `${endpoint}/products?page=${data.products.nextPage}`:'';
-    data.pages = []
-    for (let i = 0; i < data.products.totalPages; i++) {
-        data.pages[i] = {
-            page: i+1,
-            isCurrentPage: data.products.page === i+1? true:false,
-            link: `${endpoint}/products?page=${i+1}`
-        };
+    if(data.products.status === "WRONG"){
+        data.founded = false;
+        res.render('products', data);
     }
-    res.render('products', data);
+    else {
+        data.products.prevLink = data.products.hasPrevPage? `${endpoint}/products?page=${data.products.prevPage}`:'';
+
+        data.products.nextLink = data.products.hasNextPage? `${endpoint}/products?page=${data.products.nextPage}`:'';
+        for (const key in req.query) {
+            if(key !== "page"){
+                let result = params.search(key);
+                data.products.prevLink = result >= 0? data.products.prevLink+'&'+key+'='+req.query[key] : data.products.prevLink;
+                data.products.nextLink = result >= 0? data.products.nextLink+'&'+key+'='+req.query[key] : data.products.nextLink;
+            }
+        }
+        data.pages = []
+        for (let i = 0; i < data.products.totalPages; i++) {
+            data.pages[i] = {
+                page: i+1,
+                isCurrentPage: data.products.page === i+1? true:false,
+                link: `${endpoint}/products?page=${i+1}`
+            };
+            for (const key in req.query) {
+                if(key !== "page"){
+                    let result = params.search(key);
+                    data.pages[i].link = result >= 0? data.pages[i].link+'&'+key+'='+req.query[key] : data.pages[i].link; 
+                }
+            }
+        }
+        data.founded = true;
+        res.render('products', data);
+    }
 })
 router.get('/carts/:cid', async (req, res) => {
     let {cid} = req.params;

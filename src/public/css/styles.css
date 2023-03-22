@@ -14,7 +14,9 @@ body {
 a {
     text-align: justify;
 }
-  
+#main {
+    flex-direction: column;
+}
 .main-content {
     text-align: center;
 }

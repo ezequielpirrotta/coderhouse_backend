@@ -6,9 +6,7 @@ const router = Router()
 
 router.get('/', async (req, res, next) => {
     try {
-        console.log(req.query)
-        let products = await dbPm.getProducts(req.query);
-        console.log(products) 
+        let products = await dbPm.getProducts(req.query); 
         res.status(200).send(products);
     }
     catch(error) {

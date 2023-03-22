@@ -10,6 +10,7 @@ class DBProductManager {
             let category = params.category? params.category : null;
             let available = params.available? params.available : null;
             let sort = params.sort? params.sort==='asc'? 1 : params.sort==='desc'? -1 : null : null;
+
             let result = null;
             if(category||available||sort||page||limit) {
                 result = await productModel.paginate(
@@ -21,8 +22,7 @@ class DBProductManager {
                     sort?{price: sort, limit: limit, page: page}:{limit: limit, page: page}
                 );
             }
-            //console.log(result)
-            if(result.totalDocs > 0) {
+            if(result.totalDocs > 0 && result.docs.length > 0) {
                 let response = {
                     status: "success",
                     payload: result.docs,
@@ -97,7 +97,6 @@ class DBProductManager {
             else {
                 productUpdated[data.field] = data.newValue;
             }
-            console.log(productUpdated)
             let result = await productModel.updateOne({_id: pid}, {...productUpdated});
             if(result.modifiedCount > 0){
                 let product = await this.getProductById(pid);
