@@ -25,6 +25,7 @@ class DBCartManager {
     getCartById =  async (id) => {
         try {
             let cart = await cartModel.findById(id)
+            //console.log(cart)
             if(cart) {
                 return cart;
             }

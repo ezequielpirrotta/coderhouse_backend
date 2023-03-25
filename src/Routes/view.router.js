@@ -74,10 +74,11 @@ router.get('/products', async (req, res) => {
 router.get('/carts/:cid', async (req, res) => {
     let {cid} = req.params;
     let data = {
-        products: [],
+        body: [],
     };
-    data.products = await fetch(endpoint+'/api/carts/'+cid)
-    res.render('products', data);
+    console.log(cid)
+    data.body = await fetch(endpoint+'/api/carts/'+cid)
+    res.render('carts', data);
 })
 
 export default router

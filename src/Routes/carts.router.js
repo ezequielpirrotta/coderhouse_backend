@@ -16,8 +16,9 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:cid', async (req, res, next) => {
     try {
-        let id = req.params.cid;
-        let cart = await dbCrt.getCartById(id);
+        let {cid} = req.params;
+        let cart = await dbCrt.getCartById(cid);
+        //console.log(cart)
         res.send(cart);
     }
     catch(error) {
