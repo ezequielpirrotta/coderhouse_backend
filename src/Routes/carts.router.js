@@ -6,8 +6,8 @@ const router = Router()
 
 router.get('/', async (req, res, next) => {
     try {
-        let cart = await dbCrt.getCarts();
-        res.send(cart);
+        let carts = await dbCrt.getCarts();
+        res.send(carts);
     }
     catch(error) {
         next(error)
@@ -18,7 +18,6 @@ router.get('/:cid', async (req, res, next) => {
     try {
         let {cid} = req.params;
         let cart = await dbCrt.getCartById(cid);
-        //console.log(cart)
         res.send(cart);
     }
     catch(error) {

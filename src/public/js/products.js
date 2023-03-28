@@ -3,7 +3,36 @@
 const socketServer = io()
 
 const products = document.getElementsByClassName("product");
+const btn_close_session = document.getElementById("btn_close_session");
+const btn_profile = document.getElementById("btn_profile");
+const btn_login = document.getElementById("btn_login");
 
+if(btn_close_session) {
+
+    btn_close_session.addEventListener("click", async () => {
+        Swal.fire({
+            title: 'Are you sure you want to exit?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: `No`,
+        }).then( async (result) => {
+            if (result.isConfirmed) {
+                window.location.replace('/users/login');
+            }
+        })
+    });
+}
+if(btn_profile) {
+    btn_profile.addEventListener("click", async () => {
+        window.location.replace('/users');    
+    });
+}
+if(btn_login) {
+    btn_login.addEventListener("click", async () => {
+        window.location.replace('/users/login');    
+    });
+}
 for(let i=0; i < products.length;i++) {
     let id = products[i].id;
     let button = document.getElementById("add_button_"+id)

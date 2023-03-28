@@ -1,0 +1,65 @@
+<div class="container-fluid m-2 d-flex justify-content-center">
+    <div class="card d-flex justify-content-center">
+        <h1 class="card-title"> Registro</h1>
+        <div class="shadow-lg card-body bg-body rounded">
+            <form id="registerForm" class="card-body row g-3 justify-content-center needs-validation"> 
+                <div class="mb-3 col-md-4">
+                    <div>
+                        <label htmlFor="first_name" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Paula" required/>
+                        <div class="valid-feedback">
+                            ¡Se ve bien!
+                        </div>
+                        <div class="invalid-feedback">
+                            Este campo es requerido
+                        </div>
+                    </div>
+                    <div>
+
+                        <label htmlFor="last_name" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Fernandez" required/>
+                        <div class="valid-feedback">
+                            ¡Se ve bien!
+                        </div>
+                        <div class="invalid-feedback">
+                            Este campo es requerido
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 col-md-4">
+                    <label htmlFor="username" class="form-label">Email</label>
+                    <input type="username" class="form-control" name="username" id="username" placeholder="someone@gmail.com" required/>
+                    <div class="valid-feedback">
+                        ¡Se ve bien!
+                    </div>
+                    <div class="invalid-feedback">
+                        Este campo es requerido
+                    </div>
+                    <label htmlFor="password" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="*******" required/>
+                    <div class="valid-feedback">
+                        ¡Se ve bien!
+                    </div>
+                    <div class="invalid-feedback">
+                        Este campo es requerido
+                    </div>
+                </div>
+                <div class="mb-3 col-md-4">
+                    <label htmlFor="age" class="form-label">Edad</label>
+                    <input type="number" class="form-control" name="age" id="age" placeholder="Numero entero" required/>
+                    <div class="valid-feedback">
+                        ¡Se ve bien!
+                    </div>
+                    <div class="invalid-feedback">
+                        Este campo es requerido
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Registrarse</button>
+                </div>
+            </form>
+            <p>¿Ya tienes una cuenta? <a href="/users/login">Ingresa aquí</a></p>
+        </div>
+    </div>
+</div>
+<script src="/js/register.js"></script>

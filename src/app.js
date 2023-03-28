@@ -1,17 +1,25 @@
 import Express from "express";
 import handlebars from 'express-handlebars';
-import product_router from "./Routes/products.router.js";
-import carts_router from "./Routes/carts.router.js";
-import views_router from "./Routes/view.router.js";
+import session from 'express-session';
+import productRouter from "./Routes/products.router.js";
+import cartsRouter from "./Routes/carts.router.js";
+import viewsRouter from "./Routes/view.router.js";
+import usersViewRouter from "./Routes/users.views.router.js";
+import sessionsRouter from "./Routes/sessions.router.js";
+import MongoStore from 'connect-mongo';
 import __dirname from "./util.js";
 import {Server} from 'socket.io'
 import mongoose from "mongoose";
 import error_middleware from "./Middlewares/error_handler_middleware.js";
 
+export const endpoint = 'http://localhost:8080';
+const SERVER_PORT = 8080;
+const app = Express()
 /*** DB ***/
+const MONGO_URL = "mongodb+srv://ezequielpdesarrollo:DhLxBaXZaUYdyqwP@e-commerce.uelsobh.mongodb.net/e-commerce?retryWrites=true&w=majority"
 const connectToMongoDB = async () => {
     try {
-        await mongoose.connect("mongodb+srv://ezequielpdesarrollo:DhLxBaXZaUYdyqwP@e-commerce.uelsobh.mongodb.net/e-commerce?retryWrites=true&w=majority");
+        await mongoose.connect(MONGO_URL);
     }
     catch(error){
         throw {
@@ -23,10 +31,20 @@ const connectToMongoDB = async () => {
 }
 connectToMongoDB();
 
-export const endpoint = 'http://localhost:8080';
-const SERVER_PORT = 8080;
-const app = Express()
-
+app.use(session({
+    //ttl: Time to live in seconds,
+    //retries: Reintentos para que el servidor lea el archivo del storage.
+    //path: Ruta a donde se buscará el archivo del session store.
+    //store: new fileStorage({path : "./sessions", retries: 0}),
+    store: MongoStore.create({
+        mongoUrl: MONGO_URL,
+        mongoOptions: {useNewUrlParser: true, useUnifiedTopology: true},
+        ttl: 260
+    }),
+    secret: "coderS3cr3t",
+    resave : false,
+    saveUninitialized: true
+}));
 /**** Utils ***/
 app.use(Express.urlencoded({extended: true}));
 app.use(Express.json());
@@ -36,11 +54,15 @@ app.engine('handlebars', handlebars.engine())
 app.set('views',__dirname + '/views');
 app.set('view engine', 'handlebars');
 /*** Routers ***/
-app.use('/', views_router);
-app.use('/api/products', product_router);
-app.use('/api/carts', carts_router);
-product_router.use(error_middleware);
-carts_router.use(error_middleware);
+app.use('/', viewsRouter);
+app.use('/api/products', productRouter);
+app.use('/api/carts', cartsRouter);
+app.use("/users", usersViewRouter);
+app.use("/api/sessions", sessionsRouter);
+/*** Middlewares y Cookies***/
+productRouter.use(error_middleware);
+cartsRouter.use(error_middleware);
+
 /*** Server ***/
 const httpServer = app.listen(SERVER_PORT);
 const socketServer = new Server(httpServer);
