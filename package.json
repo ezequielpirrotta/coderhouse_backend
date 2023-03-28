@@ -19,8 +19,11 @@
   "homepage": "https://github.com/ezequielpirrotta/coderhouse_backend#readme",
   "dependencies": {
     "bootstrap": "^5.2.3",
+    "connect-mongo": "^5.0.0",
+    "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
     "express-handlebars": "^6.0.7",
+    "express-session": "^1.17.3",
     "mongoose": "^7.0.0",
     "mongoose-paginate-v2": "^1.7.1",
     "multer": "^1.4.5-lts.1",

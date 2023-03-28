@@ -25,12 +25,11 @@ class DBCartManager {
     getCartById =  async (id) => {
         try {
             let cart = await cartModel.findById(id)
-            //console.log(cart)
             if(cart) {
                 return cart;
             }
             else {
-                throw Error("Product not found");
+                throw Error("Cart not found");
             }
         }
         catch (error) {

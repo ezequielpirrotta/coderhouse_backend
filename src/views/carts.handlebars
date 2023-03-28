@@ -1,7 +1,10 @@
 <div id="main" class="container justify-content-center">
-    <p>Cart ID: {{body.payload.id}}</p>
+    <h2>
+        <p>Cart ID: {{cart._id}}</p>
+    </h2>
+    <label for="#products"><h3>Productos</h3></label>
     <div id="products" class="row justify-content-center">
-        {{#each body.payload.products}}
+        {{#each cart.products}}
             <div key={{this.product._id}} id={{this._id}}  class="product col-3"> 
                 <div class="card" width= "18rem" >
                     <img src={{this.product.thumbnail}} class="card-img-top img-fluid btn" alt={{this.product.title}} />
@@ -9,8 +12,8 @@
                         <h5 id="title_{{this.product._id}}" class="card-title">{{this.product.title}}</h5>
                         <label for="price_{{this.product._id}}">Precio: $</label>
                         <p id="price_{{this.product._id}}" class="card-text">{{this.product.price}}</p>
-                        <label for="stock_{{this.product._id}}">Stock:</label>
-                        <p id="stock_{{this.product._id}}" class="card-text">{{this.product.stock}}</p>
+                        <label for="quantity_{{this.product._id}}">Cantidad:</label>
+                        <p id="quantity_{{this.product._id}}" class="card-text">{{this.quantity}}</p>
                         <label for="description_{{this.product._id}}">Descripción</label>
                         <p id="description_{{this.product._id}}" class="card-text">{{this.product.description}}</p> 
                     </div>

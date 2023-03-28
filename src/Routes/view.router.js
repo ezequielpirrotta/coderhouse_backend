@@ -1,10 +1,26 @@
 import { Router } from "express";
-import socketServer from "../app.js";
+//import socketServer from "../app.js";
 import { endpoint } from "../app.js";
+import cookieParser from "cookie-parser";
+import session from "express-session";
 
 const router = Router()
 
-router.get('/', async  (req, res) => {
+router.use(cookieParser())
+router.get('/setCookie', (req, res) => {
+    res.cookie('idSesion', 'dg65d4fgsd6f5g',{maxAge: 30000}).send('Cookie')
+})
+router.get('/getCookie', (req, res) => {
+    res.send(req.cookies)
+})
+router.use(session({
+    secret: "codigoSecreto",
+    resave:true
+}))
+router.get('/', async (req, res) => {
+    res.render("login");
+})
+router.get('/staticProducts', async  (req, res) => {
     let data = {
         products: [],
     };
@@ -22,9 +38,11 @@ router.get('/realTimeProducts', async (req, res) => {
     res.render('realTimeProducts', data);
 })
 router.get('/products', async (req, res) => {
-    
-    let data = {};
-    let paramsObj = {};
+    let data = {
+        user: req.session.user,
+        linkLogin: endpoint+"/users/login",
+        linkProfile: endpoint+"/users"
+    };
     let params = '';
     if(req.query) {
         
@@ -74,10 +92,10 @@ router.get('/products', async (req, res) => {
 router.get('/carts/:cid', async (req, res) => {
     let {cid} = req.params;
     let data = {
-        body: [],
+        cart: [],
     };
-    console.log(cid)
-    data.body = await fetch(endpoint+'/api/carts/'+cid)
+    data.cart = await fetch(endpoint+'/api/carts/'+cid)
+    .then( (response) => response.json())
     res.render('carts', data);
 })
 
