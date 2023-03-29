@@ -40,9 +40,8 @@ router.get('/realTimeProducts', async (req, res) => {
 router.get('/products', async (req, res) => {
     let data = {
         user: req.session.user,
-        linkLogin: endpoint+"/users/login",
-        linkProfile: endpoint+"/users"
     };
+    data.user
     let params = '';
     if(req.query) {
         

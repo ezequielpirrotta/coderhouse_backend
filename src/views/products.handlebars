@@ -54,7 +54,7 @@
                 {{/if}}
             </ul>
         </nav>
-       
+         
         <div id="products" class="row justify-content-center">
             {{#each products.payload}}
                 <div key={{this._id}} id={{this._id}}  class="product col-3"> 
@@ -67,8 +67,14 @@
                             <label for="stock_{{this._id}}">Stock:</label>
                             <p id="stock_{{this._id}}" class="card-text">{{this.stock}}</p>
                             <label for="description_{{this._id}}">Descripción</label>
-                            <p id="description_{{this._id}}" class="card-text">{{this.description}}</p> 
-                            <button id="add_button_{{this._id}}" class="btn btn-primary add_button">Añadir a carrito</button>
+                            <p id="description_{{this._id}}" class="card-text">{{this.description}}</p>
+                            {{#if ../user}}
+                                <button id="add_button_{{this._id}}" class="btn btn-primary add_button">Añadir a carrito</button>
+                            {{else}}
+                                <p>messi</p>
+                                <button id="logedout_add_button_{{this._id}}" class="btn btn-primary add_button">Añadir a carrito</button>
+                            {{/if}}
+
                         </div>
                     </div>
                 </div>

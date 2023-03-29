@@ -47,11 +47,12 @@ router.post("/login", async (req, res)=>{
     res.send({status:"success",code: 200, payload:req.session.user, message:"¡Primer logueo realizado! :)" });
 });
 router.get("/logout", (req, res) => {
+    let user = req.session.user;
     req.session.destroy(error => {
         if (error){
-            res.json({error: "error logout", messagee: "Error al cerrar la sesion"});
+            res.json({error: "error logout",code: 400, message: "Error al cerrar la sesion"});
         }
-        res.send({status:"success",code: 200, payload:req.session.user, message:"Sesion cerrada correctamente!" });
+        res.send({status:"success",code: 200, payload: user, message:"Sesion cerrada correctamente!" });
     });
 });
 export default router;
