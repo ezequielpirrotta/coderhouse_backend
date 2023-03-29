@@ -71,7 +71,7 @@ app.set("enpoint".endpoint)
 
 socketServer.on("connection",socket  => {
     console.log(`Cliente ${socket.id} conectado!!`)
-    /**Products events */
+    /** Products events **/
     socket.on("event_update_product", async (data) => {
         let change = {
             field: data.field,
@@ -130,7 +130,7 @@ socketServer.on("connection",socket  => {
             socketServer.emit("event_product_created", {...result.data})
         }
     })
-    /**Carts events */
+    /** Carts events **/
     socket.on("event_add_product_to_cart", async (data) => {
         let request = {};
         if(data.isNewCart) {
@@ -161,6 +161,10 @@ socketServer.on("connection",socket  => {
         else {
             socketServer.emit("event_cart_added", {id: data.cart_id})
         }
+    })
+    /** User events **/
+    socket.on('event_logout_user', async () => {
+        
     })
 })
 export default socketServer;
