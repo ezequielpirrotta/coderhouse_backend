@@ -18,7 +18,27 @@ const form = document.getElementById('registerForm');
       }, false)
     })
   })()
+window.addEventListener("load", function() {
 
+    // icono para mostrar contraseña
+    showPassword = document.querySelector('.show-password');
+    showPassword.addEventListener('click', () => {
+
+        // elementos input de tipo clave
+        password = document.getElementById('password');
+        
+
+        if ( password.type === "text" ) {
+            password.type = "password"
+            showPassword.classList.remove('fa-eye-slash');
+        } else {
+            password.type = "text"
+            showPassword.classList.toggle("fa-eye-slash");
+        }
+
+    })
+
+});
 form.addEventListener('submit',async (e)=>{
     e.preventDefault();
     const data = new FormData(form);
@@ -31,7 +51,7 @@ form.addEventListener('submit',async (e)=>{
             'Content-Type':'application/json'
         }
     }).then((response)=>response.json())
-    if(result.code===201){
+    if(result.status !== 'error'){
         window.location.replace('/');
     }
     else {

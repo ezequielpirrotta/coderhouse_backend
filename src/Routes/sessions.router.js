@@ -1,35 +1,35 @@
 import { Router } from 'express';
+import passport from 'passport';
 import userModel from '../Dao/models/user.model.js';
+import { createHash, isValidPassword } from '../util.js';
 
 const router = Router();
-const admin_credentials = {username: 'adminCoder@coder.com', password: 'adminCod3r123'}; 
-router.post("/register", async (req, res)=>{
-    const { first_name, last_name, username, age, password} = req.body;
-    if(!username) {
-        return res.status(400).send({status: "error", message: "Email vacio"});
+const admin_credentials = {username: 'adminCoder@coder.com', password: 'adminCod3r123'};
+
+router.get("/github", passport.authenticate('github', {scope: ['user:email']}), async (req, res) => {});
+
+router.get('/githubcallback', passport.authenticate('github',{failureRedirect:'/github/error'}), async(req, res)=>{
+    let user = req.user;
+    user = {
+        name : `${user.first_name} ${user.last_name}`,
+        email: user.username,
+        age: user.age,
+        rol: 'usuario'
     }
-    const exists = await userModel.findOne({username});
-    if (exists){
-        return res.status(400).send({status: "error", message: "Usuario ya existe."});
-    }
-    const user = {
-        first_name: first_name,
-        last_name: last_name,
-        username: username,
-        age: age,
-        password: password
-    };
-    const result = await userModel.create(user);
-    res.status(201).send({status: "success",code: 201, message: "Usuario creado con extito con ID: " + result.id});
+    req.session.user = user;
+    res.redirect("/github");
+}); 
+router.post("/register", passport.authenticate( 
+    'register', {failureRedirect: '/api/sessions/fail-register'}), async (req, res)=>{
+    const user = req.user;
+    res.status(201).send({status: "success",code: 201, message: "User succesfully created with ID: " + user.id});
 });
 
-router.post("/login", async (req, res)=>{
-    const {username, password} = req.body;
-    const user = await userModel.findOne({username,password});
-    if(!user) return res.status(401).send({status:"error",message:"Incorrect credentials"});
-
-    if (username === admin_credentials.username || password === admin_credentials.password){
-        req.session.user= {
+router.post("/login", passport.authenticate( 
+    'login', {failureRedirect: '/api/sessions/fail-login'}), async (req, res)=>{
+    let user = req.user
+    if (user.username === admin_credentials.username || user.password === admin_credentials.password){
+        user = {
             name : `${user.first_name} ${user.last_name}`,
             email: user.username,
             age: user.age,
@@ -37,22 +37,63 @@ router.post("/login", async (req, res)=>{
         }  
     }
     else{
-        req.session.user= {
+        user = {
             name : `${user.first_name} ${user.last_name}`,
             email: user.username,
             age: user.age,
             rol: 'usuario'
         } 
     }
-    res.send({status:"success",code: 200, payload:req.session.user, message:"¡Primer logueo realizado! :)" });
+    req.session.user = user;
+    res.send({status:"success", code: 200, payload:req.session.user});
 });
 router.get("/logout", (req, res) => {
     let user = req.session.user;
     req.session.destroy(error => {
         if (error){
-            res.json({error: "error logout",code: 400, message: "Error al cerrar la sesion"});
+            res.json({error: "error logout",code: 400, message: "Error occured closing the session"});
         }
         res.send({status:"success",code: 200, payload: user, message:"Sesion cerrada correctamente!" });
     });
+});
+router.post("/resetPassword", async (req,res) => {
+    try{
+        const {username, newPassword} = req.body;
+        const confirm_password = req.body["confirm-password"]
+        const user = await userModel.findOne({username});
+        if(!user) return res.status(401).send({status:"error",message:"User not found"});
+        if(isValidPassword(user,newPassword)) return res.status(403).send({status: "error", error:"Your new password and your old one cant't be the same"});    
+        if (newPassword !== confirm_password){
+            return res.status(400).send({status: "error", message: "Password must be confirmed"});
+        }
+        user.password = createHash(newPassword);
+        const result = await userModel.updateOne(user);
+        res.status(201).send({status: "success",code: 201, message: "Password reseted succesfully"});
+    }
+    catch(error) {
+        res.status(400).send({
+            status:'error',
+            message: error.message
+        });
+    }
+});
+router.get('/fail-register', (req, res)=>{
+    res.status(401).send({error: res.message});
+});
+router.get("/fail-login", (req, res) => {
+    res.status(401).send({error: res.message});
+});
+
+passport.serializeUser((user, done) => {
+    done(null, user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        let user = await userModel.findById(id);
+        done(null, user);
+    } catch (error) {
+        console.error("Error deserializando el usuario: " + error);
+    }
 });
 export default router;

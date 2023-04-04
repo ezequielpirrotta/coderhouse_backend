@@ -48,72 +48,74 @@ if(btn_login) {
 for(let i=0; i < products.length;i++) {
     let id = products[i].id;
     let button = document.getElementById("add_button_"+id)? document.getElementById("add_button_"+id) : null;
+    let logged = true;
     if(!button) {
-        let result = document.getElementById("logedout_add_button_"+id)
-        if(result) {
-            console.log("hola")
-            Swal.fire({
-                title: 'Debes estar loggeado para poder crear un carrito',
-                showDenyButton: true,
-                showCancelButton: true,
-                confirmButtonText: 'Iniciar sesion',
-                denyButtonText: `No`,
-            }).then( async (result) => {
-                if (result.isConfirmed) {
-                    window.location.replace('/users/login');
-                }
-            })
+        button = document.getElementById("logedout_add_button_"+id)
+        if(button) {
+            logged = false;
         } 
     }
     if(button) {
-        console.log("hola 2")
         button.addEventListener("click", async () => {
+            if(!logged) {
+                Swal.fire({
+                    title: 'Debes estar loggeado para poder crear un carrito',
+                    showDenyButton: true,
+                    confirmButtonText: 'Iniciar sesion',
+                    denyButtonText: `No`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.replace('/users/login');
+                    }
+                })
+            }
+            else {
+                const { value: quantity } = await Swal.fire({
+                    title: 'How old are you?',
+                    icon: 'question',
+                    input: 'range',
+                    inputLabel: 'Cantidad de productos',
+                    inputAttributes: {
+                        min: 1,
+                        max: parseInt(document.getElementById("stock_"+id).innerHTML),
+                        step: 1
+                    },
+                    inputValue: 1
+                })
+                Swal.fire({
+                    title: 'Is this a new Cart?',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    denyButtonText: `No`,
+                }).then( async (result) => {
+                    if (result.isConfirmed) {
+                        let data = {
+                            products: [
+                                {
+                                    id: id, 
+                                    quantity: quantity
+                                }
+                            ]
+                        }
+                        socketServer.emit('event_add_product_to_cart', {isNewCart: true, body: data});
+                            
+                    } else if (result.isDenied) {
+                        const { value: cart_id } = await Swal.fire({
+                            title: 'Enter the cart id',
+                            input: 'text',
+                            inputLabel: 'ID',
+                            inputPlaceholder: 'Ej: 6756d63d3e7632f846cc6a72'
+                        })
+                        let data = {
+                            product_id: id,
+                            quantity: quantity
+                        }
+                        socketServer.emit('event_add_product_to_cart', {isNewCart: false, body: data, cart_id: cart_id});
+                    }
         
-            const { value: quantity } = await Swal.fire({
-                title: 'How old are you?',
-                icon: 'question',
-                input: 'range',
-                inputLabel: 'Cantidad de productos',
-                inputAttributes: {
-                    min: 1,
-                    max: parseInt(document.getElementById("stock_"+id).innerHTML),
-                    step: 1
-                },
-                inputValue: 1
-            })
-            Swal.fire({
-                title: 'Is this a new Cart?',
-                showDenyButton: true,
-                showCancelButton: true,
-                confirmButtonText: 'Yes',
-                denyButtonText: `No`,
-            }).then( async (result) => {
-                if (result.isConfirmed) {
-                    let data = {
-                        products: [
-                            {
-                                id: id, 
-                                quantity: quantity
-                            }
-                        ]
-                    }
-                    socketServer.emit('event_add_product_to_cart', {isNewCart: true, body: data});
-                        
-                } else if (result.isDenied) {
-                    const { value: cart_id } = await Swal.fire({
-                        title: 'Enter the cart id',
-                        input: 'text',
-                        inputLabel: 'ID',
-                        inputPlaceholder: 'Ej: 6756d63d3e7632f846cc6a72'
-                    })
-                    let data = {
-                        product_id: id,
-                        quantity: quantity
-                    }
-                    socketServer.emit('event_add_product_to_cart', {isNewCart: false, body: data, cart_id: cart_id});
-                }
-    
-            })
+                })
+            }
         })
     }
 }

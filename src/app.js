@@ -1,16 +1,24 @@
+//Express imports
 import Express from "express";
 import handlebars from 'express-handlebars';
 import session from 'express-session';
+//Routers imports
 import productRouter from "./Routes/products.router.js";
 import cartsRouter from "./Routes/carts.router.js";
 import viewsRouter from "./Routes/view.router.js";
 import usersViewRouter from "./Routes/users.views.router.js";
 import sessionsRouter from "./Routes/sessions.router.js";
+import githubRouter from "./Routes/github-login.views.router.js";
+//Other imports
 import MongoStore from 'connect-mongo';
 import __dirname from "./util.js";
 import {Server} from 'socket.io'
 import mongoose from "mongoose";
+//Midlewares imports
 import error_middleware from "./Middlewares/error_handler_middleware.js";
+//Passport imports
+import passport from "passport";
+import initializePassport from "./config/passport.config.js";
 
 export const endpoint = 'http://localhost:8080';
 const SERVER_PORT = 8080;
@@ -53,16 +61,20 @@ app.use(Express.static(__dirname+'/public'));
 app.engine('handlebars', handlebars.engine())
 app.set('views',__dirname + '/views');
 app.set('view engine', 'handlebars');
+/*** Middlewares y Cookies***/
+productRouter.use(error_middleware);
+cartsRouter.use(error_middleware);
+//Middlewares de Passport
+initializePassport();
+app.use(passport.initialize());
+app.use(session());
 /*** Routers ***/
 app.use('/', viewsRouter);
 app.use('/api/products', productRouter);
 app.use('/api/carts', cartsRouter);
 app.use("/users", usersViewRouter);
 app.use("/api/sessions", sessionsRouter);
-/*** Middlewares y Cookies***/
-productRouter.use(error_middleware);
-cartsRouter.use(error_middleware);
-
+app.use('/github',githubRouter);
 /*** Server ***/
 const httpServer = app.listen(SERVER_PORT);
 const socketServer = new Server(httpServer);

@@ -15,27 +15,22 @@
 
                     <label htmlFor="password" class="form-label">Contraseña</label>
                     <input type="password" class="form-control" name="password" id="password" placeholder="*******" required/>
+                    <span class="fa fa-fw fa-eye password-icon show-password"></span>
                     <div class="valid-feedback">
                         ¡Se ve bien!
                     </div>
                     <div class="invalid-feedback">
                         Este campo es requerido
                     </div>
+                    <p>¿Olvidaste tu contraseña? <a href="/users/reset-password">Restáurala aquí</a></p>
                 </div>
                 <div class="col-12">
                     <button class="btn btn-primary" type="submit">Continuar</button>
                 </div>
             </form>
+            <p>Ingresa con github! <a href="/github/login">Click aqui</a></p>
             <p>¿No estás registrado? <a href="/users/register">Regístrate aquí</a></p>
         </div>
     </div>
-    <!-- 
-    <div className="row justify-content-center ">
-        <div className="col-md-12 align-middle" >
-            <Link to={"/"} className="btn btn-primary"><p>Continuar como {{currentUser.name}}</p></Link>
-        </div>
-    </div>
-    -->
-    
 </div>
 <script src="/js/login.js"></script>

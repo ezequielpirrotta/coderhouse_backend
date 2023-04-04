@@ -20,10 +20,12 @@ a {
 .main-content {
     text-align: center;
 }
-  
-/*html{
-      height: 100%;
-}*/
+.password-icon {
+    float: right;
+    position: relative;
+    margin: -25px 10px 0 0;
+    cursor: pointer;
+}
 .column_form {
     display: flex;
     align-content: center;
