@@ -17,7 +17,27 @@ const form = document.getElementById('loginForm');
         form.classList.add('was-validated')
       }, false)
     })
-  })()
+})()
+window.addEventListener("load", function() {
+
+    // icono para mostrar contraseña
+    showPassword = document.querySelector('.show-password');
+    showPassword.addEventListener('click', () => {
+
+        // elementos input de tipo clave
+        password = document.getElementById('password');
+        
+        if ( password.type === "text" ) {
+            password.type = "password"
+            showPassword.classList.remove('fa-eye-slash');
+        } else {
+            password.type = "text"
+            showPassword.classList.toggle("fa-eye-slash");
+        }
+
+    })
+
+});
 form.addEventListener('submit',async (e)=>{
     e.preventDefault();
     const data = new FormData(form);
@@ -38,7 +58,7 @@ form.addEventListener('submit',async (e)=>{
         Swal.fire({
             title:"Error",
             icon:"error",
-            text: result.message
+            text: "Error con su inicio de sesión, intente con usuario registrado"
         })
     }
 })

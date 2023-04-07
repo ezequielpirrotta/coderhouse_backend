@@ -2,7 +2,7 @@
     <div class="card d-flex justify-content-center">
         <h1 class="card-title"> Registro</h1>
         <div class="shadow-lg card-body bg-body rounded">
-            <form id="registerForm" class="card-body row g-3 justify-content-center needs-validation"> 
+            <form id="registerForm" class="card-body row g-3 justify-content-center needs-validation" novalidate> 
                 <div class="mb-3 col-md-4">
                     <div>
                         <label htmlFor="first_name" class="form-label">Nombre</label>
@@ -37,6 +37,7 @@
                     </div>
                     <label htmlFor="password" class="form-label">Contraseña</label>
                     <input type="password" class="form-control" name="password" id="password" placeholder="*******" required/>
+                    <span class="fa fa-fw fa-eye password-icon show-password"></span>
                     <div class="valid-feedback">
                         ¡Se ve bien!
                     </div>
