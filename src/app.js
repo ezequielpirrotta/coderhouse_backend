@@ -11,9 +11,10 @@ import sessionsRouter from "./Routes/sessions.router.js";
 import githubRouter from "./Routes/github-login.views.router.js";
 //Other imports
 import MongoStore from 'connect-mongo';
-import __dirname from "./util.js";
+import __dirname, { PRIVATE_KEY } from "./util.js";
 import {Server} from 'socket.io'
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 //Midlewares imports
 import error_middleware from "./Middlewares/error_handler_middleware.js";
 //Passport imports
@@ -64,6 +65,7 @@ app.set('view engine', 'handlebars');
 /*** Middlewares y Cookies***/
 productRouter.use(error_middleware);
 cartsRouter.use(error_middleware);
+app.use(cookieParser(PRIVATE_KEY))
 //Middlewares de Passport
 initializePassport();
 app.use(passport.initialize());

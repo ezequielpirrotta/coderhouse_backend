@@ -10,7 +10,12 @@ const schema = new mongoose.Schema({
         unique: true
     },
     age:Number,
-    password:String //Se deja plano por el momento.
+    password:String, //Se deja plano por el momento.
+    role: {
+        type: String,
+        enum: ["admin", "user"],
+        default: "user"
+    } 
 })
 
 const userModel = mongoose.model(collection,schema);

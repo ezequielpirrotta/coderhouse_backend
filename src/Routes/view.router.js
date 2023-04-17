@@ -3,7 +3,7 @@ import { Router } from "express";
 import { endpoint } from "../app.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-
+import { passportCall } from "../util.js";
 const router = Router()
 
 router.use(cookieParser())
@@ -37,11 +37,8 @@ router.get('/realTimeProducts', async (req, res) => {
     .then( (response) => response.json());
     res.render('realTimeProducts', data);
 })
-router.get('/products', async (req, res) => {
-    let data = {
-        user: req.session.user,
-    };
-    data.user
+router.get('/products', async function(req, res) {
+    let data = {};
     let params = '';
     if(req.query) {
         
@@ -60,6 +57,8 @@ router.get('/products', async (req, res) => {
         res.render('products', data);
     }
     else {
+        
+        data.token = req.cookies["commerceCookieToken"]
         data.products.prevLink = data.products.hasPrevPage? `${endpoint}/products?page=${data.products.prevPage}`:'';
 
         data.products.nextLink = data.products.hasNextPage? `${endpoint}/products?page=${data.products.nextPage}`:'';

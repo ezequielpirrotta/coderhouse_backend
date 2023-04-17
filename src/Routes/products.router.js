@@ -1,11 +1,12 @@
-import { query, Router } from "express";
+import { Router } from "express";
 import DBProductManager from "../Dao/MongoManagers/DBProductManager.js";
 import socketServer from "../app.js";
+
 const dbPm = new DBProductManager();
 const router = Router()
 
 router.get('/', async (req, res, next) => {
-    try {
+    try { 
         let products = await dbPm.getProducts(req.query); 
         res.status(200).send(products);
     }
