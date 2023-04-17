@@ -1,36 +1,46 @@
 <div class="container-fluid m-3 d-flex justify-content-center">
     <div class="card d-flex justify-content-center">
         <h1 class="card-title"> Inicia sesión</h1>
-        <div class="shadow-lg bg-body rounded">
-            <form id="loginForm" class="card-body row g-3 justify-content-center needs-validation" novalidate>
-                <div class="col-md-12">
-                    <label htmlFor="username" class="form-label">Email</label>
-                    <input type="text" class="form-control" name="username" id="username" placeholder="someone@gmail.com" required/>
-                    <div class="valid-feedback">
-                        ¡Se ve bien!
+        {{#if token}}
+           <div class="shadow-lg bg-body rounded">
+                <div class="card-body row g-3 justify-content-center">
+                    <div class="col-12">
+                        <button class="btn btn-primary" type="submit">Continuar como {{token}}</button>
                     </div>
-                    <div class="invalid-feedback">
-                        Este campo es requerido
-                    </div>
+                </div>
+            </div>
+        {{else}}
+            <div class="shadow-lg bg-body rounded">
+                <form id="loginForm" class="card-body row g-3 justify-content-center needs-validation" novalidate>
+                    <div class="col-md-12">
+                        <label htmlFor="username" class="form-label">Email</label>
+                        <input type="text" class="form-control" name="username" id="username" placeholder="someone@gmail.com" required/>
+                        <div class="valid-feedback">
+                            ¡Se ve bien!
+                        </div>
+                        <div class="invalid-feedback">
+                            Este campo es requerido
+                        </div>
 
-                    <label htmlFor="password" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" name="password" id="password" placeholder="*******" required/>
-                    <span class="fa fa-fw fa-eye password-icon show-password"></span>
-                    <div class="valid-feedback">
-                        ¡Se ve bien!
+                        <label htmlFor="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" name="password" id="password" placeholder="*******" required/>
+                        <span class="fa fa-fw fa-eye password-icon show-password"></span>
+                        <div class="valid-feedback">
+                            ¡Se ve bien!
+                        </div>
+                        <div class="invalid-feedback">
+                            Este campo es requerido
+                        </div>
+                        <p>¿Olvidaste tu contraseña? <a href="/users/reset-password">Restáurala aquí</a></p>
                     </div>
-                    <div class="invalid-feedback">
-                        Este campo es requerido
+                    <div class="col-12">
+                        <button class="btn btn-primary" type="submit">Continuar</button>
                     </div>
-                    <p>¿Olvidaste tu contraseña? <a href="/users/reset-password">Restáurala aquí</a></p>
-                </div>
-                <div class="col-12">
-                    <button class="btn btn-primary" type="submit">Continuar</button>
-                </div>
-            </form>
-            <p>Ingresa con github! <a href="/github/login">Click aqui</a></p>
-            <p>¿No estás registrado? <a href="/users/register">Regístrate aquí</a></p>
-        </div>
+                </form>
+                <p>Ingresa con github! <a href="/github/login">Click aqui</a></p>
+                <p>¿No estás registrado? <a href="/users/register">Regístrate aquí</a></p>
+            </div>
+        {{/if}}
     </div>
 </div>
 <script src="/js/login.js"></script>

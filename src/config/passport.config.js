@@ -1,11 +1,13 @@
 import passport from "passport";
 import passportLocal from "passport-local";
+import jwtStrategy, { ExtractJwt } from "passport-jwt";
 import userModel from "../Dao/models/user.model.js";
 import GitHubStrategy from 'passport-github2';
-import { createHash, isValidPassword } from "../util.js";
+import { PRIVATE_KEY, createHash, isValidPassword } from "../util.js";
 
 //Declaración de estrategias
 const localStrategy = passportLocal.Strategy;
+const JwtStrat = jwtStrategy.Strategy;
 
 const initializePassport = () => {
     /**
@@ -72,23 +74,60 @@ const initializePassport = () => {
             }
 
         }
-    ))
+    ));
     passport.use('login', new localStrategy(
         {passReqToCallback: true}, async (req, username, password, done) => {
+            
             try{
                 const user = await userModel.findOne({username: username});
                 if(!user){
                     return done(null,false,{status:"error",message:"User not found"});
                 } 
                 if(!isValidPassword(user,password)) {
-                    return done(null,false,{status: "error", error:"Incorrect password"}); 
+                    return done(null,false,{status: "error", message:"Incorrect password"}); 
                 }
                 return done(null, user)
             }
             catch(error) {
-                return done(error.message)
+                return done(error)
             }
         }
-    ))
+    ));
+    passport.use('jwtStrat', new JwtStrat(
+        {
+            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+            secretOrKey: PRIVATE_KEY
+        },async(jwt_payload, next) => {
+            try {
+                return next(null, jwt_payload.user);
+            } 
+            catch (error) {
+                console.error(error);
+                return next(error);
+            }
+        }
+    ));
+    passport.use('current', new JwtStrat(
+        {
+            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+            secretOrKey: PRIVATE_KEY
+        },async(jwt_payload, next) => {
+            try {
+                let user = await userModel.findOne({username: jwt_payload.user.email})
+                return next(null, user);
+            } 
+            catch (error) {
+                console.error(error);
+                return next(error);
+            }
+        }
+    ));
 }
+const cookieExtractor = req => {
+    let token = null;
+    if (req && req.cookies) { //Validamos que exista el request y las cookies.
+        token = req.cookies['commerceCookieToken'];
+    }
+    return token;
+};    
 export default initializePassport

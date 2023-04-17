@@ -6,6 +6,7 @@ const products = document.getElementsByClassName("product");
 const btn_close_session = document.getElementById("btn_close_session");
 const btn_profile = document.getElementById("btn_profile");
 const btn_login = document.getElementById("btn_login");
+const navBarList = document.getElementById("navBarList");
 
 if(btn_close_session) {
 
@@ -35,6 +36,7 @@ if(btn_close_session) {
         })
     });
 }
+
 if(btn_profile) {
     btn_profile.addEventListener("click", async () => {
         window.location.replace('/users');    
@@ -75,45 +77,50 @@ for(let i=0; i < products.length;i++) {
                     icon: 'question',
                     input: 'range',
                     inputLabel: 'Cantidad de productos',
+                    showCancelButton: true,
                     inputAttributes: {
                         min: 1,
                         max: parseInt(document.getElementById("stock_"+id).innerHTML),
                         step: 1
                     },
                     inputValue: 1
-                })
-                Swal.fire({
-                    title: 'Is this a new Cart?',
-                    showDenyButton: true,
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes',
-                    denyButtonText: `No`,
                 }).then( async (result) => {
                     if (result.isConfirmed) {
-                        let data = {
-                            products: [
-                                {
-                                    id: id, 
+
+                        Swal.fire({
+                            title: 'Is this a new Cart?',
+                            showDenyButton: true,
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes',
+                            denyButtonText: `No`,
+                        }).then( async (result) => {
+                            if (result.isConfirmed) {
+                                let data = {
+                                    products: [
+                                        {
+                                            id: id, 
+                                            quantity: quantity
+                                        }
+                                    ]
+                                }
+                                socketServer.emit('event_add_product_to_cart', {isNewCart: true, body: data});
+                                    
+                            } else if (result.isDenied) {
+                                const { value: cart_id } = await Swal.fire({
+                                    title: 'Enter the cart id',
+                                    input: 'text',
+                                    inputLabel: 'ID',
+                                    inputPlaceholder: 'Ej: 6756d63d3e7632f846cc6a72'
+                                })
+                                let data = {
+                                    product_id: id,
                                     quantity: quantity
                                 }
-                            ]
-                        }
-                        socketServer.emit('event_add_product_to_cart', {isNewCart: true, body: data});
-                            
-                    } else if (result.isDenied) {
-                        const { value: cart_id } = await Swal.fire({
-                            title: 'Enter the cart id',
-                            input: 'text',
-                            inputLabel: 'ID',
-                            inputPlaceholder: 'Ej: 6756d63d3e7632f846cc6a72'
+                                socketServer.emit('event_add_product_to_cart', {isNewCart: false, body: data, cart_id: cart_id});
+                            }
+                
                         })
-                        let data = {
-                            product_id: id,
-                            quantity: quantity
-                        }
-                        socketServer.emit('event_add_product_to_cart', {isNewCart: false, body: data, cart_id: cart_id});
                     }
-        
                 })
             }
         })

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport';
 import userModel from '../Dao/models/user.model.js';
-import { createHash, isValidPassword } from '../util.js';
+import { createHash, isValidPassword, generateJWToken, passportCall } from '../util.js';
 
 const router = Router();
 const admin_credentials = {username: 'adminCoder@coder.com', password: 'adminCod3r123'};
@@ -25,27 +25,19 @@ router.post("/register", passport.authenticate(
     res.status(201).send({status: "success",code: 201, message: "User succesfully created with ID: " + user.id});
 });
 
-router.post("/login", passport.authenticate( 
-    'login', {failureRedirect: '/api/sessions/fail-login'}), async (req, res)=>{
+router.post("/login", passport.authenticate('login', {failureRedirect: '/api/sessions/fail-login'}), async (req, res)=>{
     let user = req.user
-    if (user.username === admin_credentials.username || user.password === admin_credentials.password){
-        user = {
-            name : `${user.first_name} ${user.last_name}`,
-            email: user.username,
-            age: user.age,
-            rol: 'admin'
-        }  
-    }
-    else{
-        user = {
-            name : `${user.first_name} ${user.last_name}`,
-            email: user.username,
-            age: user.age,
-            rol: 'usuario'
-        } 
-    }
-    req.session.user = user;
-    res.send({status:"success", code: 200, payload:req.session.user});
+    user = {
+        name : `${user.first_name} ${user.last_name}`,
+        email: user.username,
+        age: user.age,
+        role: user.role
+    }  
+    const access_token = generateJWToken(user);
+    res.cookie('commerceCookieToken', access_token, {
+        maxAge: 3*60*1000,
+        httpOnly: true
+    }).send({status:"success", code: 200, payload:req.session.user, token: access_token})
 });
 router.get("/logout", (req, res) => {
     let user = req.session.user;
@@ -77,6 +69,9 @@ router.post("/resetPassword", async (req,res) => {
         });
     }
 });
+router.get('/current', passportCall('current'), (req,res) =>{
+    res.status(401).send(req.user);
+})
 router.get('/fail-register', (req, res)=>{
     res.status(401).send({error: res.message});
 });

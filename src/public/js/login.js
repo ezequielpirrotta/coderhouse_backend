@@ -50,8 +50,8 @@ form.addEventListener('submit',async (e)=>{
             'Content-Type':'application/json'
         }
     }).then((response)=>response.json())
-
     if(result.code===200){
+        //localStorage.setItem('authToken',result.token);
         window.location.replace('/products');
     }
     else {
