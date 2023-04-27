@@ -4,7 +4,8 @@ import { authorization, passportCall } from "../util.js";
 const router = Router();
 
 router.get("/login", (req, res) => {
-    res.render("login", {token: req.cookies.token});
+    let token = req.cookies["commerceCookieToken"];
+    res.render("login", {token: token});
 });
 
 router.get("/register", (req, res) => {

@@ -51,14 +51,13 @@ form.addEventListener('submit',async (e)=>{
         }
     }).then((response)=>response.json())
     if(result.code===200){
-        //localStorage.setItem('authToken',result.token);
         window.location.replace('/products');
     }
     else {
         Swal.fire({
             title:"Error",
             icon:"error",
-            text: "Error con su inicio de sesión, intente con usuario registrado"
+            text: "Error con su inicio de sesión, intente con un usuario registrado"
         })
     }
 })

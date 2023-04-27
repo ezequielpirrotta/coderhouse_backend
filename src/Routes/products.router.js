@@ -1,8 +1,8 @@
 import { Router } from "express";
-import DBProductManager from "../Dao/MongoManagers/DBProductManager.js";
+import ProductService from "../services/Dao/db/product.service.js";
 import socketServer from "../app.js";
 
-const dbPm = new DBProductManager();
+const dbPm = new ProductService();
 const router = Router()
 
 router.get('/', async (req, res, next) => {

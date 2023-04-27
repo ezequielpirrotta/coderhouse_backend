@@ -20,9 +20,10 @@ import error_middleware from "./Middlewares/error_handler_middleware.js";
 //Passport imports
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
+//Environment
+import config from "./config/config.js";
+console.log(config)
 
-export const endpoint = 'http://localhost:8080';
-const SERVER_PORT = 8080;
 const app = Express()
 /*** DB ***/
 const MONGO_URL = "mongodb+srv://ezequielpdesarrollo:DhLxBaXZaUYdyqwP@e-commerce.uelsobh.mongodb.net/e-commerce?retryWrites=true&w=majority"
@@ -78,11 +79,12 @@ app.use("/users", usersViewRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use('/github',githubRouter);
 /*** Server ***/
-const httpServer = app.listen(SERVER_PORT);
+const httpServer = app.listen(config.port);
 const socketServer = new Server(httpServer);
 app.set("socket", socketServer);
-app.set("enpoint".endpoint)
-
+app.set("endpoint", config.endpoint+config.port)
+/*let cart = await cartModel.create();
+console.log(cart)*/
 socketServer.on("connection",socket  => {
     console.log(`Cliente ${socket.id} conectado!!`)
     /** Products events **/
@@ -98,7 +100,7 @@ socketServer.on("connection",socket  => {
                 'Content-type': 'application/json; charset=UTF-8',
             }
         }
-        let request = new Request(endpoint+'/api/products/'+data.id, requestData) 
+        let request = new Request(config.endpoint+config.port+'/api/products/'+data.id, requestData) 
         let result = await fetch(request)
         .then( (response) => response.json());
         if(result.status === "WRONG") {
@@ -115,7 +117,7 @@ socketServer.on("connection",socket  => {
                 'Content-type': 'application/json; charset=UTF-8',
             }
         }
-        let request = new Request(endpoint+'/api/products/'+data.id, requestData) 
+        let request = new Request(config.endpoint+config.port+'/api/products/'+data.id, requestData) 
         let result = await fetch(request)
         .then( (response) => response.json());
         if(result.status === "WRONG") {
@@ -134,7 +136,7 @@ socketServer.on("connection",socket  => {
                 'Content-type': 'application/json; charset=UTF-8',
             }
         }
-        let request = new Request(endpoint+'/api/products/', requestData) 
+        let request = new Request(config.endpoint+config.port+'/api/products/', requestData) 
         let result = await fetch(request)
         .then( (response) => response.json());
         if(result.status === "WRONG") {
@@ -155,7 +157,7 @@ socketServer.on("connection",socket  => {
                     'Content-type': 'application/json; charset=UTF-8',
                 }
             }
-            request = new Request(endpoint+'/api/carts', requestData)
+            request = new Request(config.endpoint+config.port+'/api/carts', requestData)
         }
         else {
             let requestData = {
@@ -165,7 +167,7 @@ socketServer.on("connection",socket  => {
                     'Content-type': 'application/json; charset=UTF-8',
                 }
             }
-            request = new Request(endpoint+'/api/carts/'+data.cart_id+'/product', requestData) 
+            request = new Request(config.endpoint+config.port+'/api/carts/'+data.cart_id+'/product', requestData) 
         } 
         let result = await fetch(request)
         .then( (response) => response.json());

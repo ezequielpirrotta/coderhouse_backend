@@ -3,11 +3,11 @@
         <h1 class="card-title"> Inicia sesión</h1>
         {{#if token}}
            <div class="shadow-lg bg-body rounded">
-                <div class="card-body row g-3 justify-content-center">
+                <form id="loginForm" class="card-body row g-3 justify-content-center needs-validation" novalidate>
                     <div class="col-12">
-                        <button class="btn btn-primary" type="submit">Continuar como {{token}}</button>
+                        <a class="btn btn-primary" href="/products" type="submit">Continuar </a>
                     </div>
-                </div>
+                </form>
             </div>
         {{else}}
             <div class="shadow-lg bg-body rounded">

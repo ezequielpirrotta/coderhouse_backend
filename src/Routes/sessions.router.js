@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
-import userModel from '../Dao/models/user.model.js';
+import userModel from '../services/Dao/models/user.model.js';
 import { createHash, isValidPassword, generateJWToken, passportCall } from '../util.js';
 
 const router = Router();
@@ -16,7 +16,11 @@ router.get('/githubcallback', passport.authenticate('github',{failureRedirect:'/
         age: user.age,
         rol: 'usuario'
     }
-    req.session.user = user;
+    const access_token = generateJWToken(user);
+    res.cookie('commerceCookieToken', access_token, {
+        maxAge: 3*60*1000,
+        httpOnly: true
+    }).send({status:"success", code: 200, payload:req.session.user, token: access_token})
     res.redirect("/github");
 }); 
 router.post("/register", passport.authenticate( 
@@ -40,13 +44,14 @@ router.post("/login", passport.authenticate('login', {failureRedirect: '/api/ses
     }).send({status:"success", code: 200, payload:req.session.user, token: access_token})
 });
 router.get("/logout", (req, res) => {
-    let user = req.session.user;
-    req.session.destroy(error => {
-        if (error){
-            res.json({error: "error logout",code: 400, message: "Error occured closing the session"});
-        }
-        res.send({status:"success",code: 200, payload: user, message:"Sesion cerrada correctamente!" });
-    });
+    try{
+        res.clearCookie('commerceCookieToken');
+        res.send({status:"success",code: 200, message:"Sesion cerrada correctamente!" })
+    }
+    catch(error) {
+        console.log(error)
+        res.send({error: "error logout",code: 400, message: "Error occured closing the session"});
+    }
 });
 router.post("/resetPassword", async (req,res) => {
     try{

@@ -1,7 +1,6 @@
 import productModel from "../models/product.model.js";
-import Product from "../models/Product.js";
 
-class DBProductManager {
+class ProductService {
     
     getProducts = async (params) => {
         try {
@@ -69,7 +68,16 @@ class DBProductManager {
     }
     addProduct = async (title, description, price, code, stock, category, thumbnail) => {
         let available = stock > 0? true : false;
-        let newProduct = new Product(title, description, price, code, available, stock, category, thumbnail);
+        let newProduct = {
+            title: title, 
+            description: description, 
+            price: price, 
+            code: code, 
+            available: available, 
+            stock: stock, 
+            category: category, 
+            thumbnail: thumbnail
+        };
         try {
             let result = await productModel.create(newProduct);
             if(result) {
@@ -153,4 +161,4 @@ class DBProductManager {
         }
     }
 }
-export default DBProductManager
+export default ProductService
