@@ -1,9 +1,9 @@
 import { Router } from "express";
 //import socketServer from "../app.js";
-import { endpoint } from "../app.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import { passportCall } from "../util.js";
+import config from "../config/config.js";
 const router = Router()
 
 router.use(cookieParser())
@@ -24,7 +24,7 @@ router.get('/staticProducts', async  (req, res) => {
     let data = {
         products: [],
     };
-    data.products = await fetch(endpoint+'/api/products')
+    data.products = await fetch(config.endpoint+config.port+'/api/products')
     .then( (response) => response.json());      
     res.render('home', data);
 })
@@ -33,7 +33,7 @@ router.get('/realTimeProducts', async (req, res) => {
     let data = {
         products: [],
     };
-    data.products = await fetch(endpoint+'/api/products')
+    data.products = await fetch(config.endpoint+config.port+'/api/products')
     .then( (response) => response.json());
     res.render('realTimeProducts', data);
 })
@@ -50,7 +50,7 @@ router.get('/products', async function(req, res) {
         params = req.query.category? params.length>1? params+'&category='+req.query.category:params+'category='+req.query.category : params
         params = req.query.available? params.length>1? params+'&available='+req.query.available:params+'available='+req.query.available : params
     } 
-    data.products = await fetch(endpoint+'/api/products'+params)
+    data.products = await fetch(config.endpoint+config.port+'/api/products'+params)
     .then( (response) => response.json());
     if(data.products.status === "WRONG"){
         data.founded = false;
@@ -59,9 +59,9 @@ router.get('/products', async function(req, res) {
     else {
         
         data.token = req.cookies["commerceCookieToken"]
-        data.products.prevLink = data.products.hasPrevPage? `${endpoint}/products?page=${data.products.prevPage}`:'';
+        data.products.prevLink = data.products.hasPrevPage? `${config.endpoint+config.port}/products?page=${data.products.prevPage}`:'';
 
-        data.products.nextLink = data.products.hasNextPage? `${endpoint}/products?page=${data.products.nextPage}`:'';
+        data.products.nextLink = data.products.hasNextPage? `${config.endpoint+config.port}/products?page=${data.products.nextPage}`:'';
         for (const key in req.query) {
             if(key !== "page"){
                 let result = params.search(key);
@@ -74,7 +74,7 @@ router.get('/products', async function(req, res) {
             data.pages[i] = {
                 page: i+1,
                 isCurrentPage: data.products.page === i+1? true:false,
-                link: `${endpoint}/products?page=${i+1}`
+                link: `${config.endpoint+config.port}/products?page=${i+1}`
             };
             for (const key in req.query) {
                 if(key !== "page"){
@@ -92,7 +92,7 @@ router.get('/carts/:cid', async (req, res) => {
     let data = {
         cart: [],
     };
-    data.cart = await fetch(endpoint+'/api/carts/'+cid)
+    data.cart = await fetch(config.endpoint+config.port+'/api/carts/'+cid)
     .then( (response) => response.json())
     res.render('carts', data);
 })

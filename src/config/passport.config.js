@@ -1,14 +1,15 @@
 import passport from "passport";
 import passportLocal from "passport-local";
 import jwtStrategy, { ExtractJwt } from "passport-jwt";
-import userModel from "../Dao/models/user.model.js";
+import UserService from "../services/Dao/db/user.service.js";
 import GitHubStrategy from 'passport-github2';
 import { PRIVATE_KEY, createHash, isValidPassword } from "../util.js";
+import config from "./config.js";
 
 //Declaración de estrategias
 const localStrategy = passportLocal.Strategy;
 const JwtStrat = jwtStrategy.Strategy;
-
+const userService = new UserService();
 const initializePassport = () => {
     /**
      *  Inicializando la estrategia local, username sera para nosotros email.
@@ -27,7 +28,7 @@ const initializePassport = () => {
                         message: "Mail private, make your mail public to login"
                     }
                 }
-                const user = await userModel.findOne({username: profile._json.email});
+                const user = await userService.findByUsername(profile._json.email);
                 if (!user) {
                     console.warn("User doesn't exists with username: " + profile._json.email);
                     let newUser = {
@@ -55,18 +56,33 @@ const initializePassport = () => {
                 if(!username) {
                     return res.status(400).send({status: "error", message: "Empty email"});
                 }
-                const exists = await userModel.findOne({username});
+                const exists = await userService.findByUsername(username);
                 if (exists){
                     return done(null, false, {status: "error", message: "User already exists."})
                 }
+                //let cart = await await fetch('/api/carts/').then((response)=>response.json());
+                let requestData = {
+                    method:"POST",
+                    body: JSON.stringify({}),
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8'
+                    }
+                }
+                console.log("pase")
+                console.log(requestData)
+                let cart = await fetch(config.endpoint+config.port+'/api/carts/', requestData).then( (response) => response.json());
+                console.log("holanda")
+                console.log(cart)
+
                 const user = {
                     first_name: first_name,
                     last_name: last_name,
                     username: username,
                     age: age,
-                    password: createHash(password) 
+                    password: createHash(password),
+                    cartId: cart._id
                 };
-                const result = await userModel.create(user);
+                const result = await userService.save(user);
                 return done(null,result)
             }
             catch(error) {
@@ -79,7 +95,7 @@ const initializePassport = () => {
         {passReqToCallback: true}, async (req, username, password, done) => {
             
             try{
-                const user = await userModel.findOne({username: username});
+                const user = await userService.findByUsername(username);
                 if(!user){
                     return done(null,false,{status:"error",message:"User not found"});
                 } 
@@ -113,7 +129,7 @@ const initializePassport = () => {
             secretOrKey: PRIVATE_KEY
         },async(jwt_payload, next) => {
             try {
-                let user = await userModel.findOne({username: jwt_payload.user.email})
+                let user = await userService.findByUsername(jwt_payload.user.email)
                 return next(null, user);
             } 
             catch (error) {

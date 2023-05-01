@@ -15,6 +15,15 @@ const schema = new mongoose.Schema({
         type: String,
         enum: ["admin", "user"],
         default: "user"
+    },
+    cartId: {
+        type: [
+            {  
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "carts"   
+            }
+        ],
+        default: []
     } 
 })
 

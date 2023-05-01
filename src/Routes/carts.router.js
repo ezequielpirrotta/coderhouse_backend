@@ -1,5 +1,5 @@
 import { Router } from "express";
-import DBCartManager from "../Dao/MongoManagers/DBCartManager.js";
+import DBCartManager from "../services/Dao/db/cart.service.js";
 
 const dbCrt = new DBCartManager;
 const router = Router()
@@ -27,11 +27,14 @@ router.get('/:cid', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     let products = req.body.products;
+    console.log("llegue")
     try {
         let result = await dbCrt.addCart(products)
+        console.log(result)
         res.send(result);
     }
     catch(error) {
+
         next(error)
     }
 })

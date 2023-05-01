@@ -57,7 +57,7 @@ export const passportCall = (strategy) => {
 };
 export const authorization = (role) => {
     return async (req,res,next) => {
-        if(req.user) return res.status(401).send("Unauthorized: JWT not found");
+        if(!req.user) return res.status(401).send("Unauthorized: JWT not found");
         if(req.user.role != role) {
             return res.status(403).send("Forbidden: The user does not have the permissions for this role");
         }

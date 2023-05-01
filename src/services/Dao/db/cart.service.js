@@ -1,5 +1,5 @@
 import { cartModel } from "../models/cart.model.js";
-import DBProductManager from "./DBProductManager.js";
+import DBProductManager from "./product.service.js";
 import mongoose from "mongoose";
 const dbPm = new DBProductManager;
 class DBCartManager {
@@ -50,9 +50,8 @@ class DBCartManager {
                     cart.products.push(newProduct);
                 }
                 let result = await cart.updateOne(cart);
-                if(result.modifiedCount > 0) {
-                    return await this.getCartById(cart._id);
-                }
+                
+                return await this.getCartById(cart._id);
             }
             else {
                 throw {
