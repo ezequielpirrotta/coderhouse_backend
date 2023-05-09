@@ -18,7 +18,7 @@ router.get('/githubcallback', passport.authenticate('github',{failureRedirect:'/
     }
     const access_token = generateJWToken(user);
     res.cookie('commerceCookieToken', access_token, {
-        maxAge: 3*60*1000,
+        maxAge: 60*60*1000,
         httpOnly: true
     }).send({status:"success", code: 200, payload:req.session.user, token: access_token})
     res.redirect("/github");
@@ -38,6 +38,10 @@ router.post("/login", passport.authenticate('login', {failureRedirect: '/api/ses
         role: user.role
     }  
     const access_token = generateJWToken(user);
+    const cart = JSON.stringify({products: []})
+    res.cookie("cartCookie", cart, {
+        maxAge: 24*60*60*1000
+    })
     res.cookie('commerceCookieToken', access_token, {
         maxAge: 3*60*1000,
         httpOnly: true

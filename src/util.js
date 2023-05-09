@@ -4,7 +4,6 @@ import multer from 'multer';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 import passport from 'passport';
-import { error } from 'console';
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync());
 

@@ -72,56 +72,80 @@ for(let i=0; i < products.length;i++) {
                 })
             }
             else {
-                const { value: quantity } = await Swal.fire({
-                    title: 'How old are you?',
-                    icon: 'question',
-                    input: 'range',
-                    inputLabel: 'Cantidad de productos',
+                const cookieValue = document.cookie
+                .split('; ')
+                .find(cookie => cookie.startsWith('cartCookie='));
+                console.log(cookieValue)
+                if (cookieValue) {
+                    // Extract the value from the cookie string
+                    const [, value] = cookieValue.split('=');
+                    
+                    console.log(typeof value)
+                    //console.log(`Cookie value: ${JSON.parse(value)}`);
+                    const { value: quantity } = await Swal.fire({
+                        title: 'How many products?',
+                        icon: 'question',
+                        input: 'range',
+                        inputLabel: 'Cantidad de productos',
+                        showCancelButton: true,
+                        inputAttributes: {
+                            min: 1,
+                            max: parseInt(document.getElementById("stock_"+id).innerHTML),
+                            step: 1
+                        },
+                        inputValue: 1
+                    })
+                    if (quantity) {
+                        let cart = {
+                            product: id,
+                            quantity: quantity
+                            
+                        }
+                        socketServer.emit('event_add_product_to_cart', {isNewCart: true, cart: cart});
+                    }
+                } 
+                else {
+                    
+                }
+
+                /*Swal.fire({
+                    title: 'Is this a new Cart?',
+                    showDenyButton: true,
                     showCancelButton: true,
-                    inputAttributes: {
-                        min: 1,
-                        max: parseInt(document.getElementById("stock_"+id).innerHTML),
-                        step: 1
-                    },
-                    inputValue: 1
+                    confirmButtonText: 'Yes',
+                    denyButtonText: `No`,
                 }).then( async (result) => {
                     if (result.isConfirmed) {
-
-                        Swal.fire({
-                            title: 'Is this a new Cart?',
-                            showDenyButton: true,
-                            showCancelButton: true,
-                            confirmButtonText: 'Yes',
-                            denyButtonText: `No`,
-                        }).then( async (result) => {
-                            if (result.isConfirmed) {
-                                let data = {
-                                    products: [
-                                        {
-                                            id: id, 
-                                            quantity: quantity
-                                        }
-                                    ]
-                                }
-                                socketServer.emit('event_add_product_to_cart', {isNewCart: true, body: data});
-                                    
-                            } else if (result.isDenied) {
-                                const { value: cart_id } = await Swal.fire({
-                                    title: 'Enter the cart id',
-                                    input: 'text',
-                                    inputLabel: 'ID',
-                                    inputPlaceholder: 'Ej: 6756d63d3e7632f846cc6a72'
-                                })
-                                let data = {
-                                    product_id: id,
-                                    quantity: quantity
-                                }
-                                socketServer.emit('event_add_product_to_cart', {isNewCart: false, body: data, cart_id: cart_id});
-                            }
-                
+                        
+                        
+                    } 
+                    else if (result.isDenied) {
+                        const { value: cart_id } = await Swal.fire({
+                            title: 'Enter the cart id',
+                            input: 'text',
+                            inputLabel: 'ID',
+                            inputPlaceholder: 'Ej: 6756d63d3e7632f846cc6a72'
                         })
+                        const { value: quantity } = await Swal.fire({
+                            title: 'How many products?',
+                            icon: 'question',
+                            input: 'range',
+                            inputLabel: 'Cantidad de productos',
+                            showCancelButton: true,
+                            inputAttributes: {
+                                min: 1,
+                                max: parseInt(document.getElementById("stock_"+id).innerHTML),
+                                step: 1
+                            },
+                            inputValue: 1
+                        })
+                        let data = {
+                            product_id: id,
+                            quantity: quantity
+                        }
+                        socketServer.emit('event_add_product_to_cart', {isNewCart: false, body: data, cart_id: cart_id});
                     }
-                })
+                });*/
             }
         })
     }
@@ -134,6 +158,7 @@ socketServer.on('event_adding_cart_error', (data) => {
     })
 })
 socketServer.on('event_cart_added', (data) => {
+    //console.log("llegueeeee")
     Swal.fire({
         title: 'Producto agregado exitosamente al carrito',
         text: `Este es su ID de carrito: ${data.id}`,

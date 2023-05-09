@@ -1,7 +1,10 @@
 import { Router } from "express";
 import DBCartManager from "../services/Dao/db/cart.service.js";
+import TicketService from "../services/Dao/db/ticket.service.js";
+import config from "../config/config.js";
 
-const dbCrt = new DBCartManager;
+const dbCrt = new DBCartManager();
+const ticketService = new TicketService()
 const router = Router()
 
 router.get('/', async (req, res, next) => {
@@ -27,10 +30,11 @@ router.get('/:cid', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     let products = req.body.products;
-    console.log("llegue")
+    
     try {
         let result = await dbCrt.addCart(products)
         console.log(result)
+        res.cookie('cartCookie',JSON.stringify(result), {maxAge: 24*60*60*1000})
         res.send(result);
     }
     catch(error) {
@@ -68,6 +72,32 @@ router.put('/:cid/product', async (req, res, next) => {
         let result = await dbCrt.updateProduct(cart_id, product_id, quantity, true);
         res.status(200).send(result)
     } 
+    catch(error) {
+        next(error)
+    }
+})
+router.post('/:cid/purchase', async (req, res, next) => {
+    try {
+        let {cid, username} = req.params;
+        let cart = await dbCrt.getCartById(cid)
+        
+        let data = {
+            username: username,
+            products: cart.products,
+        }
+        let requestData = {
+            method:"POST",
+            body: JSON.stringify(data),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            }
+        }
+        let request = new Request(config.endpoint+config.port+'/api/tickets/', requestData) 
+        let result = await fetch(request)
+        .then( (response) => response.json());
+        
+        res.status(200).send(result);
+    }
     catch(error) {
         next(error)
     }

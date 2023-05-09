@@ -10,21 +10,18 @@ const schema = new mongoose.Schema({
         unique: true
     },
     age:Number,
-    password:String, //Se deja plano por el momento.
+    password:String,
     role: {
         type: String,
         enum: ["admin", "user"],
         default: "user"
     },
-    cartId: {
-        type: [
-            {  
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "carts"   
-            }
-        ],
-        default: []
-    } 
+    orders: [
+        {   
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "tickets"       
+        },
+    ]
 })
 
 const userModel = mongoose.model(collection,schema);

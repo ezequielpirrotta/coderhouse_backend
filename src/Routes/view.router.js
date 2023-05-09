@@ -84,6 +84,15 @@ router.get('/products', async function(req, res) {
             }
         }
         data.founded = true;
+        if(req.cookies["cartCookie"]) {
+            let cart = JSON.parse(req.cookies["cartCookie"])
+            data.isCart = cart.products.length > 0
+            let total = 0;
+            cart.products.forEach(element => {
+                total += element.price    
+            });
+            data.totalCart = total; 
+        }
         res.render('products', data);
     }
 })

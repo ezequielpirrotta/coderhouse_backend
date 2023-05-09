@@ -47,7 +47,6 @@ class ProductService {
             };
         }
     }
-     
     getProductById = async (id) => {
         try {
             let product = await productModel.findById(id)
