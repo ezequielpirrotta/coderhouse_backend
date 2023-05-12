@@ -78,9 +78,7 @@ for(let i=0; i < products.length;i++) {
                 console.log(cookieValue)
                 if (cookieValue) {
                     // Extract the value from the cookie string
-                    const [, value] = cookieValue.split('=');
-                    
-                    console.log(typeof value)
+                    //const [, value] = cookieValue.split('=');
                     //console.log(`Cookie value: ${JSON.parse(value)}`);
                     const { value: quantity } = await Swal.fire({
                         title: 'How many products?',

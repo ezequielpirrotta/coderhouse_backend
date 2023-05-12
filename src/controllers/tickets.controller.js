@@ -35,41 +35,33 @@ export const createTicket = async (req, res, next) => {
         .then( (response) => response.json());
         let actualTickets = products.filter(product=> {
             let flag = false;
-            console.log("Productos dentro de filter")
             resultProducts.payload.forEach(element => {
-                
                 if(element._id == product.product._id){
                     flag = true
                 }
             });
             return flag;
         })
-        console.log("---------------------------")
-        console.log("Productos:")
-        console.log(actualTickets)
-
         let sum = actualTickets.reduce((acc,prev)=>{
             acc += prev.product.price * prev.quantity 
             return acc;
         },0)
         let ticketNumber = Date.now() + Math.floor(Math.random()*10000+1)
-
+        
         let ticket = {
             code: ticketNumber,
             purchaser: username,
             purchase_datetime: new Date(),
-            products: actualTickets.map(product=>product._id),
+            products: actualTickets.map(product=>product.product._id),
             amount: sum,
         }
-        console.log(ticket)
+
         const ticketResult = await ticketService.createTicket(ticket);
-        console.log("error?")
         resultUser.orders.push(ticketResult._id)
-        await userService.updateUser(user, resultUser)
-        res.send({status: 200, payload: result});
+        await userService.updateUser({username}, resultUser)
+        res.send({status: 200, payload: ticketResult});
     }   
     catch(error) {
-        console.log("dí error")
         next(error)
     }
 }

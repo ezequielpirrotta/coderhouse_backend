@@ -84,8 +84,7 @@ router.get('/products', async function(req, res) {
             }
         }
         data.founded = true;
-        console.log(req.cookies)
-        if(req.cookies["cartCookie"]!=undefined) {
+        if(req.cookies["cartCookie"]) {
             let cart = JSON.parse(req.cookies["cartCookie"])
             data.isCart = cart.products.length > 0
             let total = 0;

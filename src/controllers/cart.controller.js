@@ -1,7 +1,8 @@
 import CartService from '../services/Dao/db/cart.service.js'
 import config from '../config/config.js';
+import ProductService from '../services/Dao/db/product.service.js';
 
-
+const productService = new ProductService()
 const cartService = new CartService();
 
 export const getCarts = async (req, res, next) => {
@@ -76,23 +77,43 @@ export const purchaseCart = async (req, res, next) => {
         const {cid} = req.params;
         const {username} = req.body
         let cart = await cartService.getCartById(cid)
-        
-        let data = {
-            username: username,
-            products: cart.products,
-        }
-        let requestData = {
-            method:"POST",
-            body: JSON.stringify(data),
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8',
+        let availableCart = [];
+        let notAvailableCart = []
+        availableCart = cart.products.filter(element => element.product.stock > 0);
+        notAvailableCart = cart.products.filter(element => element.product.stock <= 0);
+        if(availableCart.length > 0){
+            let data = {
+                username: username,
+                products: availableCart,
             }
+            let requestData = {
+                method:"POST",
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                }
+            }
+            let request = new Request(config.endpoint+config.port+'/api/tickets/', requestData) 
+            let result = await fetch(request)
+            .then( (response) => response.json());
+            if(result.code === "WRONG"){
+                throw {
+                    message: "Fail to purhase cart",
+                    detail: result.message ? result.message : ""
+                }
+            }
+            let realProducts = (await productService.getProducts({limit:999})).payload
+            availableCart.forEach(element => {
+                realProducts.forEach(product => {
+                    if(element._id == product._id){
+                        let total = product.stock - element.quantity;
+                        productService.updateProduct(product._id,{newValue: total,field:"stock"})
+                    }
+                });
+            })
+           cartService.replaceCart(cid,notAvailableCart)
         }
-        let request = new Request(config.endpoint+config.port+'/api/tickets/', requestData) 
-        let result = await fetch(request)
-        .then( (response) => response.json());
-        
-        res.status(200).send(result);
+        res.status(200).send(notAvailableCart);
     }
     catch(error) {
         next(error)

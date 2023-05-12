@@ -12,7 +12,7 @@ import viewsRouter from "./Routes/view.router.js";
 import usersViewRouter from "./Routes/users.views.router.js";
 import sessionsRouter from "./Routes/sessions.router.js";
 import githubRouter from "./Routes/github-login.views.router.js";
-import cookieRouter from "./Routes/cookie.router.js";
+import emailRouter from "./Routes/email.router.js";
 //Other imports
 import MongoStore from 'connect-mongo';
 import __dirname, { PRIVATE_KEY } from "./util.js";
@@ -61,7 +61,7 @@ app.use(session({
 /**** Utils ***/
 app.use(Express.urlencoded({extended: true}));
 app.use(Express.json());
-app.use(cors())
+app.use(cors({origin:"http/localhost:3000",methods:['GET','POST','PUT','DELETE']}))
 app.use(Express.static(__dirname+'/public'));
 /*** Views ***/ 
 app.engine('handlebars', handlebars.engine())
@@ -83,8 +83,8 @@ app.use('/api/tickets', ticketsRouter);
 app.use('/api/users', usersRouter)
 app.use("/users", usersViewRouter);
 app.use("/api/sessions", sessionsRouter);
+app.use("/api/mail", emailRouter);
 app.use('/github',githubRouter);
-app.use('/cookie', cookieRouter);
 /*** Server ***/
 const httpServer = app.listen(config.port);
 const socketServer = new Server(httpServer);

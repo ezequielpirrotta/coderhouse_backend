@@ -6,6 +6,7 @@ import GitHubStrategy from 'passport-github2';
 import { PRIVATE_KEY, createHash, isValidPassword } from "../util.js";
 import config from "./config.js";
 import CartService from "../services/Dao/db/cart.service.js";
+import UserDTO from '../services/Dao/DTOs/user.model.DTO.js';
 
 //Declaración de estrategias
 const localStrategy = passportLocal.Strategy;
@@ -64,15 +65,15 @@ const initializePassport = () => {
                 }
                 
                 let cart = await cartService.addCart();
-
-                const user = {
+                
+                const user = new UserDTO({
                     first_name: first_name,
                     last_name: last_name,
                     username: username,
                     age: age,
                     password: createHash(password),
                     cart: cart._id
-                };
+                });
                 const result = await userService.saveUser(user);
                 return done(null,result)
             }
@@ -110,7 +111,6 @@ const initializePassport = () => {
                 return next(null, jwt_payload.user);
             } 
             catch (error) {
-                console.error(error);
                 return next(error);
             }
         }

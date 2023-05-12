@@ -17,12 +17,14 @@ const ticketSchema = new mongoose.Schema({
     purchase_datetime: Date,
     amount: Number,
     purchaser: stringSchemaUniqueRequired,
-    products: [
-        {   
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "products"       
-        },
-    ]
+    products: {
+        type: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "products"       
+            }   
+        ]
+    }
 });
 
 const ticketModel = mongoose.model(ticketsCollection, ticketSchema)

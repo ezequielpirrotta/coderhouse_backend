@@ -40,3 +40,13 @@ export const updateUser = async (req, res, next) => {
         
     }
 }
+export const deleteUser = async (req,res,next) => {
+    try {
+        const {username} = req.params;
+        const user = await userService.delete(username);
+        res.send({status: 200, payload: user});
+    }
+    catch(error) {
+        next(error)
+    }
+}

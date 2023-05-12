@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 class TicketService {
     
-    getTickets = async () => {
+    getAll = async () => {
         try {
             let tickets = await ticketModel.find();
             if(tickets.length > 0) {
@@ -41,12 +41,11 @@ class TicketService {
     }
     createTicket = async (ticket) => {
         try {
-            console.log("holissss")
-            
             ticket.status = "pending";
-            let ticket = await ticketModel.create(ticket);
-            if(ticket){ 
-                return ticket;
+            let resultTicket = await ticketModel.create(ticket);
+
+            if(resultTicket){ 
+                return resultTicket;
             }
             else {
                 throw {
@@ -55,6 +54,7 @@ class TicketService {
                 }
             }
         } catch (error) {
+
             throw {
                 code: error.code? error.code : 400,
                 message: "Error creating new ticket",

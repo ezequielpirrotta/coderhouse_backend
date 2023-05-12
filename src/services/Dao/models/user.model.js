@@ -18,15 +18,17 @@ const schema = new mongoose.Schema({
     },
     cart: {   
         type: mongoose.Schema.Types.ObjectId,
-        ref: "tickets",       
+        ref: "carts",       
         default: ""
     },
-    orders: [
-        {   
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "tickets"       
-        },
-    ]
+    orders: {
+        type: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "tickets"       
+            }   
+        ]
+    }
 })
 
 const userModel = mongoose.model(collection,schema);

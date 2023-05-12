@@ -5,7 +5,6 @@ import { passportCall } from '../util.js';
 import { login, gitHubLogin, register, logout, resetPassword } from '../controllers/sessions.controller.js';
 const router = Router();
 const userService = new UserService()
-//const admin_credentials = {username: 'adminCoder@coder.com', password: 'adminCod3r123'};
 
 router.get("/github", passport.authenticate('github', {scope: ['user:email']}), async (req, res) => {});
 router.get('/githubcallback', passport.authenticate('github',{failureRedirect:'/github/error'}), gitHubLogin); 
@@ -24,7 +23,6 @@ router.get("/fail-login", (req, res) => {
 });
 
 passport.serializeUser((data, done) => {
-    //console.log(data.cart)
     done(null, data.user._id);
 });
 

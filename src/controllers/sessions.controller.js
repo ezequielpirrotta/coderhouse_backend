@@ -14,7 +14,7 @@ export const login = async (req, res)=>{
         maxAge: 24*60*60*1000
     })
     res.cookie('commerceCookieToken', access_token, {
-        maxAge: 3*60*1000,
+        maxAge: 20*60*1000,
         httpOnly: true
     }).send({status:"success", code: 200, payload:req.session.user, token: access_token})
 }
@@ -44,7 +44,6 @@ export const logout = async (req, res) => {
         res.send({status:"success",code: 200, message:"Sesion cerrada correctamente!" })
     }
     catch(error) {
-        console.log(error)
         res.send({error: "error logout",code: 400, message: "Error occured closing the session"});
     }
 }
@@ -59,7 +58,6 @@ export const resetPassword = async (req,res) => {
             return res.status(400).send({status: "error", message: "Password must be confirmed"});
         }
         user.password = createHash(newPassword);
-        console.log(user)
         const result = await userService.updateUser({_id:user._id},user);
         res.status(201).send({status: "success",code: 201, message: "Password reseted succesfully"});
     }

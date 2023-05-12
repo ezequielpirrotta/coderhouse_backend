@@ -25,9 +25,11 @@ export const getProductById = async (req, res, next) => {
 export const createProduct = async (req, res, next) => {
     let product = req.body;
     try {
-        product = await productService.addProduct(product.title, product.description, product.price, product.code, product.stock, product.category, product.thumbnail)
+        let available = stock > 0? true : false;
+        product.is_available = available;
+        let resultProduct = await productService.create(product)
         if(!req.body.front) {
-            socketServer.emit("event_product_created", {...product})
+            socketServer.emit("event_product_created", {...resultProduct})
         }
         res.status(200).send({
             status: 'OK',
