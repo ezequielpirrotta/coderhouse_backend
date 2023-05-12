@@ -31,23 +31,21 @@ export const createTicket = async (req, res, next) => {
     try {
         const {username,products} = req.body;
         const resultUser = await userService.getUserByUsername(username);
-        //const resultProducts = await productsService.getProducts({limit: 999});
         const resultProducts = await fetch(config.endpoint+config.port+'/api/products/?limit=999')
         .then( (response) => response.json());
-        //console.log(resultProducts);
-        //let actualTickets = resultProducts.filter(product=>products.includes(product._id));
-        let actualTickets = resultProducts.payload.filter(product=> {
+        let actualTickets = products.filter(product=> {
             let flag = false;
-            console.log(product._id)
-            products.forEach(element => {
-                console.log(element._id)
-                if(element._id === product._id){
+            console.log("Productos dentro de filter")
+            resultProducts.payload.forEach(element => {
+                
+                if(element._id == product.product._id){
                     flag = true
                 }
             });
             return flag;
-            //console.log(products.includes(product._id))
         })
+        console.log("---------------------------")
+        console.log("Productos:")
         console.log(actualTickets)
 
         let sum = actualTickets.reduce((acc,prev)=>{
@@ -60,16 +58,18 @@ export const createTicket = async (req, res, next) => {
             code: ticketNumber,
             purchaser: username,
             purchase_datetime: new Date(),
-            products: actualTickets.map(product=>product.id),
+            products: actualTickets.map(product=>product._id),
             amount: sum,
         }
-
+        console.log(ticket)
         const ticketResult = await ticketService.createTicket(ticket);
+        console.log("error?")
         resultUser.orders.push(ticketResult._id)
         await userService.updateUser(user, resultUser)
         res.send({status: 200, payload: result});
     }   
     catch(error) {
+        console.log("dí error")
         next(error)
     }
 }

@@ -89,7 +89,6 @@ app.use('/cookie', cookieRouter);
 const httpServer = app.listen(config.port);
 const socketServer = new Server(httpServer);
 app.set("socket", socketServer);
-app.set("endpoint", config.endpoint+config.port)
 
 socketServer.on("connection",socket  => {
     console.log(`Cliente ${socket.id} conectado!!`)

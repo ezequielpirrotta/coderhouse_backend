@@ -39,16 +39,12 @@ class TicketService {
             };
         }
     }
-    createTicket = async (total, mail, code = "") => {
+    createTicket = async (ticket) => {
         try {
-            let newTicket = {
-                code: code, 
-                purchase_datetime: new Date(), 
-                amount: total,
-                purchaser: mail
-            } 
-            ticket.code = toString(code);
-            let ticket = await ticketModel.create(newTicket);
+            console.log("holissss")
+            
+            ticket.status = "pending";
+            let ticket = await ticketModel.create(ticket);
             if(ticket){ 
                 return ticket;
             }
@@ -74,12 +70,11 @@ class TicketService {
             
             let result = await ticketModel.updateOne({_id: tid}, {$set:order});
             if(result.modifiedCount > 0){
-                let product = await this.getTicketById(pid);
-
-                return {fieldUpdated: data.field, newValue: data.newValue, ...product._doc};
+                let ticket = await this.getTicketById(pid);
+                return ticket;
             }
             else {
-                throw Error("El valor elegido es el mismo al que intenta cambiar, intente con uno diferente.")
+                throw Error("No se pudo resolver el ticket.")
             }
         }
         catch (error) {

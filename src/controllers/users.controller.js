@@ -32,3 +32,11 @@ export const saveUser = async (req, res, next) => {
         next(error)
     }
 }
+export const updateUser = async (req, res, next) => {
+    try {
+
+    }
+    catch(error) {
+        
+    }
+}

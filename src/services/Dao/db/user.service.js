@@ -11,10 +11,16 @@ class UserService {
         return result;
     };
     getUserByUsername = async (username) => {
-        const result = await userModel.findOne({username: username});
+        console.log(username)
+        const result = await userModel.findOne({username});
         return result;
     };
+    getUserById = async (id) => {
+        const result = await userModel.findOne({_id: id});
+        return result;  
+    }
     updateUser = async (filter, value) => {
+        console.log(filter)
         let result = await userModel.updateOne(filter, value);
         return result;
     }

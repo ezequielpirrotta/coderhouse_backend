@@ -16,6 +16,11 @@ const schema = new mongoose.Schema({
         enum: ["admin", "user"],
         default: "user"
     },
+    cart: {   
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "tickets",       
+        default: ""
+    },
     orders: [
         {   
             type: mongoose.Schema.Types.ObjectId,
