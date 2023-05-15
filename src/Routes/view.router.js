@@ -2,7 +2,6 @@ import { Router } from "express";
 //import socketServer from "../app.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { passportCall } from "../util.js";
 import config from "../config/config.js";
 const router = Router()
 
@@ -52,7 +51,8 @@ router.get('/products', async function(req, res) {
     } 
     data.products = await fetch(config.endpoint+config.port+'/api/products'+params)
     .then( (response) => response.json());
-    if(data.products.status === "WRONG"){
+    //console.log(data.products)
+    if(data.products.status === "WRONG" || data.products.error){
         data.founded = false;
         res.render('products', data);
     }
@@ -104,6 +104,9 @@ router.get('/carts/:cid', async (req, res) => {
     data.cart = await fetch(config.endpoint+config.port+'/api/carts/'+cid)
     .then( (response) => response.json())
     res.render('carts', data);
+})
+router.get('/chat', async (req, res) => {
+    res.render('messages')
 })
 
 export default router

@@ -9,6 +9,7 @@
                     {{#if token}}
                         <button id="btn_profile" class="active btn btn-primary" aria-current="page" href={{linkProfile}}>Perfil</button>
                         <button id="btn_close_session" class="active btn btn-danger" href="" aria-current="page" >Cerrar Sesion</button>
+                        <a class="active btn btn-primary" aria-current="page" href="/chat">Prueba nuestro chat!</a>   
                     {{else}}
                         <button id="btn_login" class="active btn btn-primary" aria-current="page">Iniciar sesion</button>    
                     {{/if}}
@@ -57,6 +58,9 @@
                     </li>
                 {{/if}}
             </ul>
+            <div class="formButtons">
+                <button id="create" class="btn btn-outline-primary">Crear</button>
+            </div>
         </nav>
          
         <div id="products" class="row justify-content-center">
@@ -74,8 +78,10 @@
                             <p id="description_{{this._id}}" class="card-text">{{this.description}}</p>
                             {{#if ../token}}
                                 <button id="add_button_{{this._id}}" class="btn btn-primary add_button">Añadir a carrito</button>
+                                <button id="edit_button_{{this._id}}" class="btn btn-primary edit_button">Editar</button>
                             {{else}}
                                 <button id="logedout_add_button_{{this._id}}" class="btn btn-primary add_button">Añadir a carrito</button>
+                                <button id="logedout_edit_button_{{this._id}}" class="btn btn-primary edit_button">Editar</button>
                             {{/if}}
 
                         </div>
@@ -91,4 +97,4 @@
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="/js/products.js"></script>
+<script type="module" src="/js/products.js"></script>

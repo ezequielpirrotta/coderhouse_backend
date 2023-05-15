@@ -1,13 +1,12 @@
 import React from "react";
 import { useState, createContext } from "react";
-import {getFirestore} from "firebase/firestore";
+//import {getFirestore} from "firebase/firestore";
 import { useEffect } from "react";
 
 export const CartContext = createContext();
 
 function CartContextProvider({children}) {
 
-    const db = getFirestore();
     const [cart, setCart] = useState([]);
    
     useEffect(() => {
@@ -31,7 +30,6 @@ function CartContextProvider({children}) {
             let pos = cart.findIndex(element => element.id === item.id);
             cart[pos].quantity += quantity;
             setCart([...cart]);
-            window.localStorage.setItem("cart",JSON.stringify([...cart]))
         }
         else {
             setCart([...cart, {...item, quantity: quantity}]);
@@ -66,7 +64,6 @@ function CartContextProvider({children}) {
         <CartContext.Provider 
             value={{
                 cart,
-                db,
                 addItem,
                 removeItem,
                 clearCart,

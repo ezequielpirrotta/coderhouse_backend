@@ -6,8 +6,12 @@ import NavBar from './components/nav/NavBar';
 import Cart from './components/carts/Cart';
 import Checkout from './components/Checkout';
 import Orders from './components/Orders';
+import Chat from './components/Chat';
+import React, { useEffect, useState } from 'react';
 
 function App() {
+  
+
   
   return (
     <div>
@@ -21,7 +25,8 @@ function App() {
             <Route path={"/cart"} element={<Cart/>}/>
             <Route path={"/checkout"} element={<Checkout/>}/>
             <Route path={"/orders"} element={<Orders/>}/>
-            <Route path={"/orders/:orderId"} element={<Orders/>}/> 
+            <Route path={"/orders/:orderId"} element={<Orders/>}/>
+            <Route path={'/chat'} element={<Chat />} /> 
           </Routes>
         </BrowserRouter>
       </CartContextProvider>

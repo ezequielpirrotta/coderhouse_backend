@@ -88,8 +88,9 @@ app.use('/github',githubRouter);
 /*** Server ***/
 const httpServer = app.listen(config.port);
 const socketServer = new Server(httpServer);
-app.set("socket", socketServer);
-
+//app.set("socket", socketServer);
+app.use(Express.static('react-layer'));
+let messages = [];
 socketServer.on("connection",socket  => {
     console.log(`Cliente ${socket.id} conectado!!`)
     /** Products events **/
@@ -155,5 +156,27 @@ socketServer.on("connection",socket  => {
     socket.on('event_logout_user', async () => {
         
     })
+    /** Message Events **/
+    socket.on("message", data => {
+        messages.push(data);
+        socketServer.emit("messageLogs", messages);
+    });
+    //Parte 2
+    socket.on('userConnected', data => {
+        console.log("User connected: " + data.user);
+        socket.broadcast.emit("userConnected", data.user);
+    });
+    /*mensajes para implementación de react*/
+    socket.on('send_message', (message) => {
+        console.log("hola desde el server")
+        console.log('Mensaje recibido:', message);
+        // Emitir el mensaje a todos los clientes conectados
+        socket.emit('get_message', message);
+    });
+    
+    // Manejar desconexiones de socket
+    socket.on('disconnect', () => {
+        console.log('Un usuario se ha desconectado');
+    });
 })
 export default socketServer;

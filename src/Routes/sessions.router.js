@@ -12,7 +12,7 @@ router.post("/register", passport.authenticate('register', {failureRedirect: '/a
 router.post("/login", passport.authenticate('login', {failureRedirect: '/api/sessions/fail-login'}), login);
 router.get("/logout", logout);
 router.post("/resetPassword", resetPassword);
-router.get('/current', passportCall('current'), (req,res) =>{
+router.get('/current', passport.authenticate('jwtStrat'), (req,res) =>{
     res.status(401).send(req.user);
 })
 router.get('/fail-register', (req, res)=>{

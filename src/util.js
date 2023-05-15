@@ -4,6 +4,7 @@ import multer from 'multer';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 import passport from 'passport';
+import { log } from 'console';
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync());
 
@@ -43,8 +44,10 @@ export const authToken = (req, res, next) => {
 export const passportCall = (strategy) => {
     return async (req, res, next) => {
         passport.authenticate(strategy, (err, user, info) => {
-            if (err) return next(err);
+            if (err) { return next(err);}
             if (!user) {
+                console.log("llegué a la call");
+                console.log(info)
                 return res.status(401).send({error: info.messages?info.messages:info.toString()});
             }
             req.user = user;

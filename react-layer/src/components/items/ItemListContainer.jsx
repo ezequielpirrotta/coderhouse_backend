@@ -2,19 +2,38 @@ import React, { useState , useEffect, useContext} from "react";
 import ItemList from "./ItemList";
 import { useParams } from "react-router-dom";
 import { CartContext } from "../carts/CartContext";
-import {query, collection, where, getDocs} from "firebase/firestore";
+import Swal from 'sweetalert2';
+
+const port = '3000';
+const endpoint = 'http://localhost:';
 
 function ItemListContainer() 
 {
     const [products, setProducts] = useState([]);
     const {cat} = useParams();
-    const { db } = useContext(CartContext);
-    useEffect(() => {
-        const itemsCollection = collection(db, "items");
-        const col = cat ? query(itemsCollection, where("type", "==", cat)) : itemsCollection;
-      
+    const getProducts = async () => {
+        let result = await fetch(endpoint+port+'/api/products/').then((response)=>response.json())
+        console.log(result);
+        return result
+    }
+    useEffect(  () => {
         try {
-            getDocs(col).then((snapshot) => {
+            console.log(process.env)
+            let result = getProducts()
+            if(!result.error){
+
+                //setProducts()
+            }
+            else {
+                Swal.fire({
+                    title:"Error",
+                    icon:"error",
+                    text: result.message
+                })
+            }
+            //socketServer.emit('event_logout_user');
+            //window.location.replace('/users/login');
+            /*etDocs(col).then((snapshot) => {
                 
                 let result = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })); 
                 setProducts(result);
@@ -22,10 +41,14 @@ function ItemListContainer()
                 if(!Array.isArray(result) || result.length <= 0) {
                     setProducts(null);
                 }
-            });
+            });*/
         }
-        catch(e) {
-            console.log(e)
+        catch(error) {
+            Swal.fire({
+                title:"Error",
+                icon:"error",
+                text: error.message
+            })
         }
         
     }, [cat]);

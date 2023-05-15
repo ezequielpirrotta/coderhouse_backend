@@ -1,14 +1,17 @@
 import React, {useState, useContext, useEffect} from "react";
-import {query, collection, where, getDocs, getDoc, doc} from "firebase/firestore";
+//import {query, collection, where, getDocs, getDoc, doc} from "firebase/firestore";
 import { CartContext } from "./carts/CartContext";
 import { Link, useParams } from "react-router-dom";
 import Order from "./Order";
 import Error from "./errors_&_timeout/Error";
 
+const endpoint = process.env.ENDPOINT;
+const port = process.env.SERVER_PORT;
+
 
 function Orders () {
     // 'from' puede contener valor(integer) 1 o 2 segun si viene de 'checkout' o de 'profile'
-    const {db} = useContext(CartContext);
+    
     const [orders, setOrders] = useState([]);
     const [search, setSearch] = useState("")
     const params = useParams()
@@ -20,22 +23,24 @@ function Orders () {
         //const col = ordersCollection;
         
         try {
-            if(orderId ){
-                const documento = doc(db, "orders", orderId);
-                getDoc(documento).then((snapShot) => {
+            
+            fetch(endpoint+port+'/')
+            if(orderId){
+                //const documento = doc(db, "orders", orderId);
+                /*getDoc(documento).then((snapShot) => {
                     if (snapShot.exists()) {
                         setOrders([{id:snapShot.id, ...snapShot.data()}]);
                         console.log(orders)
                     } else {
                         console.log("Error! No se encontró el Documento!");
                     }
-                });
+                });*/
             }
             else {
 
-                const ordersCollection = collection(db, "orders");
+                //const ordersCollection = collection(db, "orders");
                 //const col = orderId? query(ordersCollection, where("id", "==", orderId)) : ordersCollection;
-                getDocs(ordersCollection).then((snapshot) => {
+                /*getDocs(ordersCollection).then((snapshot) => {
                     
                     let result = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })); 
                     console.log(result)
@@ -54,7 +59,7 @@ function Orders () {
                         setOrders(result);
                         
                     }
-                    /*if(orderId) {
+                    if(orderId) {
                         result = result.filter((element) => {
                             if(Object.values(element).includes(orderId)){
                                 return true;
@@ -62,8 +67,8 @@ function Orders () {
                             return false;
                         })
                         setOrders(result)
-                    }*/
-                });
+                    }
+                });*/
             }
             
         }

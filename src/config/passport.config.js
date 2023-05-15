@@ -90,7 +90,8 @@ const initializePassport = () => {
                 const user = await userService.getUserByUsername(username);
                 if(!user){
                     return done(null,false,{status:"error",message:"User not found"});
-                } 
+                }
+                console.log(user) 
                 if(!isValidPassword(user,password)) {
                     return done(null,false,{status: "error", message:"Incorrect password"}); 
                 }
@@ -108,6 +109,7 @@ const initializePassport = () => {
             secretOrKey: PRIVATE_KEY
         },async(jwt_payload, next) => {
             try {
+                console.log(jwt_payload)
                 return next(null, jwt_payload.user);
             } 
             catch (error) {
@@ -120,6 +122,7 @@ const initializePassport = () => {
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
             secretOrKey: PRIVATE_KEY
         },async(jwt_payload, next) => {
+            console.log("llegué")
             try {
                 let user = await userService.getUserByUsername(jwt_payload.user.email)
                 return next(null, user);
@@ -130,18 +133,11 @@ const initializePassport = () => {
             }
         }
     ));
-    passport.use('permission', new JwtStrat(
-        {
-            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
-            secretOrKey: PRIVATE_KEY
-        },async(jwt_payload, next) => {
-
-        }
-    ))
 }
 const cookieExtractor = req => {
     let token = null;
     if (req && req.cookies) { //Validamos que exista el request y las cookies.
+        console.log(req.cookies['commerceCookieToken'])
         token = req.cookies['commerceCookieToken'];
     }
     return token;

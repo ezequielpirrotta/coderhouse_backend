@@ -66,8 +66,8 @@ function Checkout () {
     }})
     const generateOrder = (e) => {
         e.preventDefault()
-        const ordersCollection = collection(db, "orders");
-        addDoc(ordersCollection, order)
+        //const ordersCollection = collection(db, "orders");
+        /*addDoc(ordersCollection, order)
         .then(({id}) => {
             setCreated(true)
             setOrder({ id: id, ...order })
@@ -90,7 +90,7 @@ function Checkout () {
                 timer: 2000
             })
             console.log(e)
-        });
+        });*/
 
     };           
                    

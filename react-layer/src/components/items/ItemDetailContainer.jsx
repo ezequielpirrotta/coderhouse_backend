@@ -4,26 +4,29 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeftIcon } from '@primer/octicons-react'
 import { CartContext } from "../carts/CartContext";
 import { BookmarkFillIcon, BookmarkIcon } from "@primer/octicons-react";
-import {doc, getDoc} from "firebase/firestore"; 
+//import {doc, getDoc} from "firebase/firestore"; 
+
+const endpoint = process.env.ENDPOINT;
+const port = process.env.SERVER_PORT;
 
 function ItemDetailContainer() 
 {
     const [product, setProduct] = useState([]);
     const {id} = useParams();
-    const { db } = useContext(CartContext);
     
-    let document = doc(db, "items", id) 
+    //let document = doc(db, "items", id) 
     useEffect( () => 
     {
+        
         //resolve(products_info.find(product => product.id === parseInt(id)));
-        getDoc(document).then((snapshot) => {
+        /*getDoc(document).then((snapshot) => {
             if(snapshot.exists()) {
                 setProduct({ id: snapshot.id, ...snapshot.data() })
             }
             else {
                 setProduct(null)
             }
-        })
+        })*/
      
     },[id]);
 

@@ -5,6 +5,7 @@ const productService = new ProductService();
 
 export const getProducts = async (req, res, next) => {
     try { 
+        console.log("estoy en el back")
         let products = await productService.getProducts(req.query); 
         res.status(200).send(products);
     }
