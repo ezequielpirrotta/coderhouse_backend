@@ -1,8 +1,8 @@
 import { cartModel } from "../models/cart.model.js";
-import DBProductManager from "./product.service.js";
+import ProductService from "./product.service.js";
 import mongoose from "mongoose";
-const dbPm = new DBProductManager;
-class DBCartManager {
+const dbPm = new ProductService();
+class CartService {
     
     getCarts = async (limit) => {
         try {
@@ -24,6 +24,7 @@ class DBCartManager {
      
     getCartById =  async (id) => {
         try {
+            console.log(id)
             let cart = await cartModel.findById(id)
             if(cart) {
                 return cart;
@@ -269,4 +270,4 @@ class DBCartManager {
         }
     }
 }
-export default DBCartManager
+export default CartService

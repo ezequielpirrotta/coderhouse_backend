@@ -1,4 +1,5 @@
 import productModel from "../models/product.model.js";
+import ProductDTO from "../DTOs/product.model.DTO.js";
 
 class ProductService {
     
@@ -47,7 +48,6 @@ class ProductService {
             };
         }
     }
-     
     getProductById = async (id) => {
         try {
             let product = await productModel.findById(id)
@@ -66,18 +66,8 @@ class ProductService {
             };
         }
     }
-    addProduct = async (title, description, price, code, stock, category, thumbnail) => {
-        let available = stock > 0? true : false;
-        let newProduct = {
-            title: title, 
-            description: description, 
-            price: price, 
-            code: code, 
-            available: available, 
-            stock: stock, 
-            category: category, 
-            thumbnail: thumbnail
-        };
+    create = async (product) => {
+        let newProduct = new ProductDTO(product);
         try {
             let result = await productModel.create(newProduct);
             if(result) {

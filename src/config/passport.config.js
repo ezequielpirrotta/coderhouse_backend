@@ -5,11 +5,14 @@ import UserService from "../services/Dao/db/user.service.js";
 import GitHubStrategy from 'passport-github2';
 import { PRIVATE_KEY, createHash, isValidPassword } from "../util.js";
 import config from "./config.js";
+import CartService from "../services/Dao/db/cart.service.js";
+import UserDTO from '../services/Dao/DTOs/user.model.DTO.js';
 
 //Declaración de estrategias
 const localStrategy = passportLocal.Strategy;
 const JwtStrat = jwtStrategy.Strategy;
 const userService = new UserService();
+const cartService = new CartService()
 const initializePassport = () => {
     /**
      *  Inicializando la estrategia local, username sera para nosotros email.
@@ -28,7 +31,7 @@ const initializePassport = () => {
                         message: "Mail private, make your mail public to login"
                     }
                 }
-                const user = await userService.findByUsername(profile._json.email);
+                const user = await userService.getUserByUsername(profile._json.email);
                 if (!user) {
                     console.warn("User doesn't exists with username: " + profile._json.email);
                     let newUser = {
@@ -39,7 +42,7 @@ const initializePassport = () => {
                         password: '',
                         loggedBy: "GitHub"
                     };
-                    const result = await userModel.create(newUser);
+                    const result = await userService.saveUser(newUser);
                     return done(null, result);
                 } else {
                     return done(null, user);
@@ -52,38 +55,27 @@ const initializePassport = () => {
     passport.use('register',new localStrategy(
         {passReqToCallback: true}, async (req, username, password, done) => {
             try {
-                const { first_name, last_name, username, age, password} = req.body;
-                if(!username) {
-                    return res.status(400).send({status: "error", message: "Empty email"});
-                }
-                const exists = await userService.findByUsername(username);
+                const { first_name, last_name, age} = req.body;
+                /*if(!mail) {
+                    done(null, false, {status: "error", message: "Empty email"})
+                    //return res.status(400).send({status: "error", message: "Empty email"});
+                }*/
+                const exists = await userService.getUserByUsername(username);
                 if (exists){
                     return done(null, false, {status: "error", message: "User already exists."})
                 }
-                //let cart = await await fetch('/api/carts/').then((response)=>response.json());
-                let requestData = {
-                    method:"POST",
-                    body: JSON.stringify({}),
-                    headers: {
-                        'Content-type': 'application/json; charset=UTF-8'
-                    }
-                }
-                console.log("pase")
-                console.log(requestData)
-                let cart = await fetch(config.endpoint+config.port+'/api/carts/', requestData).then( (response) => response.json());
-                console.log("holanda")
-                console.log(cart)
-
-                const user = {
+                
+                let cart = await cartService.addCart();
+                const user = new UserDTO({
                     first_name: first_name,
                     last_name: last_name,
-                    username: username,
+                    mail: username,
                     age: age,
                     password: createHash(password),
                     cartId: cart._id
-                };
-                const result = await userService.save(user);
-                return done(null,result)
+                });
+                const resultUser = await userService.saveUser(user);
+                return done(null,{user: resultUser})
             }
             catch(error) {
                 return done("Error loging up user: "+error)
@@ -95,14 +87,15 @@ const initializePassport = () => {
         {passReqToCallback: true}, async (req, username, password, done) => {
             
             try{
-                const user = await userService.findByUsername(username);
+                const user = await userService.getUserByUsername(username);
                 if(!user){
                     return done(null,false,{status:"error",message:"User not found"});
-                } 
+                }
                 if(!isValidPassword(user,password)) {
                     return done(null,false,{status: "error", message:"Incorrect password"}); 
                 }
-                return done(null, user)
+                const cart = await cartService.getCartById(user.cart)
+                return done(null, {user:user,cart:cart})
             }
             catch(error) {
                 return done(error)
@@ -115,10 +108,30 @@ const initializePassport = () => {
             secretOrKey: PRIVATE_KEY
         },async(jwt_payload, next) => {
             try {
+                //console.log(jwt_payload)
                 return next(null, jwt_payload.user);
             } 
             catch (error) {
-                console.error(error);
+                return next(error);
+            }
+        }
+    ));
+    passport.use('authStrat', new JwtStrat(
+        {
+            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+            secretOrKey: PRIVATE_KEY
+        },async(jwt_payload, done) => {
+            try {
+
+                let role = jwt_payload.user.role
+                if (role === 'admin') {
+                    return done(null, false, { message: 'No tienes permisos para acceder a esta ruta.' });
+                }
+              
+                // El usuario tiene acceso
+                return done(null, jwt_payload);
+            } 
+            catch (error) {
                 return next(error);
             }
         }
@@ -128,8 +141,9 @@ const initializePassport = () => {
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
             secretOrKey: PRIVATE_KEY
         },async(jwt_payload, next) => {
+            console.log("llegué")
             try {
-                let user = await userService.findByUsername(jwt_payload.user.email)
+                let user = await userService.getUserByUsername(jwt_payload.user.email)
                 return next(null, user);
             } 
             catch (error) {
@@ -139,6 +153,22 @@ const initializePassport = () => {
         }
     ));
 }
+passport.serializeUser((data, done) => {
+    console.log("Data serializada:")
+    console.log(data)
+    done(null, data.user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        let user = await userService.getUserById(id);
+        console.log("Data deserializada:")
+        console.log(id)
+        done(null, user);
+    } catch (error) {
+        console.error("Error deserializando el usuario: " + error);
+    }
+});
 const cookieExtractor = req => {
     let token = null;
     if (req && req.cookies) { //Validamos que exista el request y las cookies.

@@ -1,24 +1,29 @@
 <div id="main" class="container-fluid justify-content-center">
     <div className="row nav-bar m-2">
         <nav className="col navbar fixed-top">
-            <ul id="navBarList" class="navbar-nav flex-row justify-content-center">
-                {{#if token}}
-                    <li class="nav-item col-md-6 justify-content-center">
-                        <h1>Bienvenido!</h1>
-                    </li>
-                    <li class="nav-item col-md-6 justify-content-end"> 
+            <ul id="navBarList" class="navbar-nav nav-bar flex-row justify-content-center">
+                <li class="nav-item col-md-6 justify-content-center">
+                    <h1>Bienvenido!</h1>
+                </li>
+                <li class="nav-item col-md-6 justify-content-end"> 
+                    {{#if token}}
                         <button id="btn_profile" class="active btn btn-primary" aria-current="page" href={{linkProfile}}>Perfil</button>
                         <button id="btn_close_session" class="active btn btn-danger" href="" aria-current="page" >Cerrar Sesion</button>
-                    </li>
-                {{else}}
-                    <li class="nav-item col-md-6 justify-content-center text-center">
-                        <h1>Bienvenido!</h1>
-                    </li>
-                    <li class="nav-item col-md-6 justify-content-center text-center">
-                        <button id="btn_login" class="active btn btn-primary" aria-current="page">Iniciar sesion</button>
-                    </li>
-                     
-                {{/if}}
+                        <a class="active btn btn-primary" aria-current="page" href="/chat">Prueba nuestro chat!</a>   
+                    {{else}}
+                        <button id="btn_login" class="active btn btn-primary" aria-current="page">Iniciar sesion</button>    
+                    {{/if}}
+                    <a href="/products">
+                        <button id="" type="button" className="btn">
+                            <img src="/img/cart2.svg" alt="Carrito" width="25"/>
+                            {{#if isCart }}
+                                <span id="cart_items" className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{totalCart}} 
+                                </span>
+                            {{/if}}   
+                        </button>
+                    </a>
+                </li>
             </ul>
         </nav>   
     </div>
@@ -53,6 +58,9 @@
                     </li>
                 {{/if}}
             </ul>
+            <div class="formButtons">
+                <button id="create" class="btn btn-outline-primary">Crear</button>
+            </div>
         </nav>
          
         <div id="products" class="row justify-content-center">
@@ -70,8 +78,10 @@
                             <p id="description_{{this._id}}" class="card-text">{{this.description}}</p>
                             {{#if ../token}}
                                 <button id="add_button_{{this._id}}" class="btn btn-primary add_button">Añadir a carrito</button>
+                                <button id="edit_button_{{this._id}}" class="btn btn-primary edit_button">Editar</button>
                             {{else}}
                                 <button id="logedout_add_button_{{this._id}}" class="btn btn-primary add_button">Añadir a carrito</button>
+                                <button id="logedout_edit_button_{{this._id}}" class="btn btn-primary edit_button">Editar</button>
                             {{/if}}
 
                         </div>
@@ -87,4 +97,4 @@
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="/js/products.js"></script>
+<script type="module" src="/js/products.js"></script>
