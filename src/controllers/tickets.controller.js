@@ -1,11 +1,9 @@
-import ProductService from "../services/Dao/db/product.service.js";
 import TicketService from "../services/Dao/db/ticket.service.js";
 import UserService from "../services/Dao/db/user.service.js";
 import config from "../config/config.js";
 
 const ticketService = new TicketService();
 const userService = new UserService();
-const productsService = new ProductService();
 
 export const getTickets = async (req, res, next) => {
     try {

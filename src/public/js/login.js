@@ -54,6 +54,7 @@ form.addEventListener('submit',async (e)=>{
         window.location.replace('/products');
     }
     else {
+        cosnsole.log(result)
         Swal.fire({
             title:"Error",
             icon:"error",

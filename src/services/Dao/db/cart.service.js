@@ -24,6 +24,7 @@ class CartService {
      
     getCartById =  async (id) => {
         try {
+            console.log(id)
             let cart = await cartModel.findById(id)
             if(cart) {
                 return cart;

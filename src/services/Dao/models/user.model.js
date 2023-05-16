@@ -18,8 +18,7 @@ const schema = new mongoose.Schema({
     },
     cart: {   
         type: mongoose.Schema.Types.ObjectId,
-        ref: "carts",       
-        default: ""
+        ref: "carts"      
     },
     orders: {
         type: [

@@ -1,7 +1,11 @@
 import { createHash, isValidPassword, generateJWToken } from '../util.js';
 
 export const login = async (req, res)=>{
-    let user = req.user
+    let user = req.user.user;
+    let cart = req.user.cart;
+    console.log("llegué al login")
+    console.log(user)
+    console.log(cart)
     user = {
         name : `${user.first_name} ${user.last_name}`,
         email: user.username,
@@ -9,12 +13,13 @@ export const login = async (req, res)=>{
         role: user.role
     }  
     const access_token = generateJWToken(user);
-    const cart = JSON.stringify(req.user.cart)
+    
+    cart = JSON.stringify(cart)
     res.cookie("cartCookie", cart, {
         maxAge: 24*60*60*1000
     })
     res.cookie('commerceCookieToken', access_token, {
-        maxAge: 20*60*1000,
+        maxAge: 24*60*60*1000,
         httpOnly: true
     }).send({status:"success", code: 200, payload:req.session.user, token: access_token})
 }

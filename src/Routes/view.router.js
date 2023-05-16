@@ -51,7 +51,7 @@ router.get('/products', async function(req, res) {
     } 
     data.products = await fetch(config.endpoint+config.port+'/api/products'+params)
     .then( (response) => response.json());
-    //console.log(data.products)
+    
     if(data.products.status === "WRONG" || data.products.error){
         data.founded = false;
         res.render('products', data);

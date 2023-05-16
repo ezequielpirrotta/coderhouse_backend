@@ -55,27 +55,27 @@ const initializePassport = () => {
     passport.use('register',new localStrategy(
         {passReqToCallback: true}, async (req, username, password, done) => {
             try {
-                const { first_name, last_name, username, age, password} = req.body;
-                if(!username) {
-                    return res.status(400).send({status: "error", message: "Empty email"});
-                }
+                const { first_name, last_name, age} = req.body;
+                /*if(!mail) {
+                    done(null, false, {status: "error", message: "Empty email"})
+                    //return res.status(400).send({status: "error", message: "Empty email"});
+                }*/
                 const exists = await userService.getUserByUsername(username);
                 if (exists){
                     return done(null, false, {status: "error", message: "User already exists."})
                 }
                 
                 let cart = await cartService.addCart();
-                
                 const user = new UserDTO({
                     first_name: first_name,
                     last_name: last_name,
-                    username: username,
+                    mail: username,
                     age: age,
                     password: createHash(password),
-                    cart: cart._id
+                    cartId: cart._id
                 });
-                const result = await userService.saveUser(user);
-                return done(null,result)
+                const resultUser = await userService.saveUser(user);
+                return done(null,{user: resultUser})
             }
             catch(error) {
                 return done("Error loging up user: "+error)
@@ -91,7 +91,6 @@ const initializePassport = () => {
                 if(!user){
                     return done(null,false,{status:"error",message:"User not found"});
                 }
-                console.log(user) 
                 if(!isValidPassword(user,password)) {
                     return done(null,false,{status: "error", message:"Incorrect password"}); 
                 }
@@ -109,8 +108,28 @@ const initializePassport = () => {
             secretOrKey: PRIVATE_KEY
         },async(jwt_payload, next) => {
             try {
-                console.log(jwt_payload)
+                //console.log(jwt_payload)
                 return next(null, jwt_payload.user);
+            } 
+            catch (error) {
+                return next(error);
+            }
+        }
+    ));
+    passport.use('authStrat', new JwtStrat(
+        {
+            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+            secretOrKey: PRIVATE_KEY
+        },async(jwt_payload, done) => {
+            try {
+
+                let role = jwt_payload.user.role
+                if (role === 'admin') {
+                    return done(null, false, { message: 'No tienes permisos para acceder a esta ruta.' });
+                }
+              
+                // El usuario tiene acceso
+                return done(null, jwt_payload);
             } 
             catch (error) {
                 return next(error);
@@ -134,10 +153,25 @@ const initializePassport = () => {
         }
     ));
 }
+passport.serializeUser((data, done) => {
+    console.log("Data serializada:")
+    console.log(data)
+    done(null, data.user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        let user = await userService.getUserById(id);
+        console.log("Data deserializada:")
+        console.log(id)
+        done(null, user);
+    } catch (error) {
+        console.error("Error deserializando el usuario: " + error);
+    }
+});
 const cookieExtractor = req => {
     let token = null;
     if (req && req.cookies) { //Validamos que exista el request y las cookies.
-        console.log(req.cookies['commerceCookieToken'])
         token = req.cookies['commerceCookieToken'];
     }
     return token;

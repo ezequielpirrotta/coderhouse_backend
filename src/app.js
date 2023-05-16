@@ -13,6 +13,7 @@ import usersViewRouter from "./Routes/users.views.router.js";
 import sessionsRouter from "./Routes/sessions.router.js";
 import githubRouter from "./Routes/github-login.views.router.js";
 import emailRouter from "./Routes/email.router.js";
+import cookieRouter from "./Routes/cookie.router.js";
 //Other imports
 import MongoStore from 'connect-mongo';
 import __dirname, { PRIVATE_KEY } from "./util.js";
@@ -81,6 +82,7 @@ app.use('/api/products', productRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/api/tickets', ticketsRouter);
 app.use('/api/users', usersRouter)
+app.use('/cookies', cookieRouter)
 app.use("/users", usersViewRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/mail", emailRouter);
