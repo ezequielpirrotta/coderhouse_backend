@@ -120,16 +120,16 @@ const initializePassport = () => {
         {
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
             secretOrKey: PRIVATE_KEY
-        },async(jwt_payload, done) => {
+        },async(jwt_payload, next) => {
             try {
 
                 let role = jwt_payload.user.role
                 if (role === 'admin') {
-                    return done(null, false, { message: 'No tienes permisos para acceder a esta ruta.' });
+                    return next(null, false, { message: 'No tienes permisos para acceder a esta ruta.' });
                 }
               
                 // El usuario tiene acceso
-                return done(null, jwt_payload);
+                return next(null, jwt_payload);
             } 
             catch (error) {
                 return next(error);
