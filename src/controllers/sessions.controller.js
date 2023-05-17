@@ -2,10 +2,10 @@ import { createHash, isValidPassword, generateJWToken } from '../util.js';
 
 export const login = async (req, res)=>{
     let user = req.user.user;
-    let cart = req.user.cart;
+    let cart = req.user.cart?req.user.cart:null;
     console.log("llegué al login")
-    console.log(user)
-    console.log(cart)
+    //console.log(user)
+    //console.log(cart)
     user = {
         name : `${user.first_name} ${user.last_name}`,
         email: user.username,
@@ -13,11 +13,12 @@ export const login = async (req, res)=>{
         role: user.role
     }  
     const access_token = generateJWToken(user);
-    
-    cart = JSON.stringify(cart)
-    res.cookie("cartCookie", cart, {
-        maxAge: 24*60*60*1000
-    })
+    if(cart){
+        cart = JSON.stringify(cart)
+        res.cookie("cartCookie", cart, {
+            maxAge: 24*60*60*1000
+        })
+    }
     res.cookie('commerceCookieToken', access_token, {
         maxAge: 24*60*60*1000,
         httpOnly: true
