@@ -14,6 +14,7 @@ import sessionsRouter from "./Routes/sessions.router.js";
 import githubRouter from "./Routes/github-login.views.router.js";
 import emailRouter from "./Routes/email.router.js";
 import cookieRouter from "./Routes/cookie.router.js";
+import mockingRouter from "./Routes/products.router.mock.js"
 //Other imports
 import MongoStore from 'connect-mongo';
 import __dirname, { PRIVATE_KEY } from "./util.js";
@@ -69,7 +70,7 @@ app.engine('handlebars', handlebars.engine())
 app.set('views',__dirname + '/views');
 app.set('view engine', 'handlebars');
 /*** Middlewares y Cookies***/
-productRouter.use(error_middleware);
+//productRouter.use(error_middleware);
 cartsRouter.use(error_middleware);
 app.use(cookieParser(PRIVATE_KEY))
 //Middlewares de Passport
@@ -87,6 +88,7 @@ app.use("/users", usersViewRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/mail", emailRouter);
 app.use('/github',githubRouter);
+app.use('/mockingproducts', mockingRouter)
 /*** Server ***/
 const httpServer = app.listen(config.port);
 const socketServer = new Server(httpServer);

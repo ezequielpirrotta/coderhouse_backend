@@ -4,7 +4,7 @@ import multer from 'multer';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 import passport from 'passport';
-import { Console, log } from 'console';
+import {faker} from '@faker-js/faker';
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync());
 
@@ -62,6 +62,40 @@ export const authorization = (role) => {
         next()
     }
 }
+faker.locale = 'es'; //Idioma de los datos
+
+export const generateUser = () => {
+    let numOfProducts = parseInt(faker.random.numeric(1, {bannedDigits:['0']}));
+    let products = [];
+    for (let i = 0; i < numOfProducts; i++) {
+        products.push(generateProduct());
+    }
+    return {
+        name: faker.name.firstName(),
+        last_name: faker.name.lastName(),
+        sex: faker.name.sex(),
+        birthDate: faker.date.birthdate(),
+        products,
+        image: faker.internet.avatar(),
+        id: faker.database.mongodbObjectId(),
+        email: faker.internet.email()
+    };
+};
+
+export const generateProduct = () => {
+    let product = {
+        _id: faker.database.mongodbObjectId(),
+        code: faker.random.alphaNumeric(7),
+        title: faker.commerce.productName(),
+        description: faker.lorem.text(),
+        price: parseInt(faker.random.numeric(3)),
+        stock: parseInt(faker.random.numeric(2)),
+        category: faker.commerce.department(),
+        thumbnail: faker.image.image()
+    }
+    product.available = product.stock > 0 ? true : false;
+    return product;
+};
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename).split(path.sep).join(path.posix.sep);
 

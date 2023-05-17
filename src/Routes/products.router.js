@@ -7,7 +7,7 @@ const router = Router()
 
 router.get('/', getProducts)
 router.get('/:pid', getProductById)
-router.post('/', permissionsMiddleware, passport.authenticate("jwtStrat"), createProduct)
+router.post('/', /*permissionsMiddleware, passport.authenticate("jwtStrat"),*/ createProduct)
 router.put('/:id', passport.authenticate("authStrat"), permissionsMiddleware, updateProduct)
 router.delete('/:id', passport.authenticate("jwtStrat"), permissionsMiddleware, deleteProduct)
 

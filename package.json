@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/ezequielpirrotta/coderhouse_backend#readme",
   "dependencies": {
+    "@faker-js/faker": "^7.6.0",
     "bcrypt": "^5.1.0",
     "bootstrap": "^5.2.3",
     "commander": "^10.0.1",
