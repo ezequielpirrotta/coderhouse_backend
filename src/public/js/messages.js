@@ -25,6 +25,9 @@ const getUser = async () => {
         });
     }
     else {
+        if(user.role===){
+
+        }
         socket.emit('userConnected', {user: value});
         console.log(user)
     }

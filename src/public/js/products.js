@@ -1,7 +1,4 @@
 //import Swal from "sweetalert2";
-//require('dotenv').config()
-//import config from 'dotenv/config';
-//console.log(process.env.PORT)
 const socketServer = io()
 const products = document.getElementsByClassName("product");
 /**Buttons */
@@ -80,11 +77,7 @@ for(let i=0; i < products.length;i++) {
             }
             else {
                 let cookieCart = await fetch('http://localhost:8080/cookies/getCookie/cartCookie').then( (response) => response.json());
-                console.log(cookieCart)
                 if (cookieCart) {
-                    // Extract the value from the cookie string
-                    //const [, value] = cookieValue.split('=');
-                    //console.log(`Cookie value: ${JSON.parse(value)}`);
                     const { value: quantity } = await Swal.fire({
                         title: 'How many products?',
                         icon: 'question',
@@ -112,32 +105,34 @@ for(let i=0; i < products.length;i++) {
                                 'Content-type': 'application/json; charset=UTF-8',
                             }
                         }
-                        console.log(cart)
                         let request = new Request('http://localhost:8080/api/carts/'+user.cart+'/product', requestData)
-                        let result = await fetch(request).then( (response) => response.json());
-                        if(result.status === "WRONG") {
-                            console.log(result)
-                            Swal.fire({
-                                title: `Producto no Agregado`,
-                                text: result.detail
-                            })
-                        }
-                        else {
-                            cookieCart = cart;
-                            let requestData = {
-                                method:"POST",
-                                body: JSON.stringify({cookieValue: cookieCart ,cookieName:'cartCookie'}),
-                                headers: {
-                                    'Content-type': 'application/json; charset=UTF-8',
-                                }
+                       
+                        fetch(request)
+                        .then( (response) => {
+                            if (!response.ok) {
+                                console.log(result)
+                                Swal.fire({
+                                    title: `Producto no Agregado`,
+                                    text: result.detail
+                                })
                             }
-                            let request = new Request('http://localhost:8080/cookies/updateCookie', requestData)
-                            await fetch(request).then( (response) => response.json()); 
-                            Swal.fire({
-                                title: `Producto agregado exitosamente`,
-                                color: '#716add'
-                            })
-                        }
+                            else {
+                                cookieCart = cart;
+                                let requestData = {
+                                    method:"POST",
+                                    body: JSON.stringify({cookieValue: cookieCart ,cookieName:'cartCookie'}),
+                                    headers: {
+                                        'Content-type': 'application/json; charset=UTF-8',
+                                    }
+                                }
+                                let request = new Request('http://localhost:8080/cookies/updateCookie', requestData)
+                                fetch(request).then( (response) => response.json()); 
+                                Swal.fire({
+                                    title: `Producto agregado exitosamente`,
+                                    color: '#716add'
+                                })
+                            }
+                        })
                         //socketServer.emit('event_add_product_to_cart', {isNewCart: true, cart: cart});
                     }
                 } 
@@ -203,17 +198,15 @@ for(let i=0; i < products.length;i++) {
                             'Content-type': 'application/json; charset=UTF-8',
                         }
                     }
-                    let request = new Request('http://localhost:8080/api/products/'+id, requestData) 
-                    let result = await fetch(request)
-                    .then( (response) => response);
-                    console.log(result)
-                    if(result != "Unauthorized") {
-                        result = result.json()
-                        console.log(result)
-                        if(result.status === "WRONG") {
+                    let request = new Request('/api/products/'+id, requestData) 
+                    fetch(request)
+                    .then( (response) => {
+                        if (!response.ok) {
+                            //throw new Error('Network response was not ok');
+                            console.log(response)
                             Swal.fire({
                                 title: `Producto ${id} no actualizado`,
-                                text: result.message
+                                text: response.message
                             })
                         }
                         else {
@@ -222,7 +215,8 @@ for(let i=0; i < products.length;i++) {
                                 color: '#716add'
                             })
                         }
-                    }
+                        return response.text();
+                    });
                     
                 }
             }

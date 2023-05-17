@@ -55,7 +55,7 @@ const initializePassport = () => {
     passport.use('register',new localStrategy(
         {passReqToCallback: true}, async (req, username, password, done) => {
             try {
-                const { first_name, last_name, age} = req.body;
+                const { first_name, last_name, age, role} = req.body;
                 /*if(!mail) {
                     done(null, false, {status: "error", message: "Empty email"})
                     //return res.status(400).send({status: "error", message: "Empty email"});
@@ -64,15 +64,19 @@ const initializePassport = () => {
                 if (exists){
                     return done(null, false, {status: "error", message: "User already exists."})
                 }
-                
-                let cart = await cartService.addCart();
+                let isAdminRole = role==='on'
+                let cart = {}
+                if(!isAdminRole){
+                    cart = await cartService.addCart();
+                }
                 const user = new UserDTO({
                     first_name: first_name,
                     last_name: last_name,
                     mail: username,
                     age: age,
                     password: createHash(password),
-                    cartId: cart._id
+                    cartId: cart._id? cart._id : null,
+                    role: isAdminRole? 'admin' : 'user'
                 });
                 const resultUser = await userService.saveUser(user);
                 return done(null,{user: resultUser})
@@ -94,8 +98,12 @@ const initializePassport = () => {
                 if(!isValidPassword(user,password)) {
                     return done(null,false,{status: "error", message:"Incorrect password"}); 
                 }
-                const cart = await cartService.getCartById(user.cart)
-                return done(null, {user:user,cart:cart})
+                let cart = null
+                if(user.cart){
+
+                    cart = await cartService.getCartById(user.cart)
+                }
+                return done(null, {user: user, cart: cart})
             }
             catch(error) {
                 return done(error)
@@ -108,28 +116,7 @@ const initializePassport = () => {
             secretOrKey: PRIVATE_KEY
         },async(jwt_payload, next) => {
             try {
-                //console.log(jwt_payload)
                 return next(null, jwt_payload.user);
-            } 
-            catch (error) {
-                return next(error);
-            }
-        }
-    ));
-    passport.use('authStrat', new JwtStrat(
-        {
-            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
-            secretOrKey: PRIVATE_KEY
-        },async(jwt_payload, next) => {
-            try {
-
-                let role = jwt_payload.user.role
-                if (role === 'admin') {
-                    return next(null, false, { message: 'No tienes permisos para acceder a esta ruta.' });
-                }
-              
-                // El usuario tiene acceso
-                return next(null, jwt_payload);
             } 
             catch (error) {
                 return next(error);
@@ -141,7 +128,6 @@ const initializePassport = () => {
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
             secretOrKey: PRIVATE_KEY
         },async(jwt_payload, next) => {
-            console.log("llegué")
             try {
                 let user = await userService.getUserByUsername(jwt_payload.user.email)
                 return next(null, user);

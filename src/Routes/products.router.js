@@ -1,14 +1,15 @@
 import { Router } from "express";
 import passport from 'passport';
 import { createProduct, deleteProduct, getProductById, getProducts, updateProduct } from "../controllers/products.controller.js";
-import permissionsMiddleware from "../middlewares/permissions.midddleware.js";
+import {permissionsIsAdmin, permissionsIsUser} from "../middlewares/permissions.midddleware.js";
+import { passportCall } from "../util.js";
 
 const router = Router()
 
 router.get('/', getProducts)
 router.get('/:pid', getProductById)
-router.post('/', permissionsMiddleware, passport.authenticate("jwtStrat"), createProduct)
-router.put('/:id', passport.authenticate("authStrat"), permissionsMiddleware, updateProduct)
-router.delete('/:id', passport.authenticate("jwtStrat"), permissionsMiddleware, deleteProduct)
+router.post('/', passportCall("jwtStrat"), permissionsIsAdmin, createProduct)
+router.put('/:id', passportCall("jwtStrat"), permissionsIsAdmin, updateProduct)
+router.delete('/:id', passportCall("jwtStrat"), permissionsIsAdmin, deleteProduct)
 
 export default router

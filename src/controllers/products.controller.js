@@ -44,7 +44,7 @@ export const createProduct = async (req, res, next) => {
 }
 export const updateProduct = async (req, res, next) => {
     let {id} = req.params
-    
+    console.log("llegué al update")
     try {
         let result = await productService.updateProduct(id, req.body)
         socketServer.emit("event_product_updated", result)
