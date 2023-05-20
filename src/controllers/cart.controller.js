@@ -1,6 +1,7 @@
 import CartService from '../services/Dao/db/cart.service.js'
 import config from '../config/config.js';
 import ProductService from '../services/Dao/db/product.service.js';
+import { log } from '../config/logger.js';
 
 const productService = new ProductService()
 const cartService = new CartService();
@@ -11,6 +12,7 @@ export const getCarts = async (req, res, next) => {
         res.send(carts);
     }
     catch(error) {
+        req.logger.error(log(error.message,req));
         next(error)
     }
 }
@@ -21,7 +23,8 @@ export const getCartById = async (req, res, next) => {
         res.send(cart);
     }
     catch(error) {
-        next(error)
+        req.logger.error(log(error.message,req));
+        next(error);
     }
 }
 export const createCart = async (req, res, next) => {
@@ -33,7 +36,7 @@ export const createCart = async (req, res, next) => {
         res.send(result);
     }
     catch(error) {
-
+        req.logger.error(log(error.message,req));
         next(error)
     }
 }
@@ -45,6 +48,7 @@ export const replaceCart = async (req, res, next) => {
             res.status(200).send(result)
         } 
         catch(error) {
+            req.logger.error(log(error.message,req));
             next(error)
         }
 }
@@ -57,6 +61,7 @@ export const updateProductFromCart = async (req, res, next) => {
         res.status(200).send(result)
     } 
     catch(error) {
+        req.logger.error(log(error.message,req));
         next(error)
     }
 }
@@ -68,6 +73,7 @@ export const addProductToCart = async (req, res, next) => {
         res.status(200).send(result)
     } 
     catch(error) {
+        req.logger.error(log(error.message,req));
         next(error)
     }
 }
@@ -116,6 +122,7 @@ export const purchaseCart = async (req, res, next) => {
         res.status(200).send(notAvailableCart);
     }
     catch(error) {
+        req.logger.error(log(error.message,req));
         next(error)
     }
 }
@@ -131,6 +138,7 @@ export const deleteProductFromCart = async (req, res, next) => {
         })
     }
     catch(error) {
+        req.logger.error(log(error.message,req));
         next(error)
     }
 }
@@ -145,6 +153,7 @@ export const deleteProducts = async (req, res, next) => {
         })
     }
     catch(error) {
+        req.logger.error(log(error.message,req));
         next(error)
     }
 }
@@ -160,6 +169,7 @@ export const deleteCart = async (req, res, next) => {
         })
     }
     catch(error) {
+        req.logger.error(log(error.message,req));
         next(error)
     }
 }

@@ -20,27 +20,7 @@ export const PRIVATE_KEY = "MyCommerceSecretKeyJWT";
 export const generateJWToken = (user) => {
     return jwt.sign({user}, PRIVATE_KEY, {expiresIn: '24h'});
 };
-/**
- * Metodo que autentica el token JWT para nuestros requests.
- * OJO: Esto actúa como un middleware, observar el next.
- * @param {*} req Objeto de request
- * @param {*} res Objeto de response
- * @param {*} next Pasar al siguiente evento.
- */
-export const authToken = (req, res, next) => {
-    //El JWT token se guarda en los headers de autorización.
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).send({error: "User not authenticated or missing token."});
-    }
-    const token = authHeader.split(' ')[1]; //Se hace el split para retirar la palabra Bearer.
-    //Validar token
-    jwt.verify(token, PRIVATE_KEY, (error, credentials) => {
-        if (error) return res.status(403).send({error: "Token invalid, Unauthorized!"});
-        req.user = credentials.user;
-        next();
-    });
-};
+
 export const passportCall = (strategy) => {
     return async (req, res, next) => {
         passport.authenticate(strategy, (err, user, info) => {
