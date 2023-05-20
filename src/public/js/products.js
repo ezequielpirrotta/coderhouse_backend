@@ -108,13 +108,23 @@ for(let i=0; i < products.length;i++) {
                         let request = new Request('http://localhost:8080/api/carts/'+user.cart+'/product', requestData)
                        
                         fetch(request)
-                        .then( (response) => {
+                        .then( async (response) => {
                             if (!response.ok) {
-                                console.log(result)
-                                Swal.fire({
-                                    title: `Producto no Agregado`,
-                                    text: result.detail
-                                })
+                                const error = await response.json()
+                                if(error){
+                                    Swal.fire({
+                                        title: `Producto no Agregado`,
+                                        icon: 'error',
+                                        text: error.message
+                                    })
+                                }
+                                else {
+                                    Swal.fire({
+                                        title: `Producto no Agregado`,
+                                        icon: 'error',
+                                        text: 'Ha ocurrido un error inesperado'
+                                    })
+                                }
                             }
                             else {
                                 cookieCart = cart;

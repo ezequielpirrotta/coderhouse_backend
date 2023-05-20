@@ -1,7 +1,6 @@
 import { Router } from "express";
-import passport from 'passport';
 import { createProduct, deleteProduct, getProductById, getProducts, updateProduct } from "../controllers/products.controller.js";
-import {permissionsIsAdmin, permissionsIsUser} from "../middlewares/permissions.midddleware.js";
+import {permissionsIsAdmin} from "../middlewares/permissions.midddleware.js";
 import { passportCall } from "../util.js";
 
 const router = Router()

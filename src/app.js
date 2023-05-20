@@ -15,14 +15,17 @@ import githubRouter from "./Routes/github-login.views.router.js";
 import emailRouter from "./Routes/email.router.js";
 import cookieRouter from "./Routes/cookie.router.js";
 import mockingRouter from "./Routes/products.router.mock.js"
+import logRouter from "./Routes/log.router.js"
 //Other imports
 import MongoStore from 'connect-mongo';
 import __dirname, { PRIVATE_KEY } from "./util.js";
 import {Server} from 'socket.io'
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
+import CustomError from "./services/errors/CustomError.js";
+import EErrors from "./services/errors/errors-enum.js";
 //Midlewares imports
-import error_middleware from "./middlewares/error_handler_middleware.js";
+import { addLogger } from "./config/logger.js";
 //Passport imports
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
@@ -31,17 +34,17 @@ import config from "./config/config.js";
 
 const app = Express()
 /*** DB ***/
-const MONGO_URL = "mongodb+srv://ezequielpdesarrollo:DhLxBaXZaUYdyqwP@e-commerce.uelsobh.mongodb.net/e-commerce?retryWrites=true&w=majority"
 const connectToMongoDB = async () => {
     try {
-        await mongoose.connect(MONGO_URL);
+        await mongoose.connect(config.mongoUrl);
     }
     catch(error){
-        throw {
-            code: 404,
-            message: "Error encontrando/creando la base de datos.",
-            detail: `${error.message}`
-        }
+        CustomError.createError({
+            name: "Data Base connection/creation error",
+            cause: generateProductErrorInfo({url: config.mongoUrl, message: error.message}),
+            message: "Error trying to connect/create DB ",
+            code: EErrors.DATABASE_ERROR
+        })
     }
 }
 connectToMongoDB();
@@ -52,7 +55,7 @@ app.use(session({
     //path: Ruta a donde se buscará el archivo del session store.
     //store: new fileStorage({path : "./sessions", retries: 0}),
     store: MongoStore.create({
-        mongoUrl: MONGO_URL,
+        mongoUrl: config.mongoUrl,
         mongoOptions: {useNewUrlParser: true, useUnifiedTopology: true},
         ttl: 260
     }),
@@ -71,8 +74,8 @@ app.set('views',__dirname + '/views');
 app.set('view engine', 'handlebars');
 /*** Middlewares y Cookies***/
 //productRouter.use(error_middleware);
-cartsRouter.use(error_middleware);
 app.use(cookieParser(PRIVATE_KEY))
+app.use(addLogger)
 //Middlewares de Passport
 initializePassport();
 app.use(passport.initialize());
@@ -89,6 +92,7 @@ app.use("/api/sessions", sessionsRouter);
 app.use("/api/mail", emailRouter);
 app.use('/github',githubRouter);
 app.use('/mockingproducts', mockingRouter)
+app.use('/loggerTest', logRouter)
 /*** Server ***/
 const httpServer = app.listen(config.port);
 const socketServer = new Server(httpServer);
@@ -96,7 +100,6 @@ const socketServer = new Server(httpServer);
 app.use(Express.static('react-layer'));
 let messages = [];
 socketServer.on("connection",socket  => {
-    console.log(`Cliente ${socket.id} conectado!!`)
     /** Products events **/
     socket.on("event_update_product", async (data) => {
         let change = {
@@ -172,8 +175,7 @@ socketServer.on("connection",socket  => {
     });
     /*mensajes para implementación de react*/
     socket.on('send_message', (message) => {
-        console.log("hola desde el server")
-        console.log('Mensaje recibido:', message);
+        console.log('Mensaje recibido:', message);''
         // Emitir el mensaje a todos los clientes conectados
         socket.emit('get_message', message);
     });
