@@ -1,11 +1,10 @@
+import { log } from '../config/logger.js';
 import { createHash, isValidPassword, generateJWToken } from '../util.js';
 
 export const login = async (req, res)=>{
     let user = req.user.user;
     let cart = req.user.cart?req.user.cart:null;
-    console.log("llegué al login")
-    //console.log(user)
-    //console.log(cart)
+    req.logger.debug(log("Llegué al login",req))
     user = {
         name : `${user.first_name} ${user.last_name}`,
         email: user.username,
@@ -47,9 +46,11 @@ export const register = async (req, res)=>{
 export const logout = async (req, res) => {
     try{
         res.clearCookie('commerceCookieToken');
+        res.clearCookie('cartCookie');
         res.send({status:"success",code: 200, message:"Sesion cerrada correctamente!" })
     }
     catch(error) {
+        req.logger.error(log(error.message,req));
         res.send({error: "error logout",code: 400, message: "Error occured closing the session"});
     }
 }

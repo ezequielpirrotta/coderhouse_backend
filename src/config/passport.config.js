@@ -7,6 +7,7 @@ import { PRIVATE_KEY, createHash, isValidPassword } from "../util.js";
 import config from "./config.js";
 import CartService from "../services/Dao/db/cart.service.js";
 import UserDTO from '../services/Dao/DTOs/user.model.DTO.js';
+import { log } from "./logger.js";
 
 //Declaración de estrategias
 const localStrategy = passportLocal.Strategy;
@@ -33,7 +34,7 @@ const initializePassport = () => {
                 }
                 const user = await userService.getUserByUsername(profile._json.email);
                 if (!user) {
-                    console.warn("User doesn't exists with username: " + profile._json.email);
+                    req.logger.warning(log("User doesn't exists with username: " + profile._json.email,req));
                     let newUser = {
                         first_name: profile._json.name? profile._json.name : profile._json.login,
                         last_name: '',
@@ -48,6 +49,7 @@ const initializePassport = () => {
                     return done(null, user);
                 }
             } catch (error) {
+                req.logger.error(log(error.message,req));
                 return done(error.message); 
             }
         })
@@ -62,6 +64,7 @@ const initializePassport = () => {
                 }*/
                 const exists = await userService.getUserByUsername(username);
                 if (exists){
+                    req.logger.error(log("User already exists.",req));
                     return done(null, false, {status: "error", message: "User already exists."})
                 }
                 let isAdminRole = role==='on'
@@ -82,6 +85,7 @@ const initializePassport = () => {
                 return done(null,{user: resultUser})
             }
             catch(error) {
+                req.logger.error(log(error.message,req));
                 return done("Error loging up user: "+error)
             }
 
@@ -106,6 +110,7 @@ const initializePassport = () => {
                 return done(null, {user: user, cart: cart})
             }
             catch(error) {
+                req.logger.error(log(error.message,req));
                 return done(error)
             }
         }
@@ -140,16 +145,12 @@ const initializePassport = () => {
     ));
 }
 passport.serializeUser((data, done) => {
-    console.log("Data serializada:")
-    console.log(data)
     done(null, data.user._id);
 });
 
 passport.deserializeUser(async (id, done) => {
     try {
         let user = await userService.getUserById(id);
-        console.log("Data deserializada:")
-        console.log(id)
         done(null, user);
     } catch (error) {
         console.error("Error deserializando el usuario: " + error);
