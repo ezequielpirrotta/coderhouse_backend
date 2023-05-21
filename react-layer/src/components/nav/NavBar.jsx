@@ -1,16 +1,12 @@
-import React, {useContext}from "react";
+import React from "react";
 import { Link} from "react-router-dom";
 import LoadLinks from "./LoadLinks";
 import CartWidget from "./CartWidget";
-import { CartContext } from "../carts/CartContext";
-import Orders from "../Orders";
 
 function NavBar() {
     const links = [
         {route:"/categoria/cafe",name:"Cafés"},{route:"/categoria/pasteleria",name:"Pasteleria"},{route:"/categoria/merchandising",name:"Merchandising"}
     ];
-    //console.log(login)
-   
     return (
         <div className='container-fluid '>
             <div className="row nav-bar">
@@ -42,3 +38,38 @@ function NavBar() {
     );
 }
 export default NavBar;
+/**
+ * <div className="row nav-bar m-2">
+        <nav className="col navbar fixed-top">
+            <ul id="navBarList" class="navbar-nav nav-bar flex-row justify-content-center">
+                <li class="nav-item col-md-6 justify-content-center">
+                    <h1>Bienvenido!</h1>
+                </li>
+                <li class="nav-item col-md-6 justify-content-end"> 
+                    {
+                        products.token?
+                            <div>
+                                <button id="btn_profile" class="active btn btn-primary" aria-current="page" href="/users">Perfil</button>
+                                <button id="btn_close_session" class="active btn btn-danger" href="" aria-current="page" >Cerrar Sesion</button>
+                                <a class="active btn btn-primary" aria-current="page" href="/chat">Prueba nuestro chat!</a>
+                            </div>
+                            :
+                            <button id="btn_login" class="active btn btn-primary" aria-current="page">Iniciar sesion</button>
+                    }    
+                    <a href="/products">
+                        <button id="" type="button" className="btn">
+                            <img src="/img/cart2.svg" alt="Carrito" width="25"/>
+                            {
+                                isCart? 
+                                <span id="cart_items" className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{totalCart}} 
+                                </span>
+                                :null
+                            }   
+                        </button>
+                    </a>
+                </li>
+            </ul>
+        </nav>   
+    </div>
+ */

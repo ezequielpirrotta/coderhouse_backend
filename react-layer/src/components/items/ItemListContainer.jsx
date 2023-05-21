@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 
 const port = '3000';
+const server_port = '8080';
 const endpoint = 'http://localhost:';
 
 function ItemListContainer() 
@@ -22,7 +23,7 @@ function ItemListContainer()
         };
         try {
             const getProducts = async () => {
-                let result = await fetch(endpoint+port+'/api/products/').then((response)=>response.json())
+                let result = await fetch(endpoint+server_port+'/api/products/').then((response)=>response.json())
                 console.log(result.payload);
                 let data = {};
                 let params = '';
@@ -65,7 +66,7 @@ function ItemListContainer()
                         data.pages[i] = {
                             page: i+1,
                             isCurrentPage: data.products.page === i+1? true:false,
-                            link: `${config.endpoint+config.port}/products?page=${i+1}`
+                            link: `/products?page=${i+1}`
                         };
                         for (const key in urlParams) {
                             if(key !== "page"){
@@ -106,42 +107,9 @@ function ItemListContainer()
             })
         }
         
-    }, [cat]);
+    }, []);
     return (
         <div id="main" class="container-fluid justify-content-center">
-            <div className="row nav-bar m-2">
-                <nav className="col navbar fixed-top">
-                    <ul id="navBarList" class="navbar-nav nav-bar flex-row justify-content-center">
-                        <li class="nav-item col-md-6 justify-content-center">
-                            <h1>Bienvenido!</h1>
-                        </li>
-                        <li class="nav-item col-md-6 justify-content-end"> 
-                            {
-                                products.token?
-                                    <div>
-                                        <button id="btn_profile" class="active btn btn-primary" aria-current="page" href={{linkProfile}}>Perfil</button>
-                                        <button id="btn_close_session" class="active btn btn-danger" href="" aria-current="page" >Cerrar Sesion</button>
-                                        <a class="active btn btn-primary" aria-current="page" href="/chat">Prueba nuestro chat!</a>
-                                    </div>
-                                    :
-                                    <button id="btn_login" class="active btn btn-primary" aria-current="page">Iniciar sesion</button>
-                            }    
-                            <a href="/products">
-                                <button id="" type="button" className="btn">
-                                    <img src="/img/cart2.svg" alt="Carrito" width="25"/>
-                                    {
-                                        isCart? 
-                                        <span id="cart_items" className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                            {{totalCart}} 
-                                        </span>
-                                        :null
-                                    }   
-                                </button>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>   
-            </div>
             <ItemList products={products}/>
         </div>
     );

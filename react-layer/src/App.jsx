@@ -7,6 +7,7 @@ import Cart from './components/carts/Cart';
 import Checkout from './components/Checkout';
 import Orders from './components/Orders';
 import Chat from './components/Chat';
+import Profile from './components/users/Profile';
 import React, { useEffect, useState } from 'react';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <NavBar/>
           <Routes>
             <Route path={"/"} element={<ItemListContainer/>}/> 
+            <Route path={'/users'} element={<Profile/>}/>
             <Route path={"/categoria/:cat"} element={<ItemListContainer/>}/> 
             <Route path={"/producto/:id"} element={<ItemDetailContainer/>}/> 
             <Route path={"/cart"} element={<Cart/>}/>
