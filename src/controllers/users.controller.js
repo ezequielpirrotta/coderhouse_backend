@@ -34,7 +34,10 @@ export const saveUser = async (req, res, next) => {
 }
 export const updateUser = async (req, res, next) => {
     try {
-
+        const {username} = req.params
+        const user = req.body;
+        const result = await userService.updateUser(username, user);
+        res.send({status: 200, payload: result});
     }
     catch(error) {
         

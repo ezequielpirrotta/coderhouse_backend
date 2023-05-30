@@ -1,26 +1,23 @@
 import React from "react";
 import { useState, createContext } from "react";
-//import {getFirestore} from "firebase/firestore";
 import { useEffect } from "react";
+import Cookies from 'universal-cookie';
 
 export const CartContext = createContext();
+
+const cookies = new Cookies();
 
 function CartContextProvider({children}) {
 
     const [cart, setCart] = useState([]);
-   
+    
     useEffect(() => {
         
-        let sessionCart = window.localStorage.getItem("cart");
-        if(totalCart() === 0 || !sessionCart){
-
-            if(totalCart() === 0 && sessionCart){
-                setCart(JSON.parse(sessionCart));
+        if(totalCart() === 0){
+            let cookieCart = cookies.get("cartCookie")
+            if(cookieCart){
+                setCart(cookieCart)
             }
-            else if(totalCart() > 0 && !sessionCart) {
-                window.localStorage.setItem("cart", JSON.stringify(cart))
-            }
-            
         }
     },[])
 
@@ -49,16 +46,24 @@ function CartContextProvider({children}) {
     }
 
     const totalCart = () => {
-        if(cart.length >= 0) {
-            return cart.reduce((total, item) => total += item.quantity, 0);
+        /*if(cart) {
+            let total = 0;
+            cart.products.forEach(element => {
+                console.log(element)
+                total += element.quantity    
+            }); 
+        }*/
+        if(cart){
+            if(cart.length > 0) {
+                console.log(cart)
+                return cart.products.reduce((total, item) => total += item.quantity, 0);
+            }
         }
         return 0;
     }
     const totalPrice = () => {
         return cart.reduce((total, item) => total += item.quantity * item.price, 0);
     }
-    
-    
     
     return(
         <CartContext.Provider 

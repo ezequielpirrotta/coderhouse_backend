@@ -100,6 +100,7 @@ const initializePassport = () => {
                     return done(null,false,{status:"error",message:"User not found"});
                 }
                 if(!isValidPassword(user,password)) {
+                    req.logger.error(log("User not found",req));
                     return done(null,false,{status: "error", message:"Incorrect password"}); 
                 }
                 let cart = null
@@ -110,7 +111,7 @@ const initializePassport = () => {
                 return done(null, {user: user, cart: cart})
             }
             catch(error) {
-                req.logger.error(log(error.message,req));
+                req.logger.error(log(error,req));
                 return done(error)
             }
         }

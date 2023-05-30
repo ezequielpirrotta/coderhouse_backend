@@ -1,21 +1,28 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link} from "react-router-dom";
 import LoadLinks from "./LoadLinks";
 import CartWidget from "./CartWidget";
+import { UserContext } from "../users/UserContext";
+import { CartContext } from "../carts/CartContext";
 
-function NavBar() {
+
+function NavBar() { 
+    const {user,closeUserSession} = useContext(UserContext)
     const links = [
-        {route:"/categoria/cafe",name:"Cafés"},{route:"/categoria/pasteleria",name:"Pasteleria"},{route:"/categoria/merchandising",name:"Merchandising"}
+        {route:"/products?category=comida",name:"Comida"},{route:"/products?category=ropa",name:"Ropa"},{route:"/products?category=otros",name:"Otros"}
     ];
+    useEffect( () => {
+    },[])
+    const onClickCloseButton= () => {
+        closeUserSession()
+    }
     return (
-        <div className='container-fluid '>
+        <div className='container-fluid'>
             <div className="row nav-bar">
-                <div className="col-md-8 justify-content-center" >
-                    <nav className="navbar navbar-expand-sm ">
+                <div className="col-md-8 justify-content-center">
+                    <nav className="navbar navbar-expand-sm">
                         <div className="container-fluid">
-                            <Link className="navbar-brand" to="/">
-                                <img id="logo" src={"/img/logo.ico"} alt={"Logo"} width={100}/>
-                            </Link>
+                            <Link className="navbar-brand" to="/products"><h1>Inicio</h1></Link>
                             <button className="navbar-toggler " type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                                 <span className="navbar-toggler-icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
@@ -29,47 +36,23 @@ function NavBar() {
                         </div>
                     </nav>   
                 </div>
+                
                 <div className="col-md-4 d-flex justify-content-center align-items-center">
-                    <CartWidget className="m-2"/>
-                    <Link to={"/orders"} className="btn btn-secondary">Ir a órdenes</Link>
+                    {
+                        user?
+                            <div>
+                                <CartWidget className="m-2"/>
+                                <Link to={"/users"} className="btn btn-primary">Perfil</Link>
+                                <button id="btn_close_session" className="btn btn-danger" onClick={onClickCloseButton} href="" aria-current="page" >Cerrar Sesion</button>
+                                <Link to={"/chat"} className="btn btn-secondary">Prueba nuestro chat!</Link>
+                            </div>
+                            :
+                            <Link to={"/"} className="btn btn-primary">Inicia sesion</Link>
+                            //<button id="btn_login" className="active btn btn-primary" aria-current="page">Iniciar sesion</button>
+                    }
                 </div>
             </div>
         </div>
     );
 }
 export default NavBar;
-/**
- * <div className="row nav-bar m-2">
-        <nav className="col navbar fixed-top">
-            <ul id="navBarList" class="navbar-nav nav-bar flex-row justify-content-center">
-                <li class="nav-item col-md-6 justify-content-center">
-                    <h1>Bienvenido!</h1>
-                </li>
-                <li class="nav-item col-md-6 justify-content-end"> 
-                    {
-                        products.token?
-                            <div>
-                                <button id="btn_profile" class="active btn btn-primary" aria-current="page" href="/users">Perfil</button>
-                                <button id="btn_close_session" class="active btn btn-danger" href="" aria-current="page" >Cerrar Sesion</button>
-                                <a class="active btn btn-primary" aria-current="page" href="/chat">Prueba nuestro chat!</a>
-                            </div>
-                            :
-                            <button id="btn_login" class="active btn btn-primary" aria-current="page">Iniciar sesion</button>
-                    }    
-                    <a href="/products">
-                        <button id="" type="button" className="btn">
-                            <img src="/img/cart2.svg" alt="Carrito" width="25"/>
-                            {
-                                isCart? 
-                                <span id="cart_items" className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    {{totalCart}} 
-                                </span>
-                                :null
-                            }   
-                        </button>
-                    </a>
-                </li>
-            </ul>
-        </nav>   
-    </div>
- */
