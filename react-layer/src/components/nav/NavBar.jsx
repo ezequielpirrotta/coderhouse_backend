@@ -1,25 +1,28 @@
-import React, {useContext}from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link} from "react-router-dom";
 import LoadLinks from "./LoadLinks";
 import CartWidget from "./CartWidget";
+import { UserContext } from "../users/UserContext";
 import { CartContext } from "../carts/CartContext";
-import Orders from "../Orders";
 
-function NavBar() {
+
+function NavBar() { 
+    const {user,closeUserSession} = useContext(UserContext)
     const links = [
-        {route:"/categoria/cafe",name:"Cafés"},{route:"/categoria/pasteleria",name:"Pasteleria"},{route:"/categoria/merchandising",name:"Merchandising"}
+        {route:"/products?category=comida",name:"Comida"},{route:"/products?category=ropa",name:"Ropa"},{route:"/products?category=otros",name:"Otros"}
     ];
-    //console.log(login)
-   
+    useEffect( () => {
+    },[])
+    const onClickCloseButton= () => {
+        closeUserSession()
+    }
     return (
-        <div className='container-fluid '>
+        <div className='container-fluid'>
             <div className="row nav-bar">
-                <div className="col-md-8 justify-content-center" >
-                    <nav className="navbar navbar-expand-sm ">
+                <div className="col-md-8 justify-content-center">
+                    <nav className="navbar navbar-expand-sm">
                         <div className="container-fluid">
-                            <Link className="navbar-brand" to="/">
-                                <img id="logo" src={"/img/logo.ico"} alt={"Logo"} width={100}/>
-                            </Link>
+                            <Link className="navbar-brand" to="/products"><h1>Inicio</h1></Link>
                             <button className="navbar-toggler " type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                                 <span className="navbar-toggler-icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
@@ -33,9 +36,20 @@ function NavBar() {
                         </div>
                     </nav>   
                 </div>
+                
                 <div className="col-md-4 d-flex justify-content-center align-items-center">
-                    <CartWidget className="m-2"/>
-                    <Link to={"/orders"} className="btn btn-secondary">Ir a órdenes</Link>
+                    {
+                        user?
+                            <div>
+                                <CartWidget className="m-2"/>
+                                <Link to={"/users"} className="btn btn-primary">Perfil</Link>
+                                <button id="btn_close_session" className="btn btn-danger" onClick={onClickCloseButton} href="" aria-current="page" >Cerrar Sesion</button>
+                                <Link to={"/chat"} className="btn btn-secondary">Prueba nuestro chat!</Link>
+                            </div>
+                            :
+                            <Link to={"/"} className="btn btn-primary">Inicia sesion</Link>
+                            //<button id="btn_login" className="active btn btn-primary" aria-current="page">Iniciar sesion</button>
+                    }
                 </div>
             </div>
         </div>

@@ -4,8 +4,8 @@ import Error from "../errors_&_timeout/Error";
 
 function ItemList({products})
 {
-    console.log(products)
-    if(products !== null){
+    if(products){
+        console.log(products)
         if(products.length > 0){
             return (
                 <div className="row justify-content-center">
@@ -13,7 +13,7 @@ function ItemList({products})
                         products.map(product =>
                         {
                             return(
-                                <div key = {product.id} className={products.length >= 3?"product col-sm-4 col-md-3":"product col-sm-4 col-md-5"}>
+                                <div key = {product._id} className={products.length >= 3?"product col-sm-4 col-md-3":"product col-sm-4 col-md-5"}>
                                     <Item product={product}></Item>
                                 </div>
                             );
@@ -67,41 +67,6 @@ export default ItemList;
             </ul>
         </nav>   
     </div>
-    {{#if founded}}
-        <nav class="row" aria-label="...">
-            <ul class="pagination justify-content-center">
-                {{#if products.hasPrevPage}}
-                <li class="page-item enable">
-                    <a class="page-link" href={{products.prevLink}}>Previous</a>
-                </li>
-                {{else}}
-                <li class="page-item disabled">
-                    <a class="page-link" href={{products.prevLink}}>Previous</a>
-                </li>
-                {{/if}}
-                {{#each pages}}
-                    {{#if this.isCurrentPage}}
-                    <li class="page-item active" aria-current="page">
-                        <a class="page-link" href={{this.link}}>{{this.page}}</a>
-                    </li>
-                    {{else}}   
-                    <li class="page-item"><a class="page-link" href={{this.link}}>{{this.page}}</a></li>
-                    {{/if}}
-                {{/each}}
-                {{#if products.hasNextPage}}
-                    <li class="page-item enable">
-                        <a class="page-link" href={{products.nextLink}}>Next</a>
-                    </li>
-                {{else}}
-                    <li class="page-item disabled">
-                        <a class="page-link" href={{products.nextLink}}>Next</a>
-                    </li>
-                {{/if}}
-            </ul>
-            <div class="formButtons">
-                <button id="create" class="btn btn-outline-primary">Crear</button>
-            </div>
-        </nav>
          
         <div id="products" class="row justify-content-center">
             {{#each products.payload}}

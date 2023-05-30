@@ -4,7 +4,6 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeftIcon } from '@primer/octicons-react'
 import { CartContext } from "../carts/CartContext";
 import { BookmarkFillIcon, BookmarkIcon } from "@primer/octicons-react";
-//import {doc, getDoc} from "firebase/firestore"; 
 
 const endpoint = process.env.ENDPOINT;
 const port = process.env.SERVER_PORT;
@@ -28,17 +27,14 @@ function ItemDetailContainer()
             }
         })*/
      
-    },[id]);
+    },[]);
 
     return (
         <div id="product" className="container-fluid justify-content-center">
             <div className="row mt-2 d-flex justify-content-center">
-                <div className="col-md-4 justify-content-center">
-
-                    <Link  to={`/`} >
-                        <button className="btn-primary" >
-                            <ArrowLeftIcon size={24} />
-                        </button>
+                <div className="col-md-4 justify-content-start">
+                    <Link to={`/products`} className="btn-primary">
+                        <ArrowLeftIcon size={24} />
                     </Link>
                 </div>
             </div>
