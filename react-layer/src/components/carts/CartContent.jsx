@@ -1,14 +1,19 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect} from "react";
 import { Link } from "react-router-dom";
 import { CartContext } from "./CartContext";
+import { MDBAccordion,MDBAccordionItem,MDBTable,MDBTableHead,MDBTableBody } from "mdb-react-ui-kit";
 
 function CartContent () {
-    const {cart,removeItem,clearCart,totalPrice} = useContext(CartContext);
+    const {cart,removeItem,clearCart,totalPrice,getCart} = useContext(CartContext);
+    /*useEffect(() => {
+        
+    },[])*/
+    console.log(cart)
     let count = 0;
     return(
         <div className="container-fluid ">
             <div className="row">
-                <div className="col m-3">
+                <div className="col m-3 d-flex justify-content-center">
                     <h2>Tu Carrito</h2>
                     <Link onClick={clearCart} className="btn btn-danger" title="Vaciar Carrito">Vaciar Carrito</Link>
                 </div>
@@ -16,43 +21,36 @@ function CartContent () {
             </div>
             <div className="row d-flex flex-column align-items-center">      
                 {
-                    cart.map((product) => {
+                    cart.products.map((product) => {
                         count++
                         return(
-                            <div className={"col-sm accordion"+count} id="accordionExample">
-                                <div className="accordion-item">
-                                    <h2 className="accordion-header" id={"heading"+count}>
-                                    <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target={"#collapse"+count} aria-expanded="true" aria-controls={"collapse"+count}>
-                                        <img src={product.image} alt={product.name} width={64}/>
-                                        <span>{product.name}</span>
-                                        <span className="badge bg-primary rounded-pill">{product.quantity}</span>
-                                    </button>
-                                    </h2>
-                                    <div id={"collapse"+count} className="accordion-collapse collapse " aria-labelledby={"heading"+count} data-bs-parent="#accordionExample">
-                                        <div className="accordion-body">
-                                            <table className="table table-responsive" data-toggle="collapse">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col" className="text-center">Cantidad</th>
-                                                        <th scope="col" className="text-center">Precio</th>
-                                                        <th scope="col">&nbsp;</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr key={product.id}>
-                                
-                                                        <td className="text-center align-middle">{product.quantity}</td>
-                                                        <td className="text-center align-middle">{product.currency} {product.quantity * product.price}</td>
-                                                        <td className="text-end align-middle"> <Link onClick={() =>removeItem(product.id)} title="Eliminar Producto">
-                                                            <img src={"img/trash3.svg"} alt="Cesto" width={24}/></Link>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>      
+                            <MDBAccordion id="">
+                                <MDBAccordionItem collapseId={count} headerTitle={<>
+                                    <img src={product.product.thumbnail} alt={product.product.title} width={64}/> &nbsp; 
+                                    {product.product.title}</>
+                                }>
+                                    <MDBTable>
+                                        <MDBTableHead>
+                                            <tr>
+                                                <th scope="col" className="text-center">Cantidad</th>
+                                                <th scope="col" className="text-center">Precio</th>
+                                                <th scope="col">&nbsp;</th>
+                                            </tr>
+                                        </MDBTableHead>
+                                        <MDBTableBody>
+                                        <tr key={product.product.id}>
+                                            <td className="text-center align-middle">{product.quantity}</td>
+                                            <td className="text-center align-middle">$ {product.quantity * product.product.price}</td>
+                                            <td className="text-end align-middle"> 
+                                                <Link onClick={async() =>removeItem(product.product._id)} title="Eliminar Producto">
+                                                    <img src={"img/trash3.svg"} alt="Cesto" width={24}/>
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                        </MDBTableBody>
+                                    </MDBTable>
+                                </MDBAccordionItem>
+                            </MDBAccordion>   
                         )  
                     })
                 }

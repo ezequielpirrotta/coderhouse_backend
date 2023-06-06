@@ -16,7 +16,6 @@ function Orders () {
     const [search, setSearch] = useState("")
     const params = useParams()
     let orderId = params? params.orderId : null;
-    console.log(orderId)
 
     useEffect(() => {
         

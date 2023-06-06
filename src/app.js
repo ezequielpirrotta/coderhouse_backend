@@ -1,6 +1,5 @@
 //Express imports
 import Express from "express";
-import handlebars from 'express-handlebars';
 import session from 'express-session';
 import cors from 'cors';
 //Routers imports
@@ -8,8 +7,6 @@ import productRouter from "./Routes/products.router.js";
 import cartsRouter from "./Routes/carts.router.js";
 import ticketsRouter from './Routes/tickets.router.js';
 import usersRouter from './Routes/users.router.js';
-import viewsRouter from "./Routes/view.router.js";
-import usersViewRouter from "./Routes/users.views.router.js";
 import sessionsRouter from "./Routes/sessions.router.js";
 import githubRouter from "./Routes/github-login.views.router.js";
 import emailRouter from "./Routes/email.router.js";
@@ -33,6 +30,7 @@ import initializePassport from "./config/passport.config.js";
 import config from "./config/config.js";
 
 const app = Express()
+app.use(cors({origin:"http://localhost:3000",methods:['GET','POST','PUT','DELETE'], credentials: true}))
 /*** DB ***/
 const connectToMongoDB = async () => {
     try {
@@ -66,12 +64,7 @@ app.use(session({
 /**** Utils ***/
 app.use(Express.urlencoded({extended: true}));
 app.use(Express.json());
-app.use(cors({origin:"http://localhost:3000",methods:['GET','POST','PUT','DELETE'], credentials: true}))
 app.use(Express.static(__dirname+'/public'));
-/*** Views ***/ 
-app.engine('handlebars', handlebars.engine())
-app.set('views',__dirname + '/views');
-app.set('view engine', 'handlebars');
 /*** Middlewares y Cookies***/
 //productRouter.use(error_middleware);
 app.use(cookieParser(PRIVATE_KEY))
@@ -81,22 +74,25 @@ initializePassport();
 app.use(passport.initialize());
 app.use(session());
 /*** Routers ***/
-app.use('/', viewsRouter);
 app.use('/api/products', productRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/api/tickets', ticketsRouter);
-app.use('/api/users', usersRouter)
-app.use('/cookies', cookieRouter)
-app.use("/users", usersViewRouter);
+app.use('/api/users', usersRouter);
+app.use('/cookies', cookieRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/mail", emailRouter);
 app.use('/github',githubRouter);
-app.use('/mockingproducts', mockingRouter)
-app.use('/loggerTest', logRouter)
+app.use('/mockingproducts', mockingRouter);
+app.use('/loggerTest', logRouter);
 /*** Server ***/
 const httpServer = app.listen(config.port);
-const socketServer = new Server(httpServer);
-//app.set("socket", socketServer);
+const socketServer = new Server(httpServer,{
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true
+    }
+});
 app.use(Express.static('react-layer'));
 let messages = [];
 socketServer.on("connection",socket  => {

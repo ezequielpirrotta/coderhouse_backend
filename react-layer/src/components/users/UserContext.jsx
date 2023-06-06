@@ -18,6 +18,7 @@ function UserContextProvider({children}) {
         
         getUser()
         .then( async (userData) => { 
+            console.log(userData)
             setUser(userData);
             setLoading(false);
         })
@@ -56,18 +57,17 @@ function UserContextProvider({children}) {
             if (result.isConfirmed) {
                 const result = await fetch(endpoint+server_port+'/api/sessions/logout',{credentials: 'include'})
                 .then((response)=>response.json())
-                if(!result.error){
-                    window.location.replace('/');
-                }
-                else {
+                if(result.error){
                     Swal.fire({
                         title:"Error",
                         icon:"error",
                         text: result.message
                     })
                 }
-                socket.emit('event_logout_user');
-                window.location.replace('/users/login');
+                else {
+                    socket.emit('event_logout_user');
+                    window.location.replace('/');
+                }
             }
         })
     } 

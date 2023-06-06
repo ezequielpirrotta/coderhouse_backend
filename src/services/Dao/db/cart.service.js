@@ -1,6 +1,11 @@
 import { cartModel } from "../models/cart.model.js";
 import ProductService from "./product.service.js";
 import mongoose from "mongoose";
+/* Manejo de errores */
+import CustomError from "../../errors/CustomError.js";
+import { clearCartErrorInfo } from "../../errors/messages/cart_error.messages.js";
+import EErrors from "../../errors/errors-enum.js";
+
 const dbPm = new ProductService();
 class CartService {
     
@@ -24,21 +29,25 @@ class CartService {
      
     getCartById =  async (id) => {
         try {
-            console.log(id)
             let cart = await cartModel.findById(id)
             if(cart) {
                 return cart;
             }
             else {
-                throw Error("Cart not found");
+                const cart_error = CustomError.createError({
+                    name: "Cart not found",
+                    cause: clearCartErrorInfo(cart),
+                    message: `Error getting Cart with ID: ${id}`,
+                    code: EErrors.DATA_CONFLICT_ERROR,
+                    status_code: 409
+                })
+                throw {
+                    ...cart_error
+                } 
             }
         }
         catch (error) {
-            throw {
-                code: 404,
-                message: `Error getting Cart with ID: ${id}.`,
-                detail: error.message
-            };
+            throw error;
         }
     }
     addCart = async (products) => {
@@ -81,10 +90,16 @@ class CartService {
 
             let cart = await this.getCartById(cid)
             if(cart.products.length === 0 && productsList.length === 0){
+                const cart_error = CustomError.createError({
+                    name: "Cart Elimination Error",
+                    cause: clearCartErrorInfo(cart),
+                    message: "Couldn't update, the cart is already empty!",
+                    code: EErrors.DATA_CONFLICT_ERROR,
+                    status_code: 409
+                })
                 throw {
-                    code: 404,
-                    message: "Couldn't update, the cart is already empty!"
-                }
+                    ...cart_error
+                } 
             }
             cart.products = []
             for (const key in productsList) {
@@ -109,11 +124,7 @@ class CartService {
                 }
             }
         } catch (error) {
-            throw {
-                code: error.code? error.code : 400,
-                message: "Error replacing cart",
-                detail: error.message
-            };
+            throw error;
         }
     }
     updateProduct = async (cid, pid, quantity, newPdt = false) => {
@@ -130,15 +141,20 @@ class CartService {
                 let newProduct = {product: pid, quantity: quantity}
                 let cart = await this.getCartById(cid)
                 if(newPdt) {
+                    console.log("soy nuevo")
                     cart.products.push(newProduct);
+                    console.log(cart)
                 }
                 else {
                     pid = new mongoose.Types.ObjectId(pid)
                     cart.products.find(element => element.product._id.equals(pid)).quantity = quantity;
                 }
                 let result = await cart.updateOne(cart);
+                console.log(result)
                 if(result) {
-                    return await this.getCartById(cid);
+                    const resultCart = await this.getCartById(cid);
+                    console.log(resultCart.products)
+                    return resultCart;
                 }
                 else {
                     throw Error("El valor elegido es el mismo al que intenta cambiar, intente con uno diferente.")
@@ -169,14 +185,29 @@ class CartService {
                     let cart = await this.getCartById(cid)
                     if(cart) {
                         if(cart.products.length > 0) {
-                            throw Error("No se pudo borrar el carrito.")
-                        } 
+                            const cart_error = CustomError.createError({
+                                name: "Cart Elimination Error",
+                                cause: clearCartErrorInfo(),
+                                message: "Cart is already empty.",
+                                code: EErrors.DATA_CONFLICT_ERROR,
+                                status_code: 409
+                            })
+                            throw {
+                                error: cart_error 
+                            } 
+                        }  
                     }
                     else {
+                        const cart_error = CustomError.createError({
+                            name: "Cart Elimination Error",
+                            cause: clearCartErrorInfo(),
+                            message: "Cart not found!",
+                            code: EErrors.DATA_CONFLICT_ERROR,
+                            status_code: 404
+                        })
                         throw {
-                            code: 404,
-                            detail: "No se encontró el carrito!"
-                        } 
+                            error: cart_error 
+                        }
                     }
                 }
             }
@@ -188,11 +219,7 @@ class CartService {
             }
         }
         catch (error) {
-            throw {
-                code: error.code,
-                message: error.message? error.message : 'Error eliminando carrito',
-                detail: error.detail? error.detail : error.message 
-            }
+            throw error;
         }
     }
     deleteAllProductsFromCart = async (id) => {

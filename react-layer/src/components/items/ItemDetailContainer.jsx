@@ -5,27 +5,22 @@ import { ArrowLeftIcon } from '@primer/octicons-react'
 import { CartContext } from "../carts/CartContext";
 import { BookmarkFillIcon, BookmarkIcon } from "@primer/octicons-react";
 
-const endpoint = process.env.ENDPOINT;
-const port = process.env.SERVER_PORT;
-
+const port = '3000';
+const server_port = '8080';
+const endpoint = 'http://localhost:';
 function ItemDetailContainer() 
 {
     const [product, setProduct] = useState([]);
     const {id} = useParams();
     
-    //let document = doc(db, "items", id) 
     useEffect( () => 
     {
-        
-        //resolve(products_info.find(product => product.id === parseInt(id)));
-        /*getDoc(document).then((snapshot) => {
-            if(snapshot.exists()) {
-                setProduct({ id: snapshot.id, ...snapshot.data() })
-            }
-            else {
-                setProduct(null)
-            }
-        })*/
+        const getProduct = async () => {
+            let result = await fetch(endpoint+server_port+'/api/products/'+id,{credentials:"include"})
+                .then( (response) => response.json());
+            setProduct(result)
+        }
+        getProduct()
      
     },[]);
 

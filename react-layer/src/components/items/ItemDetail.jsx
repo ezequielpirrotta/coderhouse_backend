@@ -4,15 +4,16 @@ import React, { useState, useContext } from "react";
 import Swal from 'sweetalert2';
 import { CartContext } from "../carts/CartContext";
 import { Link } from "react-router-dom";
+import { MDBCardBody, MDBCardText,MDBCardTitle } from "mdb-react-ui-kit";
 
 
 const ItemDetail = ({product}) => 
 {
     const {addItem} = useContext(CartContext);
     const [sold, setSold] = useState(false);
-    const onAdd = (quantity, stock) => {
+    const onAdd = async (quantity, stock) => {
         if((stock > 0) && (quantity <= stock)) {
-            addItem(product, quantity);
+            await addItem(product, quantity);
             Swal.fire({
                 position: 'top-end',
                 icon: 'success',
@@ -21,7 +22,6 @@ const ItemDetail = ({product}) =>
                 timer: 2000
             })
             setSold(true);
-            
         }
         else {
             Swal.fire({
@@ -40,15 +40,22 @@ const ItemDetail = ({product}) =>
                    <div className="product col-md-4 ">
                         <div className ="card" width= "18rem">
                             <img src={product.image} className ="card-img-top" alt={product.name}/>
-                            <div className ="card-body">
-                                <h1 className="card-title">{product.name}</h1>
-                                <p className="card-text">{product.description}</p>
-                                <p>{"Precio: " + product.currency + product.price}</p>
+                            <MDBCardBody>
+                                <MDBCardTitle>{product.title}</MDBCardTitle>
+                                <MDBCardText>
+                                    {"Precio: $ " + product.price}
+                                </MDBCardText>
+                                <MDBCardText>
+                                    {"Descripción: " + product.description}
+                                </MDBCardText>
+                                <MDBCardText>
+                                    {"Stock: " + product.stock}
+                                </MDBCardText>
                                 {!sold ? 
                                     <ItemCount stock={product.stock} onAdd={onAdd}/>:
                                     <Link className="btn btn-outline-primary" to={"/cart"}>Terminar Compra</Link>
                                 }
-                            </div>
+                            </MDBCardBody>
                         </div>   
                     </div>
                 </div>

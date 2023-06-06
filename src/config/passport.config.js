@@ -57,7 +57,7 @@ const initializePassport = () => {
     passport.use('register',new localStrategy(
         {passReqToCallback: true}, async (req, username, password, done) => {
             try {
-                const { first_name, last_name, age, role} = req.body;
+                const { name, lastName, age, role} = req.body;
                 /*if(!mail) {
                     done(null, false, {status: "error", message: "Empty email"})
                     //return res.status(400).send({status: "error", message: "Empty email"});
@@ -73,8 +73,8 @@ const initializePassport = () => {
                     cart = await cartService.addCart();
                 }
                 const user = new UserDTO({
-                    first_name: first_name,
-                    last_name: last_name,
+                    first_name: name,
+                    last_name: lastName,
                     mail: username,
                     age: age,
                     password: createHash(password),

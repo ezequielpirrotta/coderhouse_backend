@@ -57,11 +57,6 @@ function Login()
         let errors = {};
         let isValid = true;
 
-        /*if (!name) {
-            isValid = false;
-            errors['name'] = 'Please enter your name.';
-        }
-        */
         if (!username) {
             isValid = false;
             errors['email'] = 'Please enter your email address.';
@@ -74,14 +69,6 @@ function Login()
             isValid = false;
             errors['password'] = 'Please enter your password.';
         }
-
-        /*if (!confirmPassword) {
-            isValid = false;
-            errors['confirmPassword'] = 'Please confirm your password.';
-        } else if (password !== confirmPassword) {
-            isValid = false;
-            errors['confirmPassword'] = 'Passwords do not match.';
-        }*/
 
         setErrors(errors);
         return isValid;
@@ -141,7 +128,7 @@ function Login()
                             </div>
                         </form>
                         <p>Ingresa con github! <a href="/github/login">Click aqui</a></p>
-                        <p>¿No estás registrado? <a href="/users/register">Regístrate aquí</a></p>
+                        <p>¿No estás registrado? <a href="/register">Regístrate aquí</a></p>
                     </div>
                 }
             </div>
@@ -149,66 +136,3 @@ function Login()
     )
 }
 export default Login;
-/*const form = document.getElementById('loginForm');
-(() => {
-    'use strict'
-  
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    const forms = document.querySelectorAll('.needs-validation')
-  
-    // Loop over them and prevent submission
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
-  
-        form.classList.add('was-validated')
-      }, false)
-    })
-})()
-window.addEventListener("load", function() {
-
-    // icono para mostrar contraseña
-    showPassword = document.querySelector('.show-password');
-    showPassword.addEventListener('click', () => {
-
-        // elementos input de tipo clave
-        password = document.getElementById('password');
-        
-        if ( password.type === "text" ) {
-            password.type = "password"
-            showPassword.classList.remove('fa-eye-slash');
-        } else {
-            password.type = "text"
-            showPassword.classList.toggle("fa-eye-slash");
-        }
-
-    })
-
-});
-form.addEventListener('submit',async (e)=>{
-    e.preventDefault();
-    const data = new FormData(form);
-    const obj = {};
-    data.forEach((value,key)=>obj[key]=value);
-    const result = await fetch('/api/sessions/login',{
-        method:'POST',
-        body:JSON.stringify(obj),
-        headers:{
-            'Content-Type':'application/json'
-        }
-    }).then((response)=>response.json())
-    if(result.code===200){
-        window.location.replace('/products');
-    }
-    else {
-        cosnsole.log(result)
-        Swal.fire({
-            title:"Error",
-            icon:"error",
-            text: "Error con su inicio de sesión, intente con un usuario registrado"
-        })
-    }
-})*/

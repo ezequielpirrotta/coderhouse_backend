@@ -4,6 +4,9 @@ import UserContextProvider from './components/users/UserContext';
 /* Items */
 import ItemDetailContainer from './components/items/ItemDetailContainer';
 import ItemListContainer from './components/items/ItemListContainer';
+/* Estilos */
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
 /**Otros */
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import React from 'react';
@@ -14,6 +17,7 @@ import Orders from './components/Orders';
 import Chat from './components/Chat';
 import Profile from './components/users/Profile';
 import Login from './components/users/Login';
+import Register from './components/users/Register';
 
 function App() {
   return (
@@ -24,8 +28,9 @@ function App() {
             <NavBar/>
             <Routes>
               <Route path={"/"} element={<Login/>}/> 
-              <Route path={"/products"} element={<ItemListContainer/>}/> 
               <Route path={'/users'} element={<Profile/>}/>
+              <Route path={'/register'} element={<Register/>}/>
+              <Route path={"/products"} element={<ItemListContainer/>}/> 
               <Route path={"/categoria/:cat"} element={<ItemListContainer/>}/> 
               <Route path={"/producto/:id"} element={<ItemDetailContainer/>}/> 
               <Route path={"/cart"} element={<Cart/>}/>

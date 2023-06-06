@@ -3,7 +3,7 @@ import {sendEmail, sendEmailWithAttachments} from '../controllers/email.controll
 
 const router = Router();
 
-router.get("/", sendEmail);
-router.get("/attachments", sendEmailWithAttachments);
+router.post("/", sendEmail);
+router.post("/attachments", sendEmailWithAttachments);
 
 export default router;

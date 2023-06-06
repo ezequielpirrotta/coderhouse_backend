@@ -8,8 +8,9 @@ import { log } from "../config/logger.js";
 const productService = new ProductService();
 
 export const getProducts = async (req, res, next) => {
-    try { 
+    try {
         let products = await productService.getProducts(req.query); 
+        console.log(products)
         res.status(200).send(products);
     }
     catch(error) {
