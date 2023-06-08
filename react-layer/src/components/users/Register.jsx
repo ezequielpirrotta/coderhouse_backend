@@ -11,6 +11,7 @@ function Register()
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [age, setAge] = useState(0);
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
     const [isCheckedAdmin, setIsCheckedAdmin] = useState(false);
@@ -46,6 +47,9 @@ function Register()
         else if (name === 'password') {
             setPassword(value);
         }
+        else if (name === 'age') {
+            setAge(value);
+        }
     };
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -53,7 +57,7 @@ function Register()
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (validateForm()) {
-            const data = {username,password,name,lastName, adminRole: isCheckedAdmin,premiumRole: isCheckedPremium};
+            const data = {username,password,name,lastName,age, adminRole: isCheckedAdmin,premiumRole: isCheckedPremium};
             console.log(data)
             const result = await fetch(endpoint+server_port+'/api/sessions/register',{
                 method:'POST',
@@ -76,8 +80,6 @@ function Register()
             }
             else {
                 console.log({...result})
-                /*isValid = false;
-                errors['password'] = 'Incorrect username or password.'*/
                 Swal.fire({
                     title:"Error con su registro",
                     icon:"error",
@@ -208,7 +210,7 @@ function Register()
                             </div>
                             <div className="mb-3 col-md-4">
                                 <label htmlFor="age" className="form-label">Edad</label>
-                                <input type="number" className="form-control" name="age" id="age" placeholder="Numero entero" required/>
+                                <input type="number" className="form-control" onChange={handleInputChange} name="age" id="age" placeholder="Numero entero" required/>
                                 <div className="valid-feedback">
                                     ¡Se ve bien!
                                 </div>

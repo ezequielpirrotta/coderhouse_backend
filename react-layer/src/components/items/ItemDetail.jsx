@@ -15,15 +15,9 @@ const ItemDetail = ({product}) =>
     const [sold, setSold] = useState(false);
     const onAdd = async (quantity, stock) => {
         if((stock > 0) && (quantity <= stock)) {
-            await addItem(product, quantity);
-            Swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: 'Haz añadido '+quantity+' items a tu carrito',
-                showConfirmButton: false,
-                timer: 2000
-            })
-            setSold(true);
+            const result = await addItem(product, quantity);
+            console.log(result)
+            setSold(result);
         }
         else {
             Swal.fire({
@@ -106,71 +100,49 @@ const ItemDetail = ({product}) =>
     }
     const onDelete = async() => {
         Swal.fire({
+            icon: "warning",
             title: 'Delete Product',
-            html:  `
-                    <div>
-                        <input type="text" id="title" class="swal2-input" placeholder="title">
-                        <select id="property" class="swal2-input" aria-label="Default select example">
-                            <option selected value="title">Titulo</option>
-                            <option value="description">Descripción</option>
-                            <option value="precio">Precio</option>
-                        </select>
-                        <input type="text" id="newValue" class="swal2-input" placeholder="image">
-                    </div>`,
-            confirmButtonText: 'Create',
+            text: 'Estás seguro de que desea eliminar el producto?',
+            confirmButtonText: 'Delete',
             focusConfirm: false,
-            preConfirm: () => {
-                const property = Swal.getPopup().querySelector('#property').value
-                const newValue = Swal.getPopup().querySelector('#newValue').value
-
-                if (!property || !newValue) {
-                    Swal.showValidationMessage(`Please complete all the fields`)
-                }
-                return { property: property, newValue: newValue}
-            }
         }).then((result) => {
-            
-            let data = {
-                stock: parseInt(result.value.stock),
-                thumbnail: result.value.image
-            }
-            
-            let requestData = {
-                method:"POST",
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
-                },
-                credentials: 'include'
-            }
-            const request = new Request(endpoint+server_port+'/api/products/', requestData)
-            fetch(request)
-            .then( async (response) => {
-                
-                if (!response.ok) {
-                    const error = await response.json()
-                    if(error.status === "WRONG") {
-                        Swal.fire({
-                            title: `Producto no creado`,
-                            icon: "error",
-                            text: error.message
-                        })
-                    }
-                    else if(error.code === "Unauthorized"){
-                        Swal.fire({
-                            title: `No tienes permisos para crear`,
-                            icon: "error"
-                        })
-                    }
-                } 
-                else {
-                    Swal.fire({
-                        icon: "success",
-                        title: `Producto ${product._id} actualizado exitosamente`,
-                        color: '#716add'
-                    })
+            if(result.isConfirmed){
+                let requestData = {
+                    method:"DELETE",
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+                    credentials: 'include'
                 }
-            })
+                const request = new Request(endpoint+server_port+'/api/products/'+product._id, requestData)
+                fetch(request)
+                .then( async (response) => {
+                    
+                    if (!response.ok) {
+                        const error = await response.json()
+                        if(error.status === "WRONG") {
+                            Swal.fire({
+                                icon: "error",
+                                title: `Error eliminando producto`,
+                                text: error.message
+                            })
+                        }
+                        else if(error.code === "Unauthorized"){
+                            Swal.fire({
+                                title: `No tienes permisos para eliminar`,
+                                icon: "error"
+                            })
+                        }
+                    } 
+                    else {
+                        Swal.fire({
+                            icon: "success",
+                            title: `Producto ${product._id} actualizado exitosamente`,
+                            color: '#716add'
+                        })
+                    }
+                })
+            }
         })
     }
     if(product !== null) {

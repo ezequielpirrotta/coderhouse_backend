@@ -21,8 +21,22 @@ class UserService {
         return result;  
     }
     updateUser = async (filter, value) => {
-        let result = await userModel.updateOne(filter, value);
-        return result;
+        try {
+            console.log(filter)
+            let result = await userModel.updateOne(filter, value);
+            if(result.modifiedCount > 0) {
+                return result;
+            }
+            else {
+                throw {
+                    code: 401,
+                    detail: "No se pudo actualizar el usuario"
+                }
+            }
+        }
+        catch(error) {
+            throw error;
+        }
     }
     delete = async (username) => {
         if(username) {

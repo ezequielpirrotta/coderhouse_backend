@@ -10,7 +10,6 @@ import {
 function ItemList({products})
 {
     if(products){
-        //console.log(products)
         if(products.length > 0){
             return (
                 

@@ -3,8 +3,12 @@ import { useState, createContext } from "react";
 import { useEffect } from "react";
 import Swal from 'sweetalert2';
 import io from 'socket.io-client';
+import Cookies from 'universal-cookie';
+
 
 export const UserContext = createContext();
+
+const cookies = new Cookies();
 
 function UserContextProvider({children}) {
     const port = '3000';
@@ -18,7 +22,6 @@ function UserContextProvider({children}) {
         
         getUser()
         .then( async (userData) => { 
-            console.log(userData)
             setUser(userData);
             setLoading(false);
         })
@@ -70,6 +73,59 @@ function UserContextProvider({children}) {
                 }
             }
         })
+    }
+    const changeRol = async () => {
+        Swal.fire({
+            title:"A qué rol quieres cambiar?",
+            icon:"info",
+            input: 'select',
+            inputOptions: {
+            'premium':'Premium',
+            'user':'Usuario'
+            },
+            inputPlaceholder: 'Selecciona un rol',
+            inputAttributes: {
+            maxlength: 10,
+            autocapitalize: 'off',
+            autocorrect: 'off'
+            },
+            confirmButtonText: "Change",
+            showCancelButton: true,
+            showConfirmButton: true,
+            showCloseButton: true
+        
+        }).then(async (result) => {
+            if(result.isConfirmed) {
+                console.log(result)
+                
+                const changeResult = await fetch(endpoint+server_port+'/api/users/premium/'+user._id,{
+                    method:'PUT',
+                    body:JSON.stringify({role: result.value}),
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    credentials: 'include'
+                }).then(async (response) => response.json())
+                if (changeResult.code === 201) {
+                    console.log("llegué")
+                    console.log(changeResult)
+                    Swal.fire({
+                        title:"Usuario actualizado correctamente",
+                        icon:"success",
+                        timer: 4000,
+                        text: changeResult.message
+                    })
+                }
+                else {
+                    console.log({...changeResult})
+                    Swal.fire({
+                        title:"Error actualizando usuario",
+                        icon:"error",
+                        text: changeResult.message?changeResult.message:"Intente con un usuario registrado"
+                    })
+                }
+            }
+        })
     } 
     return(
         <UserContext.Provider 
@@ -79,7 +135,8 @@ function UserContextProvider({children}) {
                 port,
                 server_port,
                 endpoint,
-                closeUserSession
+                closeUserSession,
+                changeRol
             }}>
             {children}
         </UserContext.Provider>

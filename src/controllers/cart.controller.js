@@ -69,6 +69,7 @@ export const addProductToCart = async (req, res, next) => {
     let cart_id = req.params.cid; 
     let {quantity,product_id} = req.body;
     try {
+        
         let result = await cartService.updateProduct(cart_id, product_id, quantity, true);
         res.status(200).send(result)
     } 

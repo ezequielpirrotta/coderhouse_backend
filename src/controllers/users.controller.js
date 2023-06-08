@@ -35,20 +35,24 @@ export const saveUser = async (req, res, next) => {
 export const updateUser = async (req, res, next) => {
     try {
         const {username,uid} = req.params
-        const user = {}
+        let user = {}
         if(uid) {
-            let oldUser = userService.getUserById(uid);
+            let oldUser = await userService.getUserById(uid);
             oldUser.role = req.body.role
             user = oldUser;
+            console.log(oldUser)
+
         }
         else {
             user = req.body;
         }
-        const result = await userService.updateUser(username, user);
-        res.send({status: 200, payload: result});
+        const result = await userService.updateUser(
+            {username: username? username : user.username}, user);
+        res.send({code: 201, message: "Usuario actualizado correctamente", payload: result});
     }
     catch(error) {
-        
+        console.log(error)
+        res.status(error.code).send(error)
     }
 }
 export const deleteUser = async (req,res,next) => {

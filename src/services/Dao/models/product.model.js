@@ -29,7 +29,8 @@ const productSchema = new mongoose.Schema({
     },
     thumbnail: stringSchemaNonUniqueRequired,
     owner: {
-        ...stringSchemaNonUniqueRequired,
+        type: String,
+        require: true,
         default: "admin"
     }
 });

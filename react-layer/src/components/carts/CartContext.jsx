@@ -106,7 +106,7 @@ function CartContextProvider({children}) {
             }
             let request = new Request(endpoint+server_port+'/api/carts/'+user.cart+'/product/', requestData)
            
-            fetch(request)
+            return await fetch(request)
             .then( async (response) => {
                 if (!response.ok) {
                     const error = await response.json()
@@ -115,6 +115,7 @@ function CartContextProvider({children}) {
                             title: error.message,
                             icon: 'error',
                         })
+                        return false;
                     }
                     else {
                         Swal.fire({
@@ -122,15 +123,22 @@ function CartContextProvider({children}) {
                             icon: 'error',
                             text: 'Ha ocurrido un error inesperado'
                         })
+                        return false;
                     }
                 }
                 else {
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Haz añadido '+quantity+' items a tu carrito',
+                        showConfirmButton: false,
+                        timer: 2000
+                    })
                     const updatedCart = await getCart()
                     setCart(updatedCart);
-                    console.log(cookieCart)
                     updateCartCookie(cart)
                     cookies.set("cartCookie",cart,{path:"/"})
-                    console.log(cookieCart)
+                    return true;
                 }
             })
         }

@@ -5,7 +5,7 @@ import { UserContext } from "./UserContext";
 
 function Profile() 
 {
-    const {user, loading, endpoint,server_port} = useContext(UserContext);
+    const {user, loading, changeRol} = useContext(UserContext);
     
     /*useEffect(  async () => {
         //let result  = await fetch(endpoint+server_port+'/api/sessions/current').then((response)=>response.json())
@@ -17,7 +17,7 @@ function Profile()
         <div className="container">
             <div className="profile">
                 { loading ? 
-                    <p>Loading user profile...</p>
+                    <h2>Loading user profile...</h2>
                     : user ? 
                     <div>
                         <h2 className="profile-heading">User Profile</h2>
@@ -49,12 +49,21 @@ function Profile()
                                 disabled
                                 />
                             </div>
+                            <div className="form-group">
+                                <label>Role</label>
+                                <input
+                                type="text"
+                                className="form-control"
+                                value={user.role}
+                                disabled
+                                />
+                            </div>
                         </div>
                         <Link to={"/orders"} className="btn btn-secondary">Ir a órdenes</Link>
-                        <Link to={"/resetPassword"} className="btn btn-secondary">Cambiar contraseña</Link>
+                        <Link className="btn btn-secondary" onClick={changeRol}>Cambiar rol</Link>
                     </div>
                     : 
-                    <p>No user profile found.</p>
+                    <h2>No user profile found.</h2>
                 }
             </div>
         </div>

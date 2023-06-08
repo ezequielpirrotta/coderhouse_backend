@@ -77,6 +77,34 @@ export const generateProduct = () => {
     product.available = product.stock > 0 ? true : false;
     return product;
 };
+
+export const generarCadenaAlfanumerica = (longitud) => {
+    var caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var cadena = '';
+    if(longitud === 0) {
+        cadena = null
+    }
+    else {
+        for (var i = 0; i < longitud; i++) {
+            var indice = Math.floor(Math.random() * caracteres.length);
+            cadena += caracteres.charAt(indice);
+        }
+    }
+    return cadena;
+}
+  
+export const generarCadenasAlfanumericasUnicas = (longitud, cantidad) => {
+    var cadenasUnicas = [];
+    if(cantidad === 0) {
+        cadenasUnicas = null
+    }else if(cantidad > 0){
+        while (cadenasUnicas.size < cantidad) {
+            var cadena = generarCadenaAlfanumerica(longitud);
+            cadenasUnicas.push(cadena);
+        }
+    }
+    return cadenasUnicas;
+}
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename).split(path.sep).join(path.posix.sep);
 

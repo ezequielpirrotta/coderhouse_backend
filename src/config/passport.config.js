@@ -112,6 +112,7 @@ const initializePassport = () => {
             }
             catch(error) {
                 req.logger.error(log(error,req));
+                console.log(error)
                 return done(error)
             }
         }

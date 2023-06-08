@@ -158,9 +158,6 @@ function ResetPassword()
                                     </InputGroup>
                                     {errors['password'] && <div className="invalid-feedback">{errors['password']}</div>}
                                 </div>
-                                
-                                
-                                
                             </div>
                             <div className="col-12">
                                 <button className="btn btn-primary" type="submit">Restablecer</button>

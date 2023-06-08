@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { passportCall } from '../util.js';
-import { login, gitHubLogin, register, logout, resetPassword, resetPasswordConfirm } from '../controllers/sessions.controller.js';
+import { login, gitHubLogin, register, logout, updateSession, resetPassword, resetPasswordConfirm } from '../controllers/sessions.controller.js';
 import { log } from '../config/logger.js';
 const router = Router();
 
@@ -15,6 +15,7 @@ router.post("/resetPassword", resetPassword);
 router.get('/current', passportCall('current'), (req,res) =>{
     res.status(200).send(req.user);
 })
+router.put('/updateSession', passportCall('current'), updateSession);
  
 router.get('/fail-register', (req, res)=>{
     res.status(401).send({error: res.message});

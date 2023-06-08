@@ -1,5 +1,5 @@
 import React, { useState , useEffect, useContext} from "react";
-//import { useParams } from "react-router-dom";
+import { InputGroup,FormControl, Button } from "react-bootstrap";
 import Swal from 'sweetalert2';
 import { UserContext } from "./UserContext";
 
@@ -101,20 +101,36 @@ function Login()
                                 </div>
                                 {errors['email'] && <div className="invalid-feedback">{errors['email']}</div>}
 
-                                <label htmlFor="password" className="form-label">Contraseña</label>
-                                <input type="password" 
-                                    className={`form-control ${errors['password'] ? 'is-invalid' : ''}`} 
-                                    name="password" 
-                                    id="password" placeholder="*******" required
-                                    onChange={handleInputChange}
-                                />
-                                <span 
-                                    className={`fa fa-fw ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
-                                    onClick={toggleShowPassword}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                </span>
-                                
+                                <div className="input-group flex-column">
+                                    <label htmlFor="password" className="form-label">Contraseña</label>
+                                    <InputGroup className="mb-3">
+                                        <FormControl
+                                            type={showPassword ? "text" : "password"}
+                                            className={`form-control ${errors['password'] ? 'is-invalid' : ''}`}
+                                            name="password"
+                                            id="password" placeholder="*******" required
+                                            onChange={handleInputChange}
+                                        >
+
+                                        </FormControl>
+                                        {errors['password'] && <div className="invalid-feedback">{errors['password']}</div>}
+
+                                        <Button
+                                            variant="outline-secondary"
+                                            onClick={toggleShowPassword}
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            {showPassword ? (
+                                            <i className="fa fa-eye-slash"></i>
+                                            ) : (
+                                            <i className="fa fa-eye"></i>
+                                            )}
+                                        </Button>
+                                        
+                                    </InputGroup>
+                                    
+                                </div>
+
                                 <div className="valid-feedback">
                                     ¡Se ve bien!
                                 </div>

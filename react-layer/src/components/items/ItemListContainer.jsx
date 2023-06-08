@@ -161,7 +161,7 @@ function ItemListContainer()
             
             let requestData = {
                 method:"POST",
-                body: JSON.stringify(),
+                body: JSON.stringify(data),
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
                 },
