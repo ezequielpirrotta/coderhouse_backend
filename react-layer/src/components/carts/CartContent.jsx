@@ -4,11 +4,8 @@ import { CartContext } from "./CartContext";
 import { MDBAccordion,MDBAccordionItem,MDBTable,MDBTableHead,MDBTableBody } from "mdb-react-ui-kit";
 
 function CartContent () {
-    const {cart,removeItem,clearCart,totalPrice,getCart} = useContext(CartContext);
-    /*useEffect(() => {
-        
-    },[])*/
-    console.log(cart)
+    const {cart,removeItem,clearCart,totalPrice} = useContext(CartContext);
+    
     let count = 0;
     return(
         <div className="container-fluid ">

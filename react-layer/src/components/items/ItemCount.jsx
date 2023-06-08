@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {MDBIcon} from "mdb-react-ui-kit"
+import { Link } from "react-router-dom";
+import { UserContext } from "../users/UserContext";
 
-const ItemCount = ({stock, onAdd}) => 
+const ItemCount = ({stock, onAdd, onEdit, onDelete}) => 
 {
+    const {user} = useContext(UserContext);
     const [items, setItems] = useState(1);
     const [stockProd, setStockProd] = useState(parseInt(stock))
-    console.log(stockProd)
+    
     const addProduct = () => {
         if(items < stockProd ) {
             setItems(items + 1);
@@ -25,6 +28,12 @@ const ItemCount = ({stock, onAdd}) =>
             setStockProd(0)
         }
     }
+    const editProduct = () => {
+        onEdit()
+    }
+    const deleteProduct = () => {
+        onDelete()
+    }
     
     return(
         <div className = "count-section justify-content-evenly">
@@ -35,9 +44,18 @@ const ItemCount = ({stock, onAdd}) =>
             <span className={"btn m-2"+(items>0?"enable":"disabled")} onClick={() =>restProduct()}>
                 <MDBIcon fas icon="minus" />
             </span>
-            <button href="#" className="add_button btn btn-outline-primary" onClick={() =>addToCart()}>
+            <Link href="#" className="add_button btn btn-outline-primary" onClick={() =>addToCart()}>
                 Añadir al Carrito
-            </button>
+            </Link>
+            {
+                user.role === 'premium' || user.role === 'admin'? 
+                    <div>
+                        <Link className="btn btn-outline-primary" onClick={() =>editProduct()}>Editar</Link>
+                        <Link className="btn btn-outline-danger" onClick={() =>deleteProduct()}>Eliminar</Link>
+                    </div>
+                    : null
+            }
+
         </div>
         
     )

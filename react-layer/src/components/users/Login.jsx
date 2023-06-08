@@ -121,7 +121,7 @@ function Login()
                                 <div className="invalid-feedback">
                                     Este campo es requerido
                                 </div>
-                                <p>¿Olvidaste tu contraseña? <a href="/users/reset-password">Restáurala aquí</a></p>
+                                <p>¿Olvidaste tu contraseña? <a href="/users/resetPassword/sendEmail">Restáurala aquí</a></p>
                             </div>
                             <div className="col-12">
                                 <button className="btn btn-primary" type="submit">Continuar</button>

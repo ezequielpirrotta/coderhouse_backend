@@ -10,7 +10,6 @@ const productService = new ProductService();
 export const getProducts = async (req, res, next) => {
     try {
         let products = await productService.getProducts(req.query); 
-        console.log(products)
         res.status(200).send(products);
     }
     catch(error) {
@@ -42,6 +41,9 @@ export const createProduct = async (req, res, next) => {
                 code: EErrors.INVALID_TYPES_ERROR
             })
         }
+        if(req.user.role === "premium"){
+            product.owner = req.user.username;
+        }
         let resultProduct = await productService.create(product)
         if(!req.body.front) {
             socketServer.emit("event_product_created", {...resultProduct})
@@ -49,7 +51,7 @@ export const createProduct = async (req, res, next) => {
         res.status(200).send({
             status: 'OK',
             message: "Product created succesfully. ",
-            data: product
+            data: resultProduct
         });
     }
     catch(error) {
@@ -70,7 +72,7 @@ export const updateProduct = async (req, res, next) => {
         })
     }
     catch(error) {
-        req.logger.error(log(error.message,req))
+        req.logger.error(log(error.message+', '+error.detail,req))
         next(error)
     }
 }

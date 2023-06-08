@@ -12,11 +12,7 @@ const stringSchemaNonUniqueRequired = {
     type: String,
     require: true
 }
-const stringSchemaIndexedNonUniqueRequired = {
-    type: String,
-    require: true,
-    index: true
-}
+
 const productSchema = new mongoose.Schema({
     title: stringSchemaNonUniqueRequired,
     description: stringSchemaNonUniqueRequired,
@@ -31,7 +27,11 @@ const productSchema = new mongoose.Schema({
         require: true,
         index: true
     },
-    thumbnail: stringSchemaNonUniqueRequired
+    thumbnail: stringSchemaNonUniqueRequired,
+    owner: {
+        ...stringSchemaNonUniqueRequired,
+        default: "admin"
+    }
 });
 productSchema.plugin(mongoosePaginate);
 const productModel = mongoose.model(productsCollection, productSchema)

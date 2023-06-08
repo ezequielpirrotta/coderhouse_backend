@@ -87,14 +87,16 @@ class ProductService {
     }
     updateProduct = async (pid, data) => {
         try {
+            console.log(data)
             let productUpdated = {}
             if(data.field === "stock") {
-                productUpdated[data.field] = data.newValue;
+                productUpdated[data.field] = parseInt(data.newValue);
                 productUpdated["available"] = data.newValue > 0? true : false;
             }
             else {
-                productUpdated[data.field] = data.newValue;
+                productUpdated[data.field] = data.field === "price" ? parseInt(data.newValue) : data.newValue;
             }
+            console.log(productUpdated)
             let result = await productModel.updateOne({_id: pid}, {...productUpdated});
             if(result.modifiedCount > 0){
                 let product = await this.getProductById(pid);
@@ -102,6 +104,7 @@ class ProductService {
                 return {fieldUpdated: data.field, newValue: data.newValue, ...product._doc};
             }
             else {
+                console.log(result)
                 throw Error("El valor elegido es el mismo al que intenta cambiar, intente con uno diferente.")
             } 
                 

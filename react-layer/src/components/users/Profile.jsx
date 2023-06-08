@@ -11,36 +11,8 @@ function Profile()
         //let result  = await fetch(endpoint+server_port+'/api/sessions/current').then((response)=>response.json())
         fetchUserProfile()
         //setUser(result)
-    })
-    const handleFormSubmit = async (event) => {
-        event.preventDefault();
+    })*/
     
-        try {
-          const updatedUser = {
-            ...user,
-            // Updated form fields
-          };
-    
-          const response = await fetch(endpoint+server_port+'/api/user/'+user.username, {
-            method: 'PUT',
-            body: JSON.stringify(updatedUser),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedUser),
-          });
-    
-          if (response.ok) {
-            setUser(updatedUser);
-            Swal('Success', 'User profile updated successfully.', 'success');
-          } else {
-            throw new Error('Error updating user profile');
-          }
-        } catch (error) {
-          console.error('Error updating user profile:', error);
-          Swal('Error', 'An error occurred while updating the user profile.', 'error');
-        }
-      };*/
     return (
         <div className="container">
             <div className="profile">
@@ -71,7 +43,7 @@ function Profile()
                             <div className="form-group">
                                 <label>Age</label>
                                 <input
-                                type="email"
+                                type="number"
                                 className="form-control"
                                 value={user.age}
                                 disabled
@@ -79,6 +51,7 @@ function Profile()
                             </div>
                         </div>
                         <Link to={"/orders"} className="btn btn-secondary">Ir a órdenes</Link>
+                        <Link to={"/resetPassword"} className="btn btn-secondary">Cambiar contraseña</Link>
                     </div>
                     : 
                     <p>No user profile found.</p>

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { passportCall } from '../util.js';
-import { login, gitHubLogin, register, logout, resetPassword } from '../controllers/sessions.controller.js';
+import { login, gitHubLogin, register, logout, resetPassword, resetPasswordConfirm } from '../controllers/sessions.controller.js';
 import { log } from '../config/logger.js';
 const router = Router();
 
@@ -10,6 +10,7 @@ router.get('/githubcallback', passport.authenticate('github',{failureRedirect:'/
 router.post("/register", passport.authenticate('register', {failureRedirect: '/api/sessions/fail-register'}), register);
 router.post("/login", passportCall("login"), login);
 router.get("/logout", logout);
+router.post("/resetPasswordConfirm", resetPasswordConfirm);
 router.post("/resetPassword", resetPassword);
 router.get('/current', passportCall('current'), (req,res) =>{
     res.status(200).send(req.user);

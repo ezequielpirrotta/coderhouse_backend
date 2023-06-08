@@ -34,8 +34,16 @@ export const saveUser = async (req, res, next) => {
 }
 export const updateUser = async (req, res, next) => {
     try {
-        const {username} = req.params
-        const user = req.body;
+        const {username,uid} = req.params
+        const user = {}
+        if(uid) {
+            let oldUser = userService.getUserById(uid);
+            oldUser.role = req.body.role
+            user = oldUser;
+        }
+        else {
+            user = req.body;
+        }
         const result = await userService.updateUser(username, user);
         res.send({status: 200, payload: result});
     }

@@ -17,8 +17,9 @@ export const PRIVATE_KEY = "MyCommerceSecretKeyJWT";
  * Segundo argumento: La llave privada a firmar el token.
  * Tercer argumento: Tiempo de expiración del token.
  */
-export const generateJWToken = (user) => {
-    return jwt.sign({user}, PRIVATE_KEY, {expiresIn: '24h'});
+export const generateJWToken = (user,time) => {
+    jwt
+    return jwt.sign({user}, PRIVATE_KEY, {expiresIn: time});
 };
 
 export const passportCall = (strategy) => {

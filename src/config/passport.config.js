@@ -57,7 +57,7 @@ const initializePassport = () => {
     passport.use('register',new localStrategy(
         {passReqToCallback: true}, async (req, username, password, done) => {
             try {
-                const { name, lastName, age, role} = req.body;
+                const { name, lastName, age, adminRole,premiumRole} = req.body;
                 /*if(!mail) {
                     done(null, false, {status: "error", message: "Empty email"})
                     //return res.status(400).send({status: "error", message: "Empty email"});
@@ -67,9 +67,9 @@ const initializePassport = () => {
                     req.logger.error(log("User already exists.",req));
                     return done(null, false, {status: "error", message: "User already exists."})
                 }
-                let isAdminRole = role==='on'
+                
                 let cart = {}
-                if(!isAdminRole){
+                if(!adminRole){
                     cart = await cartService.addCart();
                 }
                 const user = new UserDTO({
@@ -79,7 +79,7 @@ const initializePassport = () => {
                     age: age,
                     password: createHash(password),
                     cartId: cart._id? cart._id : null,
-                    role: isAdminRole? 'admin' : 'user'
+                    role: adminRole? 'admin' : premiumRole? 'premium' : 'user'
                 });
                 const resultUser = await userService.saveUser(user);
                 return done(null,{user: resultUser})

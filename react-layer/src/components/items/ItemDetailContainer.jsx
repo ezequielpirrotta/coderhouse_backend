@@ -5,7 +5,6 @@ import { ArrowLeftIcon } from '@primer/octicons-react'
 import { CartContext } from "../carts/CartContext";
 import { BookmarkFillIcon, BookmarkIcon } from "@primer/octicons-react";
 
-const port = '3000';
 const server_port = '8080';
 const endpoint = 'http://localhost:';
 function ItemDetailContainer() 
@@ -23,7 +22,7 @@ function ItemDetailContainer()
         getProduct()
      
     },[]);
-
+    
     return (
         <div id="product" className="container-fluid justify-content-center">
             <div className="row mt-2 d-flex justify-content-center">

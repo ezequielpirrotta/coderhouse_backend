@@ -141,19 +141,15 @@ class CartService {
                 let newProduct = {product: pid, quantity: quantity}
                 let cart = await this.getCartById(cid)
                 if(newPdt) {
-                    console.log("soy nuevo")
                     cart.products.push(newProduct);
-                    console.log(cart)
                 }
                 else {
                     pid = new mongoose.Types.ObjectId(pid)
                     cart.products.find(element => element.product._id.equals(pid)).quantity = quantity;
                 }
                 let result = await cart.updateOne(cart);
-                console.log(result)
                 if(result) {
                     const resultCart = await this.getCartById(cid);
-                    console.log(resultCart.products)
                     return resultCart;
                 }
                 else {

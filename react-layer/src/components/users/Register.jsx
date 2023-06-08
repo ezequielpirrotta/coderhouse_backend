@@ -13,6 +13,22 @@ function Register()
     const [lastName, setLastName] = useState('');
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
+    const [isCheckedAdmin, setIsCheckedAdmin] = useState(false);
+    const [isCheckedPremium, setIsCheckedPremium] = useState(false);
+
+    
+    const handleChangeAdmin = () => {
+        setIsCheckedAdmin(!isCheckedAdmin);
+        if (isCheckedPremium) {
+            setIsCheckedPremium(!isCheckedPremium);
+        }
+    }
+    const handleChangePremium = () => {
+        setIsCheckedPremium(!isCheckedPremium);
+        if (isCheckedAdmin) {
+            setIsCheckedAdmin(!isCheckedAdmin);
+        }
+    }
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -37,7 +53,7 @@ function Register()
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (validateForm()) {
-            const data = {username,password,name,lastName};
+            const data = {username,password,name,lastName, adminRole: isCheckedAdmin,premiumRole: isCheckedPremium};
             console.log(data)
             const result = await fetch(endpoint+server_port+'/api/sessions/register',{
                 method:'POST',
@@ -47,18 +63,26 @@ function Register()
                 },
                 credentials: 'include'
             }).then((response)=>response.json())
-            if(result.code===200){
-                window.location.replace('/products');
+            if(result.code===201){
+                Swal.fire({
+                    title:"Usuario creado correctamente",
+                    icon:"success",
+                    timer: 2000,
+                    text: result.message
+                })
+                setTimeout(()=>{
+                    window.location.replace('/');
+                },4000)
             }
             else {
                 console.log({...result})
                 /*isValid = false;
                 errors['password'] = 'Incorrect username or password.'*/
-                /*Swal.fire({
-                    title:"Error",
+                Swal.fire({
+                    title:"Error con su registro",
                     icon:"error",
-                    text: "Error con su inicio de sesión, intente con un usuario registrado"
-                })*/
+                    text: result.message?result.message:"Intente con un usuario registrado"
+                })
             }
         }
         else {
@@ -194,14 +218,18 @@ function Register()
                                 <label className="form-check-label form-label" htmlFor="role">
                                     Crear como admin
                                 </label>
-                                <input className="form-check-input " type="checkbox" id="role" name="role"/>
+                                <input className="form-check-input " type="checkbox" checked={isCheckedAdmin} onChange={handleChangeAdmin} id="admin_role" name="admin_role"/>
+                                <label className="form-check-label form-label" htmlFor="role">
+                                    Crear como usuario premium
+                                </label>
+                                <input className="form-check-input " type="checkbox" checked={isCheckedPremium} onChange={handleChangePremium} id="premium_role" name="premium_role"/>
                             </div>
                             
                             <div className="col-12 justify-content-center">
                                 <button className="btn btn-primary" type="submit">Registrarse</button>
                             </div>
                         </form>
-                        <p>¿Ya tienes una cuenta? <a href="/users/login">Ingresa aquí</a></p>
+                        <p>¿Ya tienes una cuenta? <a href="/">Ingresa aquí</a></p>
                     </div>
                 }
             </div>
@@ -209,66 +237,3 @@ function Register()
     )
 }
 export default Register;
-/*const form = document.getElementById('loginForm');
-(() => {
-    'use strict'
-  
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    const forms = document.querySelectorAll('.needs-validation')
-  
-    // Loop over them and prevent submission
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
-  
-        form.classList.add('was-validated')
-      }, false)
-    })
-})()
-window.addEventListener("load", function() {
-
-    // icono para mostrar contraseña
-    showPassword = document.querySelector('.show-password');
-    showPassword.addEventListener('click', () => {
-
-        // elementos input de tipo clave
-        password = document.getElementById('password');
-        
-        if ( password.type === "text" ) {
-            password.type = "password"
-            showPassword.classList.remove('fa-eye-slash');
-        } else {
-            password.type = "text"
-            showPassword.classList.toggle("fa-eye-slash");
-        }
-
-    })
-
-});
-form.addEventListener('submit',async (e)=>{
-    e.preventDefault();
-    const data = new FormData(form);
-    const obj = {};
-    data.forEach((value,key)=>obj[key]=value);
-    const result = await fetch('/api/sessions/login',{
-        method:'POST',
-        body:JSON.stringify(obj),
-        headers:{
-            'Content-Type':'application/json'
-        }
-    }).then((response)=>response.json())
-    if(result.code===200){
-        window.location.replace('/products');
-    }
-    else {
-        cosnsole.log(result)
-        Swal.fire({
-            title:"Error",
-            icon:"error",
-            text: "Error con su inicio de sesión, intente con un usuario registrado"
-        })
-    }
-})*/
