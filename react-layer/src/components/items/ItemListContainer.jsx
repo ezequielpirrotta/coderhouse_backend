@@ -1,21 +1,20 @@
 import React, { useState , useEffect, useContext} from "react";
 import ItemList from "./ItemList";
-import { useParams, useSearchParams } from "react-router-dom";
-import { CartContext } from "../carts/CartContext";
+import FilterNavbar from "../nav/FilterNavbar";
+import {useSearchParams } from "react-router-dom";
+//import { CartContext } from "../carts/CartContext";
 import Swal from 'sweetalert2';
 import { UserContext } from "../users/UserContext";
+import {MDBContainer,MDBPagination,MDBPaginationLink,MDBPaginationItem,MDBBtnGroup,MDBBtn,MDBRow, MDBCol} from "mdb-react-ui-kit"
 
-const port = '3000';
 const server_port = '8080';
 const endpoint = 'http://localhost:';
 
 function ItemListContainer() 
 {
-    const {user,cart} = useContext(UserContext)
+    const {user} = useContext(UserContext)
     const [products, setProducts] = useState({});
     const [searchParams, setSearchParams] = useSearchParams();
-    const {limit,page,sort,category,available} = useParams()
-    console.log(searchParams.get("category"))
     
     useEffect(  () => {
             
@@ -30,58 +29,79 @@ function ItemListContainer()
                 const sort = searchParams.get("sort")
                 const category = searchParams.get("category")
                 const available = searchParams.get("available")
-
+                let filters = [];
                 if(limit||page||sort||category||available) {
                     
                     params = params+'?'
                     
-                    params = limit? params.length>1? params+'&limit='+limit : params+'limit='+limit : params
-                    params = page? params.length>1? params+'&page='+page : params+'page='+page : params
-                    params = sort? params.length>1? params+'&sort='+sort : params+'sort='+sort : params
-                    params = category? params.length>1? params+'&category='+category : params+'category='+category : params
-                    params = available? params.length>1? params+'&available='+available : params+'available='+available : params
+                    if(limit) {
+                        params = params.length>1? params+'&limit='+limit : params+'limit='+limit
+                        filters["limit"] = limit
+                    }
+                    if(page) {
+                        params = params.length>1? params+'&page='+page : params+'page='+page
+                        filters["page"] = page
+                    }
+                    if(sort) {
+                        params = params.length>1? params+'&sort='+sort : params+'sort='+sort
+                        filters["sort"] = sort
+                    }
+                    if(category) {
+                        console.log("categoría")
+                        params = params.length>1? params+'&category='+category : params+'category='+category
+                        filters["category"] = category
+                    }
+                    else if(available) {
+                        params = params.length>1? params+'&available='+available : params+'available='+available
+                        filters["available"] = available
+                    }
+                    
                 } 
-                console.log()
-                data.products = await fetch(endpoint+port+'/api/products'+params)
+                data.products = await fetch(endpoint+server_port+'/api/products'+params,{credentials:"include"})
                 .then( (response) => response.json());
-                
                 if(data.products.status === "WRONG" || data.products.error){
                     data.founded = false;
                 }
                 else {
                     
                     data.token = user
-                    data.products.prevLink = data.products.hasPrevPage? `${endpoint+port}/products?page=${data.products.prevPage}`:'';
+                    console.log(data.products)
+                    
+                    data.products.prevLink = data.products.hasPrevPage? `/products?page=${data.products.prevPage}`:null;
     
-                    data.products.nextLink = data.products.hasNextPage? `${endpoint+port}/products?page=${data.products.nextPage}`:'';
-                    /*for (const key in urlParams) {
+                    data.products.nextLink = data.products.hasNextPage? `/products?page=${data.products.nextPage}`:null;
+                    for (const key in filters) {
+                        console.log(data.products.nextLink)
                         if(key !== "page"){
                             let result = params.search(key);
-                            data.products.prevLink = result >= 0? data.products.prevLink+'&'+key+'='+urlParams[key] : data.products.prevLink;
-                            data.products.nextLink = result >= 0? data.products.nextLink+'&'+key+'='+urlParams[key] : data.products.nextLink;
+                            data.products.prevLink = result >= 0? data.products.prevLink+'&'+key+'='+filters[key] : data.products.prevLink;
+                            data.products.nextLink = result >= 0? data.products.nextLink+'&'+key+'='+filters[key] : data.products.nextLink;
                         }
-                    }*/
+                    }
                     data.pages = []
-                    for (let i = 0; i < data.products.totalPages; i++) {
+                    for (let i = 1; i <= data.products.totalPages; i++) {
+                        console.log(i)
                         data.pages[i] = {
-                            page: i+1,
-                            isCurrentPage: data.products.page === i+1? true:false,
+                            page: i,
+                            isCurrentPage: data.products.page === i? true:false,
                             link: `/products?page=${i+1}`
                         };
-                        /*for (const key in urlParams) {
+                        console.log(data.pages[i].link)
+                        
+                        for (const key in filters) {
                             if(key !== "page"){
+                                console.log(key)
                                 let result = params.search(key);
-                                data.pages[i].link = result >= 0? data.pages[i].link+'&'+key+'='+urlParams[key] : data.pages[i].link; 
+                                data.pages[i].link = result >= 0? data.pages[i].link+'&'+key+'='+filters[key] : data.pages[i].link; 
                             }
-                        }*/
+                        }
                     }
                     data.founded = true;
-                    console.log(cart)
-                    
                 }
                 if(data.products["error"]){
                     throw {message: products.error}
                 }
+                console.log(data)
                 setProducts(data)
             }
             catch(error) {
@@ -97,56 +117,136 @@ function ItemListContainer()
             })
         }
     }, [searchParams,user]);
+    const createProduct = async() => {
+        Swal.fire({
+            title: 'Create Product',
+            html:  `
+                    <div>
+                        <input type="text" id="title" class="swal2-input" placeholder="title">
+                        <input type="number" id="price" class="swal2-input" placeholder="price">
+                        <input type="text" id="description" class="swal2-input" placeholder="description">
+                        <select id="category" class="swal2-input" aria-label="Default select example">
+                            <option selected value="comida">Comida</option>
+                            <option value="ropa">Ropa</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                        <input type="number" id="stock" class="swal2-input" placeholder="stock">
+                        <input type="text" id="image" class="swal2-input" placeholder="image">
+                    </div>`,
+            confirmButtonText: 'Create',
+            focusConfirm: false,
+            preConfirm: () => {
+              const title = Swal.getPopup().querySelector('#title').value
+              const price = Swal.getPopup().querySelector('#price').value
+              const description = Swal.getPopup().querySelector('#description').value
+              const category = Swal.getPopup().querySelector('#category').value
+              const stock = Swal.getPopup().querySelector('#stock').value
+              const image = Swal.getPopup().querySelector('#image').value
+
+              if (!price || !description || !title || !category || !stock || !image) {
+                Swal.showValidationMessage(`Please complete all the fields`)
+              }
+              return { price: price, description: description, title: title, category:category, stock:stock, image:image}
+            }
+        }).then((result) => {
+            
+            let data = {
+                price: parseInt(result.value.price), 
+                description: result.value.description, 
+                title: result.value.title,
+                category: result.value.category,
+                stock: parseInt(result.value.stock),
+                thumbnail: result.value.image
+            }
+            
+            let requestData = {
+                method:"POST",
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+                credentials: 'include'
+            }
+            const request = new Request(endpoint+server_port+'/api/products/', requestData)
+            fetch(request)
+            .then( async (response) => {
+                
+                if (!response.ok) {
+                    const error = await response.json()
+                    if(error.status === "WRONG") {
+                        Swal.fire({
+                            title: `Producto no creado`,
+                            text: error.message
+                        })
+                    }
+                    else if(error.code === "Unauthorized"){
+                        Swal.fire({
+                            title: `No tienes permisos para crear`,
+                        })
+                    }
+                } 
+                else {
+                    const data = await response.json()
+                    Swal.fire({
+                        title: `Producto ${data._id} creado exitosamente`,
+                        color: '#716add'
+                    })
+                }
+            })
+        })
+    }
     if(!(Object.keys(products).length === 0) ){
         return (
-            <div id="main" className="container-fluid justify-content-center"> 
-                <nav className="row" aria-label="...">
-                    <ul className="pagination justify-content-center">
-                        { products.hasPrevPage?
-                            <li className="page-item enable">
-                                <a className="page-link" href={products.products.prevLink}>Previous</a>
-                            </li>
-                            :
-                            <li className="page-item disabled">
-                                <a className="page-link" href={products.products.prevLink}>Previous</a>
-                            </li>
-                        }
-                        { products.pages.map(page =>
+            <MDBContainer fluid className="py-5 container-fluid justify-content-center" style={{ backgroundColor: "transparent" }}>
+                <nav aria-label='Page navigation example'>
+                    <MDBPagination className='mb-0 justify-content-center'>
+                    <MDBPaginationItem className={products.products.hasPrevPage?"enable":"disabled"}>
+                        <MDBPaginationLink href={products.products.prevLink} aria-label='Previous'>
+                            <span aria-hidden='true'>Previous</span>
+                        </MDBPaginationLink>
+                    </MDBPaginationItem>
+                    { products.pages.map(page =>
                             {
                                 if(page.isCurrentPage){
                                     return(
-                                        <li className="page-item active" aria-current="page">
-                                            <a className="page-link" href={page.link}>{page.page}</a>
-                                        </li>
+                                        <MDBPaginationItem className="disabled" aria-current="page">
+                                            <MDBPaginationLink href={page.link}>{page.page}</MDBPaginationLink>
+                                        </MDBPaginationItem>
                                     );
                                 }
                                 else{
                                     return(
 
-                                        <li className="page-item"><a className="page-link" href={page.link}>{page.page}</a></li>
+                                        <MDBPaginationItem className="active">
+                                            <MDBPaginationLink href={page.link}>{page.page}</MDBPaginationLink>
+                                        </MDBPaginationItem>
                                     );
                                 }
                             }
-                        )}
-                        {
-                            products.hasNextPage?
-                            
-                            <li className="page-item enable">
-                                <a className="page-link" href={products.products.nextLink}>Next</a>
-                            </li>
-                            :
-                            <li className="page-item disabled">
-                                <a className="page-link" href={products.products.nextLink}>Next</a>
-                            </li>
-
-                        }
-                    </ul>
-                    <div className="formButtons">
-                        <button id="create" className="btn btn-outline-primary">Crear</button>
-                    </div>
+                    )}
+                    <MDBPaginationItem className={products.products.hasNextPage?"enable":"disabled"}>
+                        <MDBPaginationLink href={products.products.nextLink} aria-label='Next'>
+                            <span aria-hidden='true'>Next</span>
+                        </MDBPaginationLink>
+                    </MDBPaginationItem>
+                    </MDBPagination>
                 </nav>
+                {
+                    user?
+                        user.role === "admin" || user.role === "premium"?
+                        <MDBRow >
+                            <MDBCol className="justify-content-center">
+                                <MDBBtnGroup aria-label='Basic example'>
+                                    <MDBBtn onClick={createProduct}>Crear</MDBBtn>
+                                </MDBBtnGroup>
+
+                            </MDBCol>
+                        </MDBRow>
+                        :null
+                    :null
+                }
                 <ItemList products={products.products.payload}/>
-            </div>
+            </MDBContainer>
         );
     }
     else{
@@ -159,3 +259,8 @@ function ItemListContainer()
 }
 
 export default ItemListContainer;
+/**
+ * <div id="main" className="container-fluid justify-content-center"> 
+    </div>
+ * 
+ */

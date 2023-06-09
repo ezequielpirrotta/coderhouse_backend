@@ -5,47 +5,19 @@ import { UserContext } from "./UserContext";
 
 function Profile() 
 {
-    const {user, loading, endpoint,server_port} = useContext(UserContext);
+    const {user, loading, changeRol} = useContext(UserContext);
     
     /*useEffect(  async () => {
         //let result  = await fetch(endpoint+server_port+'/api/sessions/current').then((response)=>response.json())
         fetchUserProfile()
         //setUser(result)
-    })
-    const handleFormSubmit = async (event) => {
-        event.preventDefault();
+    })*/
     
-        try {
-          const updatedUser = {
-            ...user,
-            // Updated form fields
-          };
-    
-          const response = await fetch(endpoint+server_port+'/api/user/'+user.username, {
-            method: 'PUT',
-            body: JSON.stringify(updatedUser),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedUser),
-          });
-    
-          if (response.ok) {
-            setUser(updatedUser);
-            Swal('Success', 'User profile updated successfully.', 'success');
-          } else {
-            throw new Error('Error updating user profile');
-          }
-        } catch (error) {
-          console.error('Error updating user profile:', error);
-          Swal('Error', 'An error occurred while updating the user profile.', 'error');
-        }
-      };*/
     return (
         <div className="container">
             <div className="profile">
                 { loading ? 
-                    <p>Loading user profile...</p>
+                    <h2>Loading user profile...</h2>
                     : user ? 
                     <div>
                         <h2 className="profile-heading">User Profile</h2>
@@ -71,17 +43,27 @@ function Profile()
                             <div className="form-group">
                                 <label>Age</label>
                                 <input
-                                type="email"
+                                type="number"
                                 className="form-control"
                                 value={user.age}
                                 disabled
                                 />
                             </div>
+                            <div className="form-group">
+                                <label>Role</label>
+                                <input
+                                type="text"
+                                className="form-control"
+                                value={user.role}
+                                disabled
+                                />
+                            </div>
                         </div>
                         <Link to={"/orders"} className="btn btn-secondary">Ir a órdenes</Link>
+                        <Link className="btn btn-secondary" onClick={changeRol}>Cambiar rol</Link>
                     </div>
                     : 
-                    <p>No user profile found.</p>
+                    <h2>No user profile found.</h2>
                 }
             </div>
         </div>

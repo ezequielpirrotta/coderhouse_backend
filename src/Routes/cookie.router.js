@@ -15,5 +15,6 @@ router.get('/getCookie/:name', (req, res) => {
 router.post('/updateCookie',(req,res)=>{
     const {cookieName,cookieValue} = req.body
     req.cookies[cookieName] = cookieValue;
+    console.log(req.cookies)
 })
 export default router;

@@ -2,14 +2,19 @@ import React, { useState , useEffect, useContext} from "react";
 import { InputGroup,FormControl, Button } from "react-bootstrap";
 import Swal from 'sweetalert2';
 import { UserContext } from "./UserContext";
+import { useParams } from "react-router-dom";
+import { useJwt } from "react-jwt";
 
-function Login() 
+function ResetPassword() 
 {
     const {user, port, server_port, endpoint} = useContext(UserContext);
     const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
+    const {token} = useParams();
+    const {isExpired} = useJwt(token)
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -18,8 +23,12 @@ function Login()
             setUsername(value);
         } 
         else if (name === 'password') {
-            setPassword(value);
-        } 
+            setNewPassword(value);
+        }
+        else if (name === 'confirmPassword') {
+            setConfirmNewPassword(value)
+        }
+
     };
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -27,9 +36,9 @@ function Login()
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (validateForm()) {
-            const data = {username, password};
+            const data = {username, newPassword, confirmNewPassword};
             console.log(data)
-            const result = await fetch(endpoint+server_port+'/api/sessions/login',{
+            const result = await fetch(endpoint+server_port+'/api/sessions/resetPassword',{
                 method:'POST',
                 body:JSON.stringify(data),
                 headers:{
@@ -37,16 +46,15 @@ function Login()
                 },
                 credentials: 'include'
             }).then((response)=>response.json())
-            if(result.code===200){
-                window.location.replace('/products');
+            if(result.code===201){
+                window.location.replace('/');
             }
             else {
-                console.log(result)
-                
+                console.log({...result})
                 Swal.fire({
-                    title:"Error con su inicio de sesión",
+                    title:"Error restableciendo su contraseña",
                     icon:"error",
-                    text: result.message?result.message:"Intente con un usuario registrado"
+                    text: result.error? result.error : "Ha ocurrido un error inesperado"
                 })
             }
         }
@@ -64,23 +72,37 @@ function Login()
             errors['email'] = 'Please enter a valid email address.';
         }
 
-        if (!password) {
+        if (!newPassword) {
             isValid = false;
             errors['password'] = 'Please enter your password.';
+        }
+        if (newPassword && !confirmNewPassword) {
+            isValid = false;
+            errors['password'] = 'Please confirm your password.';
+        }
+        if(newPassword !== confirmNewPassword){
+            isValid = false;
+            errors['password'] = 'Passwords must be equals.';
         }
 
         setErrors(errors);
         return isValid;
     };
+    
     return (
         <div className="container-fluid m-3 d-flex justify-content-center">
             <div className="card d-flex justify-content-center">
-                <h1 className="card-title"> Inicia sesión</h1>
-                { user?
+                <h1 className="card-title">Restablece tu contraseña</h1>
+                { isExpired?
                     <div className="shadow-lg bg-body rounded">
-                        <form id="loginForm" className="card-body row g-3 justify-content-center needs-validation" noValidate>
-                            <div className="col-12">
-                                <a className="btn btn-primary" href="/products" type="submit">Continuar </a>
+                        <form id="loginForm" className="card-body row g-3 justify-content-center needs-validation d-flex align-items-center" noValidate>
+                            <div className = "col-12 justify-content-center">
+                                <div className = "product alert alert-danger" role = "alert">
+                                    Tu link expiró!
+                                </div>
+                            </div>
+                            <div className="col-12 justify-content-center">
+                                <a className="btn btn-primary" href="/users/resetPassword/sendEmail" type="submit">Enviar de nuevo </a>
                             </div>
                         </form>
                     </div>
@@ -100,6 +122,7 @@ function Login()
                                 </div>
                                 {errors['email'] && <div className="invalid-feedback">{errors['email']}</div>}
 
+                                <div className="mb-3 col-md-4"></div>
                                 <div className="input-group flex-column">
                                     <label htmlFor="password" className="form-label">Contraseña</label>
                                     <InputGroup className="mb-3">
@@ -127,27 +150,28 @@ function Login()
                                         </Button>
                                         
                                     </InputGroup>
-                                    
+                                    <label htmlFor="confirmPassword" className="form-label">Confirma tu contraseña</label>
+                                    <InputGroup className="mb-3">
+                                        <FormControl
+                                            type={showPassword ? "text" : "password"}
+                                            className={`form-control ${errors['password'] ? 'is-invalid' : ''}`}
+                                            name="confirmPassword"
+                                            id="confirmPassword" placeholder="*******" required
+                                            onChange={handleInputChange}
+                                        >
+                                        </FormControl>
+                                    </InputGroup>
+                                    {errors['password'] && <div className="invalid-feedback">{errors['password']}</div>}
                                 </div>
-
-                                <div className="valid-feedback">
-                                    ¡Se ve bien!
-                                </div>
-                                <div className="invalid-feedback">
-                                    Este campo es requerido
-                                </div>
-                                <p>¿Olvidaste tu contraseña? <a href="/users/resetPassword/sendEmail">Restáurala aquí</a></p>
                             </div>
                             <div className="col-12">
-                                <button className="btn btn-primary" type="submit">Continuar</button>
+                                <button className="btn btn-primary" type="submit">Restablecer</button>
                             </div>
                         </form>
-                        <p>Ingresa con github! <a href="/github/login">Click aqui</a></p>
-                        <p>¿No estás registrado? <a href="/register">Regístrate aquí</a></p>
                     </div>
                 }
             </div>
         </div>
     )
 }
-export default Login;
+export default ResetPassword;

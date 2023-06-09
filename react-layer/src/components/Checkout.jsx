@@ -6,7 +6,7 @@ import Order from "./Order";
 import Swal from 'sweetalert2';
 
 function Checkout () {
-    const { cart, totalPrice, db, clearCart } = useContext(CartContext);
+    const {cart, totalPrice, clearCart, purchaseCart} = useContext(CartContext);
     const [created, setCreated] = useState(false)
     const [order, setOrder] = useState({})
 
@@ -16,7 +16,7 @@ function Checkout () {
     const [lastName, setLastName] = useState("")
     const [cellNumber, setCellNumber] = useState("")
 
-    useEffect(() => {{
+    useEffect(() => {
 
         let forms = document.querySelectorAll('.needs-validation')
        
@@ -42,7 +42,7 @@ function Checkout () {
                     "cell_number": cellNumber
                 },
                 "items": 
-                    cart.map(product => {
+                    cart.products.map(product => {
                         return(
                             {
                                 "id": product.id,
@@ -63,13 +63,24 @@ function Checkout () {
         else {
             console.log('orden lista')
         }
-    }})
-    const generateOrder = (e) => {
+    },[created])
+    const generateOrder = async (e) => {
         e.preventDefault()
+        const result = await purchaseCart()
+        if(result){
+            setCreated(result)
+        }
+        else {
+            console.log(result)
+            Swal.fire({
+                title:"Error comprando carrito",
+                icon:"error",
+                text: result.message?result.message:"Intente de nuevo más tarde"
+            })
+        }
         //const ordersCollection = collection(db, "orders");
         /*addDoc(ordersCollection, order)
         .then(({id}) => {
-            setCreated(true)
             setOrder({ id: id, ...order })
             Swal.fire({
                 position: 'center',
@@ -108,93 +119,6 @@ function Checkout () {
                     <div className="shadow-lg bg-body rounded">
         
                         <form className="card-body row g-3 justify-content-center needs-validation" onSubmit={generateOrder} noValidate>
-                            <div className="col-md-4">
-                                <label htmlFor="name" className="form-label">Nombre</label>
-                                <input type="text" className="form-control" name="name" onChange={
-                                    e => setName(e.target.value)
-                                    } id="name" placeholder="Mark" required/>
-                                <div className="valid-feedback">
-                                    ¡Se ve bien!
-                                </div>
-                                <div className="invalid-feedback">
-                                    Este campo es requerido
-                                </div>
-                            </div>
-                            <div className="col-md-4">
-                                <label htmlFor="last_name" className="form-label">Apellido</label>
-                                <input type="text" className="form-control" onChange={
-                                    e => setLastName(e.target.value) 
-                                    } id="last_name" placeholder="Otto" required/>
-                                <div className="valid-feedback">
-                                    ¡Se ve bien!
-                                </div>
-                                <div className="invalid-feedback">
-                                    Este campo es requerido
-                                </div>
-                            </div>
-                        
-                            <div className="col-md-4">
-                                <label htmlFor="email" className="form-label">Mail</label>
-                                <input type="text" className="form-control" onChange={
-                                    e => setEmail(e.target.value) 
-                                    } id="email" placeholder="alguien@example.com" required/>
-                                {
-                                    email.toUpperCase() === verifyEmail.toUpperCase() ? 
-                                        <div className="valid-feedback">
-                                            ¡Se ve bien!
-                                        </div>
-                                        :
-                                        <div className="invalid-feedback">
-                                            Los mail deben coincidir
-                                        </div>
-                                }
-                                {
-                                    !email? 
-                                        <div className="invalid-feedback">
-                                            Este campo es requerido
-                                        </div>
-                                        :
-                                        null
-                                }
-                            </div>
-        
-                            <div className="col-md-4">
-                                <label htmlFor="verify_email" className="form-label">Verificá tu Mail</label>
-                                <input type="text" className="form-control is-invalid" onChange={
-                                    e => setVerifyEmail(e.target.value) 
-                                } id="verify_email" placeholder="alguien@example.com" required/>
-        
-                                {
-                                    email.toUpperCase() === verifyEmail.toUpperCase() ? 
-                                        <div className="valid-feedback">
-                                            ¡Se ve bien!
-                                        </div>
-                                        :
-                                        <div className="invalid-feedback is-invalid">
-                                            Los mail deben coincidir
-                                        </div>
-                                }
-                                {
-                                    !verifyEmail? 
-                                        <div className="invalid-feedback">
-                                            Este campo es requerido
-                                        </div>
-                                        :
-                                        null
-                                }
-                            </div>
-                            <div className="col-md-4">
-                                <label htmlFor="phone" className="form-label">Celular</label>
-                                <input type="number" className="form-control" onChange={
-                                    e => setCellNumber(e.target.value) 
-                                    } id="phone" required/>
-                                <div className="valid-feedback">
-                                    ¡Se ve bien!
-                                </div>
-                                <div className="invalid-feedback">
-                                    Este campo es requerido
-                                </div>
-                            </div>
                             
                             <div className="col-12">
                                 <button className="btn btn-primary" type="submit">Generar orden</button>
@@ -206,7 +130,6 @@ function Checkout () {
         );
     }
     else {
-        clearCart()
         return(
             <Order order={order}></Order>
         );

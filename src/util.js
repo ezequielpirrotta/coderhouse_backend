@@ -17,8 +17,9 @@ export const PRIVATE_KEY = "MyCommerceSecretKeyJWT";
  * Segundo argumento: La llave privada a firmar el token.
  * Tercer argumento: Tiempo de expiración del token.
  */
-export const generateJWToken = (user) => {
-    return jwt.sign({user}, PRIVATE_KEY, {expiresIn: '24h'});
+export const generateJWToken = (user,time) => {
+    jwt
+    return jwt.sign({user}, PRIVATE_KEY, {expiresIn: time});
 };
 
 export const passportCall = (strategy) => {
@@ -76,6 +77,34 @@ export const generateProduct = () => {
     product.available = product.stock > 0 ? true : false;
     return product;
 };
+
+export const generarCadenaAlfanumerica = (longitud) => {
+    var caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var cadena = '';
+    if(longitud === 0) {
+        cadena = null
+    }
+    else {
+        for (var i = 0; i < longitud; i++) {
+            var indice = Math.floor(Math.random() * caracteres.length);
+            cadena += caracteres.charAt(indice);
+        }
+    }
+    return cadena;
+}
+  
+export const generarCadenasAlfanumericasUnicas = (longitud, cantidad) => {
+    var cadenasUnicas = [];
+    if(cantidad === 0) {
+        cadenasUnicas = null
+    }else if(cantidad > 0){
+        while (cadenasUnicas.size < cantidad) {
+            var cadena = generarCadenaAlfanumerica(longitud);
+            cadenasUnicas.push(cadena);
+        }
+    }
+    return cadenasUnicas;
+}
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename).split(path.sep).join(path.posix.sep);
 
