@@ -17,7 +17,7 @@ function Cart () {
                 <Error status={"empty"} quantity={2} /> 
                 <div className="row justify-content-center ">
                     <div className="col-md-12 align-middle">
-                        <Link to={"/"} className="btn btn-primary">Volver al inicio</Link>
+                        <Link to={"/products"} className="btn btn-primary">Volver al inicio</Link>
                     </div>
                 </div>
             </div>

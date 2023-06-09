@@ -4,11 +4,12 @@ import CustomError from "../services/errors/CustomError.js";
 import { generateProductErrorInfo } from "../services/errors/messages/product_creation_error.js";
 import EErrors from "../services/errors/errors-enum.js";
 import { log } from "../config/logger.js";
+import { generarCadenaAlfanumerica } from "../util.js";
 
 const productService = new ProductService();
 
 export const getProducts = async (req, res, next) => {
-    try { 
+    try {
         let products = await productService.getProducts(req.query); 
         res.status(200).send(products);
     }
@@ -41,6 +42,11 @@ export const createProduct = async (req, res, next) => {
                 code: EErrors.INVALID_TYPES_ERROR
             })
         }
+        if(req.user.role === "premium"){
+            product.owner = req.user.email;
+            console.log(product)
+        }
+        product.code = generarCadenaAlfanumerica(6);
         let resultProduct = await productService.create(product)
         if(!req.body.front) {
             socketServer.emit("event_product_created", {...resultProduct})
@@ -48,11 +54,12 @@ export const createProduct = async (req, res, next) => {
         res.status(200).send({
             status: 'OK',
             message: "Product created succesfully. ",
-            data: product
+            data: resultProduct
         });
     }
     catch(error) {
         req.logger.error(log(error.message,req))
+        console.log(error)
         res.status(500).send(error);
     }
 }
@@ -69,7 +76,7 @@ export const updateProduct = async (req, res, next) => {
         })
     }
     catch(error) {
-        req.logger.error(log(error.message,req))
+        req.logger.error(log(error.message+', '+error.detail,req))
         next(error)
     }
 }

@@ -5,13 +5,14 @@ import config from "../config/config.js";
 const ticketService = new TicketService();
 const userService = new UserService();
 
-export const getTickets = async (req, res, next) => {
+export const getTickets = async (req, res) => {
     try {
         const tickets = await ticketService.getAll();
-        res.send({status: 200, payload: tickets});
+        console.log(tickets)
+        res.status(200).send({payload: tickets});
     }   
     catch(error) {
-        next(error)
+        res.status(error.code).send(error)
     }
 }
 
@@ -22,7 +23,7 @@ export const getTicketById = async (req, res, next) => {
         res.send({status: 200, payload: ticket});
     }   
     catch(error) {
-        next(error)
+        res.status(error.code).send(error)
     }
 }
 export const createTicket = async (req, res, next) => {

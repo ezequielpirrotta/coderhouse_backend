@@ -8,5 +8,9 @@ export default class ProductDTO {
         this.stock = product.stock, 
         this.category = product.category, 
         this.thumbnail = product.thumbnail
+        if(product.owner){
+            console.log("llegué")
+            this.owner = product.owner
+        }
     }
 }

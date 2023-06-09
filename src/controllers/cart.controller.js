@@ -24,7 +24,7 @@ export const getCartById = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        next(error);
+        res.status(error.status_code).send(error)
     }
 }
 export const createCart = async (req, res, next) => {
@@ -69,6 +69,7 @@ export const addProductToCart = async (req, res, next) => {
     let cart_id = req.params.cid; 
     let {quantity,product_id} = req.body;
     try {
+        
         let result = await cartService.updateProduct(cart_id, product_id, quantity, true);
         res.status(200).send(result)
     } 
@@ -119,7 +120,7 @@ export const purchaseCart = async (req, res, next) => {
             })
            cartService.replaceCart(cid,notAvailableCart)
         }
-        res.status(200).send(notAvailableCart);
+        res.status(200).send({notAvailableCart,result});
     }
     catch(error) {
         req.logger.error(log(error.message,req));
@@ -139,11 +140,12 @@ export const deleteProductFromCart = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        next(error)
+        res.status(error.status_code).send(error)
     }
 }
 export const deleteProducts = async (req, res, next) => { 
     try {
+        console.log("ESTOY EN DELETE")
         let {cid} = req.params;
         let result = await cartService.deleteProductFromCart(cid,null,true);
         res.status(200).send({
@@ -153,8 +155,9 @@ export const deleteProducts = async (req, res, next) => {
         })
     }
     catch(error) {
-        req.logger.error(log(error.message,req));
-        next(error)
+        const error_message = error.name+": "+error.message
+        req.logger.error(log(error_message,req));
+        res.status(error.status_code).send(error)
     }
 }
 

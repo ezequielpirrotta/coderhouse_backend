@@ -15,8 +15,8 @@ class TicketService {
         } catch (error) {
             throw {
                 code: 404,
-                message: 'Error getting tickets.',
-                detail: error.message
+                error: 'Error getting tickets.',
+                message: error.message
             };
         }
     }
