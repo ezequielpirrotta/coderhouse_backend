@@ -64,10 +64,20 @@ function Checkout () {
             console.log('orden lista')
         }
     },[created])
-    const generateOrder = (e) => {
+    const generateOrder = async (e) => {
         e.preventDefault()
-        const result = purchaseCart()
-        setCreated(result)
+        const result = await purchaseCart()
+        if(result){
+            setCreated(result)
+        }
+        else {
+            console.log(result)
+            Swal.fire({
+                title:"Error comprando carrito",
+                icon:"error",
+                text: result.message?result.message:"Intente de nuevo más tarde"
+            })
+        }
         //const ordersCollection = collection(db, "orders");
         /*addDoc(ordersCollection, order)
         .then(({id}) => {

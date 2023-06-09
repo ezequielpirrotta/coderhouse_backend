@@ -4,7 +4,7 @@ import { getTickets, createTicket, getTicketById } from "../controllers/tickets.
 const router = Router();
 
 router.get("/", getTickets);
-router.post("/", createTicket);
 router.get("/:tid", getTicketById)
+router.post("/", createTicket);
 
 export default router;

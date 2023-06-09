@@ -95,9 +95,14 @@ function ResetPassword()
                 <h1 className="card-title">Restablece tu contraseña</h1>
                 { isExpired?
                     <div className="shadow-lg bg-body rounded">
-                        <form id="loginForm" className="card-body row g-3 justify-content-center needs-validation" noValidate>
-                            <div className="col-12">
-                                <a className="btn btn-primary" href="/users/resetPassword/sendEmail" type="submit">Continuar </a>
+                        <form id="loginForm" className="card-body row g-3 justify-content-center needs-validation d-flex align-items-center" noValidate>
+                            <div className = "col-12 justify-content-center">
+                                <div className = "product alert alert-danger" role = "alert">
+                                    Tu link expiró!
+                                </div>
+                            </div>
+                            <div className="col-12 justify-content-center">
+                                <a className="btn btn-primary" href="/users/resetPassword/sendEmail" type="submit">Enviar de nuevo </a>
                             </div>
                         </form>
                     </div>

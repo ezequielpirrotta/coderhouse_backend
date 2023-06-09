@@ -21,7 +21,7 @@ function ResetPasswordConfirm()
         if (validateForm()) {
             const data = {username:username,link:`${endpoint+port}/users/resetPassword`};
             console.log(data)
-            const result = await fetch(endpoint+server_port+'/api/sessions//resetPasswordConfirm',{
+            const result = await fetch(endpoint+server_port+'/api/sessions/resetPasswordConfirm',{
                 method:'POST',
                 body:JSON.stringify(data),
                 headers:{
@@ -36,6 +36,9 @@ function ResetPasswordConfirm()
                     icon:"error",
                     text: result.message? result.message : "Intente con un usuario registrado"
                 })
+            }
+            else {
+                setSended(true)
             }
             
         }

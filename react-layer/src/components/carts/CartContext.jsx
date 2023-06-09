@@ -94,8 +94,6 @@ function CartContextProvider({children}) {
             })
         }
         else {
-            console.log("NO ESTÁ EN CARRITO")
-            console.log(item)
             let requestData = {
                 method:"PUT",
                 body: JSON.stringify({product_id: item._id, quantity: quantity}),
@@ -239,13 +237,15 @@ function CartContextProvider({children}) {
                         Swal.fire({
                             title: error.message,
                             icon: 'error',
+                            timer: 2000
                         })
                     }
                     else {
                         Swal.fire({
                             title: `Orden no generada`,
                             icon: 'error',
-                            text: 'Ha ocurrido un error inesperado'
+                            text: 'Ha ocurrido un error inesperado',
+                            timer: 2000
                         })
                     }
                     return false
@@ -271,6 +271,7 @@ function CartContextProvider({children}) {
                     return true
                 }
             });
+        return result
     }
     const isInCart = (id) => {
         return (cart.products.some(item => item._id === id));

@@ -41,14 +41,13 @@ function Login()
                 window.location.replace('/products');
             }
             else {
-                console.log({...result})
-                /*isValid = false;
-                errors['password'] = 'Incorrect username or password.'*/
-                /*Swal.fire({
-                    title:"Error",
+                console.log(result)
+                
+                Swal.fire({
+                    title:"Error con su inicio de sesión",
                     icon:"error",
-                    text: "Error con su inicio de sesión, intente con un usuario registrado"
-                })*/
+                    text: result.message?result.message:"Intente con un usuario registrado"
+                })
             }
         }
     };
