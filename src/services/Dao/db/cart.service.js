@@ -51,7 +51,7 @@ class CartService {
         }
     }
     addCart = async (products) => {
-        let newCart = {wasPurchased: false};
+        let newCart = {};
         try {
             let cart = await cartModel.create(newCart);
             if(cart){ 

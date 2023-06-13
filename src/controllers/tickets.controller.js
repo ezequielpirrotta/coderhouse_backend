@@ -30,7 +30,7 @@ export const createTicket = async (req, res, next) => {
     try {
         const {username,products} = req.body;
         const resultUser = await userService.getUserByUsername(username);
-        const resultProducts = await fetch(config.endpoint+config.port+'/api/products/?limit=999')
+        const resultProducts = await fetch(config.serverUrl+'/api/products/?limit=999')
         .then( (response) => response.json());
         let actualTickets = products.filter(product=> {
             let flag = false;

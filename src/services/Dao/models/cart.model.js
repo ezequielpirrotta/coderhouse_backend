@@ -18,7 +18,6 @@ const cartSchema = new mongoose.Schema({
         ],
         default: []
     },
-    wasPurchased: Boolean
 })
 
 cartSchema.pre('find', function() {
