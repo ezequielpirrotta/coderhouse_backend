@@ -1,0 +1,371 @@
+paths:
+  /api/carts/:
+    get:
+      summary: Obtiene todos los carritos
+      tags: 
+        - Carts
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Cart'
+          description: Operación exitosa, hay carritos en la BBDD
+        "404":
+          description: Operación fallida, no hay carritos en la BBDD en base a los filtros proporcionados
+        "500":
+          description: Operación fallida, ocurrió un error inesperado
+    post:
+      summary: Crea un carrito, pasando opcionalmente un array de productos
+      tags: 
+        - Carts
+      requestBody:
+        description: Crea un carrito
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Cart"
+      responses:
+          "200":
+            description: Operación exitosa, carrito creado exitosamente
+          "404":
+            description: Operación exitosa, procto creado exitosamente
+          "500":
+            description: Operación exitosa, procto creado exitosamente
+    delete:
+      tags: 
+        - Carts
+      summary: Elimina un carrito 
+      description: En base a un ID elimina un carrito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            description: ID del carrito a eliminar
+            required: true
+            schema:
+              $ref: "#/components/schemas/ObjectId"
+            examples:
+              cartIdExample:
+                $ref: "#/components/examples/cartIdExample"
+          
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Cart not found
+  /api/carts/{cid}:
+    get:
+      tags: 
+        - Carts
+      summary: Busca un carrito
+      description: Devuelve un objeto Carrito en base a un ID
+      parameters:
+        - name: cid
+          in: path
+          description: ID del objeto a retornar
+          required: true
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+          example: 6418d63d3e7632f846cc6a72
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Product not found
+    put:
+      tags: 
+        - Carts
+      summary: Actualiza un producto en base a un ID
+      description: Actualiza un objeto Producto y devuelve el estado
+      
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                newValue:
+                  type: string
+                field:    
+                  type: string
+              required:
+                - newValue
+                - field
+      parameters:
+        - name: pid
+          in: path
+          description: ID del objeto a retornar
+          required: true
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+          example: 6418d63d3e7632f846cc6a72
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Product not found
+    delete:
+      tags: 
+        - Carts
+      summary: Elimina un carrito en base a un ID
+      description: Devuelve el id del Producto y un estado OK
+      parameters:
+        - name: cid
+          in: path
+          description: ID del objeto a retornar
+          required: true
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+          example: 6418d63d3e7632f846cc6a72
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Cart not found
+  /api/carts/{cid}/products/{pid}:
+    put:
+      tags: 
+        - Carts
+      summary: Actualiza un producto del carrito
+      description:  En base a un ID, actualiza un producto del 
+        carrito y devuelve el id del Producto y un estado OK
+      parameters:
+        - name: cid
+          in: path
+          description: ID del carrito a actualizar
+          required: true
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+          example: 6418d63d3e7632f846cc6a72
+        - name: pid
+          in: path
+          description: ID del producto a actualizar
+          required: true
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+          example: 6418d63d3e7632f846cc6a72
+    delete:
+      tags: 
+        - Carts
+      summary: Elimina un producto del carrito 
+      description: En base a un ID, elimina un producto del 
+        carrito y devuelve el id del Producto y un estado OK
+      parameters:
+        - name: cid
+          in: path
+          description: ID del carrito a actualizar
+          required: true
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+          example: 6418d63d3e7632f846cc6a72
+        - name: pid
+          in: path
+          description: ID del producto a eliminar del carrito
+          required: true
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+          example: 6418d63d3e7632f846cc6a72
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Cart not found
+  /api/carts/{cid}/product:
+    put:
+      tags: 
+        - Carts
+      summary: Elimina un producto del carrito en base a un ID
+      description: Devuelve el id del Producto y un estado OK
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  schema:
+                    $ref: "#/components/schemas/ObjectId"
+                  example: 
+                    $ref: "#/components/examples/productIdExample"
+                quantity:    
+                  type: integer
+              required:
+                - product_id
+                - quantity
+      parameters:
+        - name: cid
+          in: path
+          description: ID del carrito a comprar
+          required: true
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+          example: 
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Cart not found
+  /api/carts/{cid}/purchase:
+    post:
+      tags:
+        - Carts
+      summary: Compra el carrito
+      description:  En base a un ID y un mail de usuario, actualiza el carrito
+        con los productos que no estaban disponibles y crea un pedido de los productos 
+        que estaban disponibles (si estaba todo desponible el carrito se vacía)
+      parameters:
+        - name: cid
+          in: path
+          description: ID del carrito a actualizar
+          required: true
+          schema:
+            $ref: "#/components/schemas/ObjectId"
+          example: 6418d63d3e7632f846cc6a72
+      requestBody:
+        required: true
+        content:
+          application/json:
+            description: Email identificador del usuario dueño del carrito
+            required: true
+            schema:
+              $ref: "#/components/schemas/Username"
+            examples:
+              usernameExample:
+                $ref: "#/components/examples/usernameExample"
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Missing parameters
+        '409':
+          description: Cart already empty
+        '404':
+          description: Cart not found
+
+components:
+  examples:
+    cartIdExample:
+      value:
+        cid: 6418d63d3e7632f846cc6a72
+    productIdExample:
+      value:
+        pid: 6418d63d3e7632f846cc6a72
+    usernameExample:
+      value:
+        username: echutob90@gmail.com
+
+  schemas:
+    Username:
+      type: string
+      format: string
+    ObjectId:
+      type: ObjectId
+      format: string
+    Product:
+      $ref: "#/components/schemas/Product"
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: ID autogenerado por MongoDB
+        products: 
+          type: array
+          description: Arreglo de productos
+          items:
+            type: object
+            properties:
+              product:
+                type: ObjectId
+              quantity: 
+                type: integer
+      example:
+        _id: 647de6a6980a7859da8c1cb6,
+        products: [
+            {
+                product: {
+                    owner: admin,
+                    _id: 6418d63d3e7632f846cc6a72,
+                    title: producto_prueba_1,
+                    description: mocking product,
+                    price: 25,
+                    code: abc123,
+                    available: true,
+                    stock: 25,
+                    category: otros,
+                    thumbnail: Sin imagen,
+                    __v: 0
+                },
+                quantity: 3,
+                _id: 6487cf5cf071451c68cd26cf
+            }
+        ]
+
+          

@@ -26,14 +26,18 @@ function App() {
     <div>
       <UserContextProvider>
         <CartContextProvider>
-          <BrowserRouter>    
-            <NavBar/>
+          <BrowserRouter>
             <Routes>
               <Route path={"/"} element={<Login/>}/> 
-              <Route path={'/users'} element={<Profile/>}/>
               <Route path={'/users/resetPassword/sendEmail'} element={<ResetPasswordConfirm/>}/>
               <Route path={'/users/resetPassword/:token'} element={<ResetPassword/>}/>
               <Route path={'/register'} element={<Register/>}/>
+            </Routes>
+          </BrowserRouter>
+          <BrowserRouter>    
+            <NavBar/>
+            <Routes>
+              <Route path={'/users'} element={<Profile/>}/>
               <Route path={"/products"} element={<ItemListContainer/>}/> 
               <Route path={"/categoria/:cat"} element={<ItemListContainer/>}/> 
               <Route path={"/producto/:id"} element={<ItemDetailContainer/>}/> 

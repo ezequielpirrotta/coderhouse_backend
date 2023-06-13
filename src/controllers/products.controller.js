@@ -15,7 +15,7 @@ export const getProducts = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req))
-        next(error)
+        res.status(error.code?error.code:500).send(error);
     }
 }
 export const getProductById = async (req, res, next) => {
@@ -26,7 +26,7 @@ export const getProductById = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req))
-        next(error)
+        res.status(error.code?error.code:500).send(error);
     }
 }
 export const createProduct = async (req, res, next) => {
@@ -48,9 +48,6 @@ export const createProduct = async (req, res, next) => {
         }
         product.code = generarCadenaAlfanumerica(6);
         let resultProduct = await productService.create(product)
-        if(!req.body.front) {
-            socketServer.emit("event_product_created", {...resultProduct})
-        }
         res.status(200).send({
             status: 'OK',
             message: "Product created succesfully. ",
@@ -60,7 +57,7 @@ export const createProduct = async (req, res, next) => {
     catch(error) {
         req.logger.error(log(error.message,req))
         console.log(error)
-        res.status(500).send(error);
+        res.status(error.code?error.code:500).send(error);
     }
 }
 export const updateProduct = async (req, res, next) => {
@@ -68,7 +65,6 @@ export const updateProduct = async (req, res, next) => {
     req.logger.debug(log("Llegué al update",req))
     try {
         let result = await productService.updateProduct(id, req.body)
-        socketServer.emit("event_product_updated", result)
         res.status(200).send({
             status: 'OK',
             message: "Product updated succesfully.",
@@ -77,14 +73,13 @@ export const updateProduct = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message+', '+error.detail,req))
-        next(error)
+        res.status(error.code?error.code:500).send(error);
     }
 }
 export const deleteProduct = async (req, res, next) => {
     let {id} = req.params;
     try {
         await productService.deleteProduct(id)
-        socketServer.emit("event_product_deleted", {id: id})
         res.status(200).send({
             status: 'OK',
             message: "Product deleted succesfully.",
@@ -93,6 +88,6 @@ export const deleteProduct = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req))
-        next(error)
+        res.status(error.code?error.code:500).send(error);
     }
 }

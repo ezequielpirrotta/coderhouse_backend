@@ -2,8 +2,11 @@ import { log } from '../config/logger.js';
 import { createHash, isValidPassword, generateJWToken } from '../util.js';
 import config from '../config/config.js';
 import UserService from '../services/Dao/db/user.service.js';
+import MailService from '../services/Dao/email.service.js';
 
+const mailService = new MailService()
 const userService = new UserService()
+
 export const login = async (req, res)=>{
     let user = req.user.user;
     let cart = req.user.cart?req.user.cart:null;
@@ -60,26 +63,22 @@ export const logout = async (req, res) => {
 export const resetPasswordConfirm = async (req,res) => {
     try{
         const {username,link} = req.body;
-        let requestData = {
-            method:"POST",
-            body: JSON.stringify({email:username,link:link}),
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8',
-            },
-            credentials: 'include'
-        }
-        const request = new Request(config.endpoint+config.port+'/api/mail/resetPass', requestData)
-        const result = await fetch(request).then( (response) => response.json());
-        if(result.error){
-            throw {
-                error:  result.error, 
-                message: result.message
+        mailService.sendResetPasswordEmail(username, link, (error, result) => {
+            if(error){
+                req.logger.error(log(error,req));
+                throw {
+                    error:  result.error, 
+                    message: result.message
+                }
             }
-        }
-        res.status(201).send({status: "success",code: 201, message: "Mail to reset password sended"});
+            else {
+                req.logger.info(log(("Message sent: %s", result.payload.messageId),req));
+                res.status(201).send({status: "success",code: 201, message: "Mail to reset password sended"});;
+            }
+        })
     }
     catch(error) {
-        res.status(500).send(error);
+        res.status(error.code?error.code:500).send(error);
     }
 }
 export const resetPassword = async (req,res) => {

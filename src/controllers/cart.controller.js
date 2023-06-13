@@ -9,22 +9,22 @@ const cartService = new CartService();
 export const getCarts = async (req, res, next) => {
     try {
         let carts = await cartService.getCarts();
-        res.send(carts);
+        res.status(200).send(carts);
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        next(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 export const getCartById = async (req, res, next) => {
     try {
         let {cid} = req.params;
         let cart = await cartService.getCartById(cid);
-        res.send(cart);
+        res.status(200).send(cart);
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.status_code).send(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 export const createCart = async (req, res, next) => {
@@ -33,24 +33,24 @@ export const createCart = async (req, res, next) => {
     try {
         let result = await cartService.addCart(products)
         res.cookie('cartCookie',JSON.stringify(result), {maxAge: 24*60*60*1000})
-        res.send(result);
+        res.status(200).send(result);
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        next(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 export const replaceCart = async (req, res, next) => {
     let cart_id = req.params.cid; 
-        let {products} = req.body;
-        try {
-            let result = await cartService.replaceCart(cart_id, products);
-            res.status(200).send(result)
-        } 
-        catch(error) {
-            req.logger.error(log(error.message,req));
-            next(error)
-        }
+    let {products} = req.body;
+    try {
+        let result = await cartService.replaceCart(cart_id, products);
+        res.status(200).send(result)
+    } 
+    catch(error) {
+        req.logger.error(log(error.message,req));
+        res.status(error.code?error.code:500).send(error)
+    }
 }
 export const updateProductFromCart = async (req, res, next) => {
     let cart_id = req.params.cid;
@@ -62,7 +62,7 @@ export const updateProductFromCart = async (req, res, next) => {
     } 
     catch(error) {
         req.logger.error(log(error.message,req));
-        next(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 export const addProductToCart = async (req, res, next) => {
@@ -75,7 +75,7 @@ export const addProductToCart = async (req, res, next) => {
     } 
     catch(error) {
         req.logger.error(log(error.message,req));
-        next(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 
@@ -100,7 +100,7 @@ export const purchaseCart = async (req, res, next) => {
                     'Content-type': 'application/json; charset=UTF-8',
                 }
             }
-            let request = new Request(config.endpoint+config.port+'/api/tickets/', requestData) 
+            let request = new Request(config.serverUrl+'/api/tickets/', requestData) 
             let result = await fetch(request)
             .then( (response) => response.json());
             if(result.code === "WRONG"){
@@ -124,7 +124,7 @@ export const purchaseCart = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        next(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 export const deleteProductFromCart = async (req, res, next) => { 
@@ -140,7 +140,7 @@ export const deleteProductFromCart = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.status_code).send(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 export const deleteProducts = async (req, res, next) => { 
@@ -157,7 +157,7 @@ export const deleteProducts = async (req, res, next) => {
     catch(error) {
         const error_message = error.name+": "+error.message
         req.logger.error(log(error_message,req));
-        res.status(error.status_code).send(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 
@@ -173,6 +173,6 @@ export const deleteCart = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        next(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
