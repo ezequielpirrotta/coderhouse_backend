@@ -2,6 +2,7 @@ import React from "react";
 import { useState, createContext } from "react";
 import { useEffect } from "react";
 import Cookies from 'universal-cookie';
+import {useCookies} from 'react-cookie'
 import { useContext } from "react";
 import { UserContext } from "../users/UserContext";
 import Swal from "sweetalert2";
@@ -9,35 +10,24 @@ import Swal from "sweetalert2";
 export const CartContext = createContext();
 const server_port = '8080';
 const endpoint = 'http://localhost:';
-const cookies = new Cookies();
+//const cookies = new Cookies();
 
 function CartContextProvider({children}) {
     const { user } = useContext(UserContext);
-    const [cookieCart,setCookieCart] = useState(cookies.get("cartCookie"))
+    //const [cookies, setCookie, removeCookie] = useCookies(['cartCookie']);
+    const cookies = new Cookies();
     const [cart, setCart] = useState({});
     
     useEffect(() => {
-        
-        if(totalCart() === 0){
-            if(cookieCart){
-                console.log("setié el carrito")
-                console.log(cookieCart)
-                setCart(cookieCart)
-            }
+        const storedCart = cookies.get('cartCookie');
+        if (storedCart) {
+            setCart(storedCart);
         }
+      }, []);
+    useEffect(() => {
+        cookies.set('cartCookie', JSON.stringify(cart), { sameSite: 'lax' });
+        updateCartCookie(JSON.stringify(cart))
     },[cart])
-    const getCartCookie = () => {
-        let requestData = {
-            method:"GET",
-            body: JSON.stringify({name:'cartCookie'}),
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8',
-            },
-            credentials: 'include'
-        }
-        let request = new Request(endpoint+server_port+'/cookies/getCookie', requestData)
-        fetch(request).then( (response) => response.json());
-    }
     const updateCartCookie = (value) => {
         let requestData = {
             method:"POST",
@@ -49,10 +39,10 @@ function CartContextProvider({children}) {
         }
         let request = new Request(endpoint+server_port+'/cookies/setCookie', requestData)
         fetch(request).then( (response) => response.json());
-
     }
     const addItem = async (item, quantity) => {
         if(isInCart(item._id)) {
+            console.log("llegué")
             let pos = cart.products.findIndex(element => element.product._id === item._id);
             cart.products[pos].quantity += quantity;
             let requestData = {
@@ -86,10 +76,6 @@ function CartContextProvider({children}) {
                 else {
                     const updatedCart = await getCart()
                     setCart(updatedCart);
-                    console.log(cookieCart)
-                    updateCartCookie(cart)
-                    console.log(cookieCart)
-                    cookies.set("cartCookie",cart,{path:"/"})
                 }
             })
         }
@@ -134,8 +120,6 @@ function CartContextProvider({children}) {
                     })
                     const updatedCart = await getCart()
                     setCart(updatedCart);
-                    updateCartCookie(cart)
-                    cookies.set("cartCookie",cart,{path:"/"})
                     return true;
                 }
             })
@@ -172,10 +156,6 @@ function CartContextProvider({children}) {
             else {
                 const updatedCart = await getCart()
                 setCart(updatedCart);
-                console.log(cookieCart)
-                updateCartCookie(cart)
-                console.log(cookieCart)
-                cookies.set("cartCookie",cart,{path:"/"})
             }
         })
     }
@@ -211,10 +191,6 @@ function CartContextProvider({children}) {
             else {
                 const updatedCart = await getCart()
                 setCart(updatedCart);
-                console.log(cookieCart)
-                updateCartCookie(cart)
-                console.log(cookieCart)
-                cookies.set("cartCookie",cart,{path:"/"})
             }
         })
     }
@@ -251,7 +227,6 @@ function CartContextProvider({children}) {
                     return false
                 }
                 else {
-                    console.log(await response.json())
                     let title = "Pedido exitoso!!"
                     let message = "Muchas gracias por confiar en nosotros para tu compra!"
                     let requestData = {
@@ -266,15 +241,15 @@ function CartContextProvider({children}) {
                     fetch(request)
                     const updatedCart = await getCart()
                     setCart(updatedCart);
-                    updateCartCookie(cart)
-                    cookies.set("cartCookie",cart,{path:"/"})
                     return true
                 }
             });
         return result
     }
     const isInCart = (id) => {
-        return (cart.products.some(item => item._id === id));
+        if(cart.products){
+            return (cart.products.some(item => item._id === id));
+        }
     }
     const getCart = async () => {
         let requestData = {

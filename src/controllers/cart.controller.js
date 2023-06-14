@@ -13,7 +13,8 @@ export const getCarts = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.code?error.code:500).send(error)
+        const code = error.status_code? error.status_code : error.code? error.code : 500
+        res.status(code).send(error)
     }
 }
 export const getCartById = async (req, res, next) => {
@@ -24,7 +25,8 @@ export const getCartById = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.code?error.code:500).send(error)
+        const code = error.status_code? error.status_code : error.code? error.code : 500
+        res.status(code).send(error)
     }
 }
 export const createCart = async (req, res, next) => {
@@ -37,7 +39,8 @@ export const createCart = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.code?error.code:500).send(error)
+        const code = error.status_code? error.status_code : error.code? error.code : 500
+        res.status(code).send(error)
     }
 }
 export const replaceCart = async (req, res, next) => {
@@ -49,7 +52,8 @@ export const replaceCart = async (req, res, next) => {
     } 
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.code?error.code:500).send(error)
+        const code = error.status_code? error.status_code : error.code? error.code : 500
+        res.status(code).send(error)
     }
 }
 export const updateProductFromCart = async (req, res, next) => {
@@ -62,7 +66,8 @@ export const updateProductFromCart = async (req, res, next) => {
     } 
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.code?error.code:500).send(error)
+        const code = error.status_code? error.status_code : error.code? error.code : 500
+        res.status(code).send(error)
     }
 }
 export const addProductToCart = async (req, res, next) => {
@@ -75,7 +80,8 @@ export const addProductToCart = async (req, res, next) => {
     } 
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.code?error.code:500).send(error)
+        const code = error.status_code? error.status_code : error.code? error.code : 500
+        res.status(code).send(error)
     }
 }
 
@@ -124,7 +130,8 @@ export const purchaseCart = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.code?error.code:500).send(error)
+        const code = error.status_code? error.status_code : error.code? error.code : 500
+        res.status(code).send(error)
     }
 }
 export const deleteProductFromCart = async (req, res, next) => { 
@@ -140,7 +147,8 @@ export const deleteProductFromCart = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.code?error.code:500).send(error)
+        const code = error.status_code? error.status_code : error.code? error.code : 500
+        res.status(code).send(error)
     }
 }
 export const deleteProducts = async (req, res, next) => { 
@@ -157,7 +165,10 @@ export const deleteProducts = async (req, res, next) => {
     catch(error) {
         const error_message = error.name+": "+error.message
         req.logger.error(log(error_message,req));
-        res.status(error.code?error.code:500).send(error)
+        console.log("Error: ")
+        console.log(error)
+        const code = error.status_code? error.status_code : error.code? error.code : 500
+        res.status(code).send(error)
     }
 }
 
@@ -173,6 +184,7 @@ export const deleteCart = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.status(error.code?error.code:500).send(error)
+        const code = error.status_code? error.status_code : error.code? error.code : 500
+        res.status(code).send(error)
     }
 }

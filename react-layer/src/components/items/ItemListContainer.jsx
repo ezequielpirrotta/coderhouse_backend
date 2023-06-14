@@ -84,7 +84,7 @@ function ItemListContainer()
                         data.pages[i] = {
                             page: i,
                             isCurrentPage: data.products.page === i? true:false,
-                            link: `/products?page=${i+1}`
+                            link: `/products?page=${i}`
                         };
                         console.log(data.pages[i].link)
                         
@@ -131,68 +131,73 @@ function ItemListContainer()
                             <option value="otros">Otros</option>
                         </select>
                         <input type="number" id="stock" class="swal2-input" placeholder="stock">
-                        <input type="text" id="image" class="swal2-input" placeholder="image">
+                        <input type="url" id="image" class="swal2-input" placeholder="image">
                     </div>`,
             confirmButtonText: 'Create',
+            cancelButtonText: 'Cancel',
+            showCancelButton: true,
+            allowOutsideClick: false,
             focusConfirm: false,
             preConfirm: () => {
-              const title = Swal.getPopup().querySelector('#title').value
-              const price = Swal.getPopup().querySelector('#price').value
-              const description = Swal.getPopup().querySelector('#description').value
-              const category = Swal.getPopup().querySelector('#category').value
-              const stock = Swal.getPopup().querySelector('#stock').value
-              const image = Swal.getPopup().querySelector('#image').value
+                const title = Swal.getPopup().querySelector('#title').value
+                const price = Swal.getPopup().querySelector('#price').value
+                const description = Swal.getPopup().querySelector('#description').value
+                const category = Swal.getPopup().querySelector('#category').value
+                const stock = Swal.getPopup().querySelector('#stock').value
+                const image = Swal.getPopup().querySelector('#image').value
 
-              if (!price || !description || !title || !category || !stock || !image) {
-                Swal.showValidationMessage(`Please complete all the fields`)
-              }
-              return { price: price, description: description, title: title, category:category, stock:stock, image:image}
+                if (!price || !description || !title || !category || !stock || !image) {
+                    Swal.showValidationMessage(`Please complete all the fields`)
+                }
+                return { price: price, description: description, title: title, category:category, stock:stock, image:image}
             }
         }).then((result) => {
-            
-            let data = {
-                price: parseInt(result.value.price), 
-                description: result.value.description, 
-                title: result.value.title,
-                category: result.value.category,
-                stock: parseInt(result.value.stock),
-                thumbnail: result.value.image
-            }
-            
-            let requestData = {
-                method:"POST",
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
-                },
-                credentials: 'include'
-            }
-            const request = new Request(endpoint+server_port+'/api/products/', requestData)
-            fetch(request)
-            .then( async (response) => {
-                
-                if (!response.ok) {
-                    const error = await response.json()
-                    if(error.status === "WRONG") {
-                        Swal.fire({
-                            title: `Producto no creado`,
-                            text: error.message
-                        })
-                    }
-                    else if(error.code === "Unauthorized"){
-                        Swal.fire({
-                            title: `No tienes permisos para crear`,
-                        })
-                    }
-                } 
-                else {
-                    const data = await response.json()
-                    Swal.fire({
-                        title: `Producto ${data._id} creado exitosamente`,
-                        color: '#716add'
-                    })
+            if(result.isConfirmed) {
+                let data = {
+                    price: parseInt(result.value.price), 
+                    description: result.value.description, 
+                    title: result.value.title,
+                    category: result.value.category,
+                    stock: parseInt(result.value.stock),
+                    thumbnail: result.value.image
                 }
-            })
+                
+                let requestData = {
+                    method:"POST",
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+                    credentials: 'include'
+                }
+                const request = new Request(endpoint+server_port+'/api/products/', requestData)
+                fetch(request)
+                .then( async (response) => {
+                    
+                    if (!response.ok) {
+                        const error = await response.json()
+                        if(error.status === "WRONG") {
+                            Swal.fire({
+                                title: `Producto no creado`,
+                                text: error.message
+                            })
+                        }
+                        else if(error.code === "Unauthorized"){
+                            Swal.fire({
+                                title: `No tienes permisos para crear`,
+                            })
+                        }
+                    } 
+                    else {
+                        const data = await response.json()
+                        console.log(data)
+                        Swal.fire({
+                            title: `Producto ${data._id} creado exitosamente`,
+                            color: '#716add'
+                        })
+                    }
+                })
+            }
         })
     }
     if(!(Object.keys(products).length === 0) ){
@@ -209,7 +214,7 @@ function ItemListContainer()
                             {
                                 if(page.isCurrentPage){
                                     return(
-                                        <MDBPaginationItem className="disabled" aria-current="page">
+                                        <MDBPaginationItem key={page.page} className="disabled" aria-current="page">
                                             <MDBPaginationLink href={page.link}>{page.page}</MDBPaginationLink>
                                         </MDBPaginationItem>
                                     );

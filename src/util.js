@@ -64,6 +64,8 @@ export const generateUser = () => {
 };
 
 export const generateProduct = () => {
+    const categories = ["comida","ropa","otros"]
+    const fakerCategories = ["food","fashion"]
     let product = {
         _id: faker.database.mongodbObjectId(),
         code: faker.random.alphaNumeric(7),
@@ -71,10 +73,10 @@ export const generateProduct = () => {
         description: faker.lorem.text(),
         price: parseInt(faker.random.numeric(3)),
         stock: parseInt(faker.random.numeric(2)),
-        category: faker.commerce.department(),
-        thumbnail: faker.image.image()
+        category: categories[faker.mersenne.rand(3, 1)-1],
+        thumbnail: faker.image.imageUrl(640,480,fakerCategories[faker.mersenne.rand(2, 1)-1],true)
     }
-    product.available = product.stock > 0 ? true : false;
+    product.is_available = product.stock > 0 ? true : false;
     return product;
 };
 

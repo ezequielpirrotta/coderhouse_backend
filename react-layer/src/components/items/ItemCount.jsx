@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import {MDBIcon} from "mdb-react-ui-kit"
+import {MDBBtn, MDBIcon} from "mdb-react-ui-kit"
 import { Link } from "react-router-dom";
 import { UserContext } from "../users/UserContext";
 
@@ -36,21 +36,25 @@ const ItemCount = ({stock, onAdd, onEdit, onDelete}) =>
     }
     
     return(
-        <div className = "count-section justify-content-evenly">
-            <span className={"btn m-2"+(stockProd>0?"enable":"disabled")} onClick={() => addProduct()}>
-                <MDBIcon fas icon="plus" />
-            </span>
-            <span className="m-2" width="32" height="32">{items}</span>
-            <span className={"btn m-2"+(items>0?"enable":"disabled")} onClick={() =>restProduct()}>
-                <MDBIcon fas icon="minus" />
-            </span>
-            <Link href="#" className="add_button btn btn-outline-primary" onClick={() =>addToCart()}>
-                Añadir al Carrito
-            </Link>
+        <div className = "count-section container justify-content-evenly">
+            <div className="d-flex align-items-center">
+                <span className={"btn m-2"+(stockProd>0?"enable":"disabled")} onClick={() => addProduct()}>
+                    <MDBIcon fas icon="plus" />
+                </span>
+                <span className="m-2" width="32" height="32">{items}</span>
+                <span className={"btn m-2"+(items>0?"enable":"disabled")} onClick={() =>restProduct()}>
+                    <MDBIcon fas icon="minus" />
+                </span>
+                <Link href="#" className="" onClick={() =>addToCart()}>
+                    <MDBBtn rounded>Añadir al Carrito</MDBBtn> 
+                </Link>
+            </div>
             {
                 user.role === 'premium' || user.role === 'admin'? 
-                    <div>
-                        <Link className="btn btn-outline-primary" onClick={() =>editProduct()}>Editar</Link>
+                    <div className="m-3 d-flex justify-content-evenly ">
+                        <Link className="" onClick={() =>editProduct()}>
+                            <MDBBtn rounded color="warning">Editar</MDBBtn>
+                        </Link>
                         <Link className="btn btn-outline-danger" onClick={() =>deleteProduct()}>Eliminar</Link>
                     </div>
                     : null

@@ -4,6 +4,7 @@ import LoadLinks from "./LoadLinks";
 import CartWidget from "./CartWidget";
 import { UserContext } from "../users/UserContext";
 import { CartContext } from "../carts/CartContext";
+import {Avatar} from '@primer/react'
 
 
 function NavBar() { 
@@ -40,9 +41,20 @@ function NavBar() {
                 <div className="col-md-4 d-flex justify-content-center align-items-center">
                     {
                         user?
-                            <div>
+                            <div className="d-flex ">
                                 <CartWidget className="m-2"/>
-                                <Link to={"/users"} className="btn btn-primary">Perfil</Link>
+                                <Link to={"/users"} >
+                                    {
+                                        user.avatar? 
+                                            <Avatar src={user.avatar} size={24}></Avatar>
+                                            :
+                                            <button type="button" className="btn position-relative">
+
+                                                <img src={"/img/circle-user-solid.svg"} width={25}/>
+                                            </button>
+                                            
+                                    }
+                                </Link>
                                 <button id="btn_close_session" className="btn btn-danger" onClick={onClickCloseButton} href="" aria-current="page" >Cerrar Sesion</button>
                                 <Link to={"/chat"} className="btn btn-secondary">Prueba nuestro chat!</Link>
                             </div>

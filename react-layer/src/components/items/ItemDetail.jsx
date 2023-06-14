@@ -4,7 +4,7 @@ import React, { useState, useContext } from "react";
 import Swal from 'sweetalert2';
 import { CartContext } from "../carts/CartContext";
 import { Link } from "react-router-dom";
-import { MDBCardBody, MDBCardText,MDBCardTitle } from "mdb-react-ui-kit";
+import { MDBCardBody, MDBCardText,MDBCardTitle,MDBCardImage, MDBCard, MDBIcon } from "mdb-react-ui-kit";
 
 const server_port = '8080';
 const endpoint = 'http://localhost:';
@@ -150,8 +150,10 @@ const ItemDetail = ({product}) =>
             return(
                 <div className="row justify-content-center">
                    <div className="product col-md-4 ">
-                        <div className ="card" width= "18rem">
-                            <img src={product.image} className ="card-img-top" alt={product.name}/>
+                        
+                        <MDBCard>
+                            <MDBIcon></MDBIcon>
+                            <MDBCardImage src={product.thumbnail} position='top' alt={product.name} />
                             <MDBCardBody>
                                 <MDBCardTitle>{product.title}</MDBCardTitle>
                                 <MDBCardText>
@@ -164,11 +166,13 @@ const ItemDetail = ({product}) =>
                                     {"Stock: " + product.stock}
                                 </MDBCardText>
                                 {!sold ? 
-                                    <ItemCount stock={product.stock} onAdd={onAdd} onEdit={onEdit} onDelete={onDelete}/>:
+                                    <ItemCount stock={product.stock} onAdd={onAdd} onEdit={onEdit} onDelete={onDelete}/>
+                                    :
                                     <Link className="btn btn-outline-primary" to={"/cart"}>Terminar Compra</Link>
                                 }
                             </MDBCardBody>
-                        </div>   
+                        </MDBCard>
+                           
                     </div>
                 </div>
             );

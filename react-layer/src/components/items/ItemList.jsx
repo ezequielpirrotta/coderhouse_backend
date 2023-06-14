@@ -18,7 +18,7 @@ function ItemList({products})
                         products.map(product =>
                         {
                             return(
-                                <MDBCol sm='6'>
+                                <MDBCol sm='6' key={product._id} className={products.length >= 3?"product col-sm-4 col-md-3":"product col-sm-4 col-md-5"}>
                                     <Item product={product}></Item>
                                 </MDBCol>
                                 /*<div key = {product._id} className={products.length >= 3?"product col-sm-4 col-md-3":"product col-sm-4 col-md-5"}>
