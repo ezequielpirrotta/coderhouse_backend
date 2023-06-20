@@ -1,6 +1,6 @@
-import {generateProduct} from '../util.js'
-import { log } from '../config/logger.js';
-import ProductService from '../services/Dao/db/product.service.js';
+import {generateProduct} from '../../util.js'
+import { log } from '../../config/logger.js';
+import ProductService from '../../services/Dao/db/product.service.js';
 
 const productService = new ProductService()
 

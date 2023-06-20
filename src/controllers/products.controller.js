@@ -1,5 +1,4 @@
 import ProductService from "../services/Dao/db/product.service.js";
-import socketServer from "../app.js";
 import CustomError from "../services/errors/CustomError.js";
 import { generateProductErrorInfo } from "../services/errors/messages/product_creation_error.js";
 import EErrors from "../services/errors/errors-enum.js";
@@ -48,7 +47,7 @@ export const createProduct = async (req, res, next) => {
         }
         product.code = generarCadenaAlfanumerica(6);
         let resultProduct = await productService.create(product)
-        res.status(200).send({
+        res.status(201).send({
             status: 'OK',
             message: "Product created succesfully. ",
             data: resultProduct

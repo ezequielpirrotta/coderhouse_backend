@@ -1,9 +1,10 @@
 import dotenv from 'dotenv'
+import program from '../process.js';
 
-const environment = 'develop'
+const environment = program.opts().mode;
 
 dotenv.config({
-    path: environment === 'develop' ? './src/config/.env.development' : './src/config/.env.production' 
+    path: environment === 'develop' ? './src/config/.env.development' : environment === 'test'?'./src/config/.env.test':'./src/config/.env.production' 
 });
 
 export default {
@@ -12,6 +13,7 @@ export default {
     serverUrl: process.env.SERVER_URL,
     frontUrl: process.env.FRONT_URL,
     mongoUrl: process.env.MONGO_URL,
+    mongoUrlTest: process.env.MONGO_URL_TEST,
     adminUsername: process.env.ADMIN_USERNAME,
     adminPassword: process.env.ADMIN_PASSWORD,
     gmailAccount: process.env.GMAIL_ACCOUNT,

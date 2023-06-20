@@ -53,11 +53,11 @@ export const logout = async (req, res) => {
     try{
         res.clearCookie('commerceCookieToken');
         res.clearCookie('cartCookie');
-        res.send({status:"success",code: 200, message:"Sesion cerrada correctamente!" })
+        res.status(200).send({status:"success",code: 200, message:"Sesion cerrada correctamente!" })
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        res.send({error: "error logout",code: 400, message: "Error occured closing the session"});
+        res.status(400).send({error: "error logout",code: 400, message: "Error occured closing the session"});
     }
 }
 export const resetPasswordConfirm = async (req,res) => {

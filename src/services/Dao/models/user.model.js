@@ -1,16 +1,20 @@
 import mongoose from 'mongoose';
 
-const collection = 'users';
+const collection = 'user';
 
 const schema = new mongoose.Schema({
     first_name:String,
     last_name:String,
     username:{
         type: String,
-        unique: true
+        unique: true,
+        require: true
     },
     age:Number,
-    password:String,
+    password:{
+        type: String,
+        require: true
+    },
     role: {
         type: String,
         enum: ["admin", "user", "premium"],

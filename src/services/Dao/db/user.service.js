@@ -9,8 +9,16 @@ class UserService {
         return users.map(user=>user.toObject());
     };
     saveUser = async (user) => {
-        let result = await userModel.create(user);
-        return result;
+        try {
+            if(!user.username || !user.password){
+                return {error:"Campos 'username' y 'password' obligatorios"}
+            }
+            let result = await userModel.create(user);
+            return result;
+        }
+        catch(error){
+            return {error: error.message}
+        }
     };
     getUserByUsername = async (username) => {
         const result = await userModel.findOne({username});
@@ -43,7 +51,7 @@ class UserService {
             let cartId = (await this.getUserByUsername(username)).cart;
             let result = await userModel.deleteOne({username: username});
             if(result.deletedCount > 0) {
-                await cartService.deleteCart(cartId);
+                if(cartId){await cartService.deleteCart(cartId);}
                 return true;
             }
             else {

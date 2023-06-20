@@ -6,8 +6,8 @@ class MailService {
    
     #transporter
     constructor() {
-        
         this.#transporter = nodemailer.createTransport({
+            pool: true,
             service: 'gmail',
             port: 587,
             auth: {
