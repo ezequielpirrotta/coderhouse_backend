@@ -27,7 +27,7 @@ export const login = async (req, res)=>{
     res.cookie('commerceCookieToken', access_token, {
         maxAge: 24*60*60*1000,
         httpOnly: true
-    }).send({status:"success", code: 200, payload:req.session.user, token: access_token})
+    }).send({status:"success", code: 200, payload:req.user, token: access_token})
 }
 
 export const gitHubLogin = async(req, res)=>{

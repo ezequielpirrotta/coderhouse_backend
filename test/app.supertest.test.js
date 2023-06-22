@@ -1,10 +1,8 @@
-import mongoose from "mongoose";
-import ProductService from "../src/services/Dao/db/product.service.js";
 import config from "../src/config/config.js";
 import { generateProduct } from "../src/util.js";
 import chai from "chai";
 import supertest from "supertest";
-
+import jwt from 'jsonwebtoken'
 
 
 const expect = chai.expect;
@@ -13,7 +11,7 @@ const requester = supertest(config.serverUrl)
 describe("Testing E-commerce App",() => {
     describe("Testing Sessions Api",()=>{
         before(async function(){
-            this.timeout(5000);
+            this.timeout(10000);
             this.cookie;
             this.mockUser = {
                 username: "alguien@gmail.com", 
@@ -26,7 +24,7 @@ describe("Testing E-commerce App",() => {
             }
         })
         beforeEach(function(){
-            this.timeout(5000);
+            this.timeout(1000);
         })
         it("Resgister user", async function(){
             const {statusCode, _body, ok} = await requester.post("/api/sessions/register").send(this.mockUser);
@@ -37,8 +35,13 @@ describe("Testing E-commerce App",() => {
         it("Login user", async function(){
             const {statusCode, _body, ok} = await requester.post("/api/sessions/login").send({ username: this.mockUser.username, password: this.mockUser.password});
             expect(ok).to.be.ok
-            expect(_body).to.have.property("payload").and.to.have.property("email").and.to.be.eql(this.mockUser.username)
-            //expect(_body.payload).to
+            expect(_body).to.have.property("payload").and.to.have.property("user").and.to.have.property("username").and.to.be.eql(this.mockUser.username)
+        })
+        it("Login with an unexisting user", async function(){
+            const {statusCode, _body, ok} = await requester.post("/api/sessions/login").send({ username: "alguien2@gmail.com", password: "algo2"});
+            expect(ok).to.be.not.ok
+            expect(statusCode).to.be.eql(401)
+            expect(_body).to.have.property("error").to.have.property("message").and.to.be.eql("User not found")
         })
     })
     describe("Testing Product Api",()=>{
@@ -96,44 +99,98 @@ describe("Testing E-commerce App",() => {
                 expect(ok).to.be.not.ok;
                 expect(statusCode).to.be.equal(401)
             })
+            it("Obtener productos creados en tests anteriores: El API GET /apis/products debe devolver un array con productos",async function(){
+                const {statusCode, _body, ok} = await requester.get("/api/products").send();
+                expect(ok).to.be.ok;
+                expect(statusCode).to.be.equal(200)
+                expect(_body).to.have.property("payload").and.to.be.a("array")
+            })
         })  
     })
-    /*
-    it('Devolver error cuando consulta sin productos creados.', async function(){
-        const result = await this.productService.getProducts({});
-        expect(result).to.have.property("detail");
-    });
-
-    it("Crear product correctamente en la BD", async function(){
-        const productMock = generateProduct(true)
-        const result = await this.productService.create(productMock);
-        expect(result._id).to.be.ok;
+    describe("Testing Carts Api",()=>{
+        describe("Normal user is logged in cases", ()=> {
+            before(async function(){
+                this.timeout(5000);
+                this.cookieCart;
+                this.cookieToken;
+                const {_body} = await requester.get("/api/products").send()
+                this.product = _body.payload[0]
+                this.mockUser = {
+                    username: "alguien_user@gmail.com", 
+                    password: "algo", 
+                    name:"alguien", 
+                    lastName:"alguien", 
+                    age:20, 
+                    adminRole:false,
+                    premiumRole:false
+                }
+                await requester.post("/api/sessions/register").send(this.mockUser);
+                const result = await requester.post("/api/sessions/login").send({ username: this.mockUser.username, password: this.mockUser.password});
+                let not_founded = true;
+                let cookieTokenResult = ''
+                let i = 0;
+                while(not_founded){
+                    let cookie = result.headers["set-cookie"][i]
+                    if(cookie.split('=')[0] === 'commerceCookieToken'){
+                        not_founded = false;
+                        cookieTokenResult = cookie;
+                    }
+                    i++
+                }
+                not_founded = true;
+                i = 0;
+                let cookieCartResult
+                while(not_founded){
+                    let cookie = result.headers["set-cookie"][i]
+                    if(cookie.split('=')[0] === 'cartCookie'){
+                        not_founded = false;
+                        cookieCartResult = cookie;
+                    }
+                    i++
+                }
+                expect(cookieTokenResult).to.be.ok;
+                expect(cookieCartResult).to.be.ok;
+                this.cookieCart = {
+                    name: cookieCartResult.split('=')[0],
+                    value: cookieCartResult.split('=')[1]
+                }
+                if(cookieTokenResult){
+                    const {_body} = await requester.get("/api/sessions/current").set('Cookie', [`${cookieTokenResult.split('=')[0]}=${cookieTokenResult.split('=')[1]}`]);
+                    this.cookieToken = {
+                        name: cookieTokenResult.split('=')[0],
+                        value: _body,
+                        jwt: cookieTokenResult.split('=')[1] 
+                    }
+                }
+            })
+            it("Añadir producto a carrito: El API PUT /apis/carts/:cid/product debe dejar añadir un producto", async function(){
+                const productMock = {product_id: this.product._id, quantity: 2}
+                expect(this.cookieToken.name).to.be.ok.and.eql('commerceCookieToken');
+                const {statusCode, _body, ok} = await requester.put("/api/carts/"+this.cookieToken.value.cart+"/product")
+                    .set('Cookie',[`${this.cookieCart.name}=${this.cookieCart.value}`,`${this.cookieToken.name}=${this.cookieToken.jwt}`])
+                    .send(productMock);
+                expect(ok).to.be.ok;
+                expect(statusCode).to.be.equal(200)
+                expect(_body).to.have.property("products")
+            })
+            it("Aumentar cantidad de producto en carrito: El API PUT /apis/carts/:cid/product/:pid debe modificar la cantidad del producto", async function(){
+                expect(this.cookieToken.name).to.be.ok.and.eql('commerceCookieToken');
+                const {statusCode, _body, ok} = await requester.put("/api/carts/"+this.cookieToken.value.cart+"/product/"+this.product._id)
+                    .set('Cookie',[`${this.cookieCart.name}=${this.cookieCart.value}`,`${this.cookieToken.name}=${this.cookieToken.jwt}`])
+                    .send({quantity: 5});
+                expect(statusCode).to.be.equal(200)
+                expect(_body).to.have.property("products")
+                expect(_body.products[0].quantity).to.be.deep.equal(5)
+            })
+            it("Eliminar productos de carrito: El API DELETE /apis/carts/:cid debe dejar eliminar todos los productos del carrito", async function(){
+                expect(this.cookieToken.name).to.be.ok.and.eql('commerceCookieToken');
+                const {statusCode, _body, ok} = await requester.delete("/api/carts/"+this.cookieToken.value.cart)
+                    .set('Cookie',[`${this.cookieCart.name}=${this.cookieCart.value}`,`${this.cookieToken.name}=${this.cookieToken.jwt}`])
+                    .send();
+                expect(statusCode).to.be.equal(200)
+                expect(_body).to.have.property("data").and.to.have.property("cid").and.to.be.deep.equal(this.cookieToken.value.cart)
+                //expect(_body.products[0].quantity).to.be.deep.equal(5)
+            })
+        })
     })
-
-    it("No puedo crear producto sin datos clave", async function(){
-        const productMock = {};
-        const result = await this.productService.create(productMock);
-        expect(result).to.have.property("detail")
-    })
-    
-    it("Borrar producto OK", async function(){
-        const productMock = generateProduct(true)
-        const resultProduct = await this.productService.create(productMock);
-        const result = await this.productService.deleteProduct(resultProduct._id);
-        expect(result).to.be.ok
-    })
-    it("Crear producto con código duplicado", async function(){
-        const productMock = generateProduct(true)
-        await this.productService.create(productMock);
-        const resultProduct = await this.productService.create(productMock);
-        expect(resultProduct).to.have.property("detail")
-    })
-    it("Actualizar un producto OK",async function(){
-        const productMock = generateProduct(true)
-        const resultProduct = await this.productService.create(productMock);
-        const data = {field: "title", newValue: "cambie de titulo"}
-        const updateResult= await this.productService.updateProduct(resultProduct._id, data);
-        expect(updateResult).to.have.property("newValue");
-        expect(updateResult.newValue).to.be.deep.equal(data.newValue)
-    })*/
 });

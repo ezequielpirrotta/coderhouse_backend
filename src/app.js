@@ -34,7 +34,7 @@ import swaggerUIExpress from "swagger-ui-express";
 import { cpus } from "os";
 
 
-if(cluster.isPrimary) {
+/*if(cluster.isPrimary) {
     
     const cpusNumber = cpus().length;
     console.log("Nro de cpus:")
@@ -44,7 +44,7 @@ if(cluster.isPrimary) {
     }
 }
 else{
-    console.log("Soy worker!, proceso: "+process.pid)
+    console.log("Soy worker!, proceso: "+process.pid)*/
     const app = Express()
     app.use(cors({origin:"http://localhost:3000",methods:['GET','POST','PUT','DELETE'], credentials: true}))
     /*** DB ***/
@@ -206,4 +206,4 @@ else{
             console.log('Un usuario se ha desconectado');
         });
     })
-}
+//}

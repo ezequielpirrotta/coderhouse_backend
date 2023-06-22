@@ -153,7 +153,6 @@ export const deleteProductFromCart = async (req, res, next) => {
 }
 export const deleteProducts = async (req, res, next) => { 
     try {
-        console.log("ESTOY EN DELETE")
         let {cid} = req.params;
         let result = await cartService.deleteProductFromCart(cid,null,true);
         res.status(200).send({

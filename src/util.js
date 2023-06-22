@@ -18,7 +18,6 @@ export const PRIVATE_KEY = "MyCommerceSecretKeyJWT";
  * Tercer argumento: Tiempo de expiración del token.
  */
 export const generateJWToken = (user,time) => {
-    jwt
     return jwt.sign({user}, PRIVATE_KEY, {expiresIn: time});
 };
 
@@ -27,12 +26,14 @@ export const passportCall = (strategy) => {
         passport.authenticate(strategy, (err, user, info) => {
             if (err) { return next(err);}
             if (!user) {
-                return res.status(401).send({error: info.messages?info.messages:info.toString()});
+                console.log("estoy acá en la call")
+                return res.status(401).send({error: info.messages?info.messages:typeof info === 'object'?info:info.toString()});
             }
             req.user = user;
             next();
         })(req, res, next);
     }
+    
 };
 export const authorization = (role) => {
     return async (req,res,next) => {
