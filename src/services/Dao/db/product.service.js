@@ -41,7 +41,7 @@ class ProductService {
                 throw Error("Products not found.");
             }
         } catch (error) {
-            throw {
+            return {
                 code: 404,
                 message: 'Error getting products.',
                 detail: error.message
@@ -59,7 +59,7 @@ class ProductService {
             }
         }
         catch (error) {
-            throw {
+            return {
                 code: 404,
                 message: `Error getting product with ID: ${id}.`,
                 detail: error.message
@@ -67,8 +67,12 @@ class ProductService {
         }
     }
     create = async (product) => {
-        let newProduct = new ProductDTO(product);
+
         try {
+            if(!product.code || !product.category || !product.title || !product.description){
+                throw Error("Faltan parámetros obligatorios.")
+            }
+            let newProduct = new ProductDTO(product);
             let result = await productModel.create(newProduct);
             if(result) {
                 return {_id: result._id, ...newProduct};
@@ -77,17 +81,16 @@ class ProductService {
                 throw Error("No se encuentra el producto creado.");
             }
         } catch (error) {
-            throw {
-                message: `Error creando producto nuevo: ${newProduct.title}`,
-                detail: `Detalle del error: ${error.message}`,
-                data: newProduct
+            return {
+                message: `Error creando producto nuevo`,
+                detail: error.message,
+                data: product
             };
         }
        
     }
     updateProduct = async (pid, data) => {
         try {
-            console.log(data)
             let productUpdated = {}
             if(data.field === "stock") {
                 productUpdated[data.field] = parseInt(data.newValue);
@@ -96,7 +99,6 @@ class ProductService {
             else {
                 productUpdated[data.field] = data.field === "price" ? parseInt(data.newValue) : data.newValue;
             }
-            console.log(productUpdated)
             let result = await productModel.updateOne({_id: pid}, {...productUpdated});
             if(result.modifiedCount > 0){
                 let product = await this.getProductById(pid);
@@ -104,13 +106,12 @@ class ProductService {
                 return {fieldUpdated: data.field, newValue: data.newValue, ...product._doc};
             }
             else {
-                console.log(result)
                 throw Error("El valor elegido es el mismo al que intenta cambiar, intente con uno diferente.")
             } 
                 
         }
         catch (error) {
-            throw {
+            return {
                 code: 409,
                 message: "Error actualizando producto.",
                 detail: error.message,
@@ -146,7 +147,7 @@ class ProductService {
             }
         }
         catch (error) {
-            throw {
+            return {
                 code: error.code,
                 message: 'Error eliminando producto',
                 detail: error.detail? error.detail : error.message 

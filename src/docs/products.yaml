@@ -58,7 +58,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Product"
+              $ref: "#/components/schemas/ProductNew"
       responses:
           "200":
             description: Operación exitosa, producto creado exitosamente
@@ -206,6 +206,47 @@ components:
       example:
           owner: admin
           _id: ObjectId("6418d5e5421da9b90db906a6")
+          title: producto_prueba_6
+          description: Este es un producto prueba
+          price: 45
+          code: abc1236
+          available: true
+          stock: 25
+          category: otros
+          thumbnail: Sin imagen
+    ProductNew:
+      type: object
+      properties:
+        owner:
+          type: string
+          description: Tipo de usuario que creó el producto
+          default: admin
+        title:
+          type: string
+          description: Nombre del producto
+        description: 
+          type: string
+          description: Descripción del producto
+        price: 
+          type: integer
+          description: Precio del producto
+        code: 
+          type: string
+          description: Código de identificación del productoalfanumerico generado aleatoriamente 
+        available: 
+          type: string
+          description: Disponibilidad del producto
+        stock: 
+          type: string
+          description: Cantidad de unidades disponibles del producto
+        category: 
+          type: string
+          description: Categoría del producto
+        thumbnail: 
+          type: string
+          description: Imagen del producto
+      example:
+          owner: admin
           title: producto_prueba_6
           description: Este es un producto prueba
           price: 45

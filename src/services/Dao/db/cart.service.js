@@ -34,6 +34,7 @@ class CartService {
                 return cart;
             }
             else {
+                console.log("estoy en get cart")
                 const cart_error = CustomError.createError({
                     name: "Cart not found",
                     cause: clearCartErrorInfo(cart),

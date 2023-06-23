@@ -18,7 +18,6 @@ export const PRIVATE_KEY = "MyCommerceSecretKeyJWT";
  * Tercer argumento: Tiempo de expiración del token.
  */
 export const generateJWToken = (user,time) => {
-    jwt
     return jwt.sign({user}, PRIVATE_KEY, {expiresIn: time});
 };
 
@@ -27,12 +26,14 @@ export const passportCall = (strategy) => {
         passport.authenticate(strategy, (err, user, info) => {
             if (err) { return next(err);}
             if (!user) {
-                return res.status(401).send({error: info.messages?info.messages:info.toString()});
+                console.log("estoy acá en la call")
+                return res.status(401).send({error: info.messages?info.messages:typeof info === 'object'?info:info.toString()});
             }
             req.user = user;
             next();
         })(req, res, next);
     }
+    
 };
 export const authorization = (role) => {
     return async (req,res,next) => {
@@ -45,22 +46,22 @@ export const authorization = (role) => {
 }
 faker.locale = 'es'; //Idioma de los datos
 
-export const generateUser = () => {
-    let numOfProducts = parseInt(faker.random.numeric(1, {bannedDigits:['0']}));
-    let products = [];
-    for (let i = 0; i < numOfProducts; i++) {
-        products.push(generateProduct());
-    }
-    return {
-        name: faker.name.firstName(),
+export const generateUser = (hasCart = false) => {
+    let user = {
+        first_name: faker.name.firstName(),
         last_name: faker.name.lastName(),
-        sex: faker.name.sex(),
-        birthDate: faker.date.birthdate(),
-        products,
-        image: faker.internet.avatar(),
-        id: faker.database.mongodbObjectId(),
-        email: faker.internet.email()
+        age: parseInt(faker.random.numeric(2)),
+        username: faker.internet.email(),
+        password: createHash(faker.random.alphaNumeric(6)),
+        
+        //sex: faker.name.sex(),
+        //birthDate: faker.date.birthdate(),
+        //products,
+        //pfp: faker.internet.avatar(),
+        //id: faker.database.mongodbObjectId(),
     };
+    hasCart? user.cartId = faker.database.mongodbObjectId() : null
+    return user;
 };
 
 export const generateProduct = () => {

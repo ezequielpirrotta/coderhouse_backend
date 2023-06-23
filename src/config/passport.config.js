@@ -97,6 +97,7 @@ const initializePassport = () => {
             try{
                 const user = await userService.getUserByUsername(username);
                 if(!user){
+                    console.log("estoy")
                     return done(null,false,{status:"error",message:"User not found"});
                 }
                 if(!isValidPassword(user,password)) {
@@ -111,8 +112,8 @@ const initializePassport = () => {
                 return done(null, {user: user, cart: cart})
             }
             catch(error) {
+                console.log("estoy en error")
                 req.logger.error(log(error,req));
-                console.log(error)
                 return done(error)
             }
         }
@@ -126,6 +127,7 @@ const initializePassport = () => {
                 return next(null, jwt_payload.user);
             } 
             catch (error) {
+                console.log("estoy en jwt")
                 return next(error);
             }
         }
@@ -140,7 +142,6 @@ const initializePassport = () => {
                 return next(null, user);
             } 
             catch (error) {
-                console.error(error);
                 return next(error);
             }
         }

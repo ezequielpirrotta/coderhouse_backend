@@ -27,7 +27,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Cart"
+              $ref: "#/components/schemas/CartNew"
       responses:
           "200":
             description: Operación exitosa, carrito creado exitosamente
@@ -348,6 +348,40 @@ components:
                 type: integer
       example:
         _id: 647de6a6980a7859da8c1cb6,
+        products: [
+            {
+                product: {
+                    owner: admin,
+                    _id: 6418d63d3e7632f846cc6a72,
+                    title: producto_prueba_1,
+                    description: mocking product,
+                    price: 25,
+                    code: abc123,
+                    available: true,
+                    stock: 25,
+                    category: otros,
+                    thumbnail: Sin imagen,
+                    __v: 0
+                },
+                quantity: 3,
+                _id: 6487cf5cf071451c68cd26cf
+            }
+        ]
+    CartNew:
+      type: object
+      properties:
+        products: 
+          type: array
+          description: Arreglo de productos
+          default: []
+          items:
+            type: object
+            properties:
+              product:
+                type: ObjectId
+              quantity: 
+                type: integer
+      example:
         products: [
             {
                 product: {

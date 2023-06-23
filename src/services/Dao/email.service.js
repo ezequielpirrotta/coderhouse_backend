@@ -4,18 +4,19 @@ import __dirname, { generateJWToken } from '../../util.js';
 
 class MailService {
    
-    #transporter
+    static #transporter
     constructor() {
-        
-        this.#transporter = nodemailer.createTransport({
-            service: 'gmail',
-            port: 587,
-            auth: {
-                user: config.gmailAccount,
-                pass: config.gmailAppPassword
-            }
-        });
-        this.#transporter.verify(function(error, success) {
+        if(!MailService.#transporter){
+            MailService.#transporter = nodemailer.createTransport({
+                service: 'gmail',
+                port: 587,
+                auth: {
+                    user: config.gmailAccount,
+                    pass: config.gmailAppPassword
+                }
+            });
+        }
+        MailService.#transporter.verify(function(error, success) {
             if (error) {
                 console.log(error);
             } else {
@@ -23,7 +24,8 @@ class MailService {
             }
         });
     }
-    static #mailOptions = (receiver,title,message) => {
+    #mailOptions = (receiver,title,message) => {
+        console.log("llegué")
         return {
             from: "Coder Test " + config.gmailAccount,
             to: receiver,
@@ -32,7 +34,7 @@ class MailService {
             attachments: []
         }
     }
-    static #mailOptionsForResetPassword = (receiverMail,link) => {
+    #mailOptionsForResetPassword = (receiverMail,link) => {
         const token = generateJWToken(receiverMail,"1h")
         return {
             from: "Coder Test " + config.gmailAccount,
@@ -49,7 +51,7 @@ class MailService {
         }
         
     }
-    static #mailOptionsWithAttachments = (receiver,title,message,attachmentPath=__dirname+'/public/images/meme.png') => {
+    #mailOptionsWithAttachments = (receiver,title,message,attachmentPath=__dirname+'/public/images/meme.png') => {
         return {
             from: "Coder Test " + config.gmailAccount,
             to: receiver?receiver:config.gmailAccount,
@@ -71,7 +73,7 @@ class MailService {
     sendEmail (email,message,title,callback) {
         
         let finalEmail = email ? email : config.gmailAccount;
-        this.#transporter.sendMail(this.constructor.#mailOptions(finalEmail,title,message), (error, info) => {
+        MailService.#transporter.sendMail(this.#mailOptions(finalEmail,title,message), (error, info) => {
             if (error) {
                 callback({
                     message: "Error", 
@@ -86,7 +88,7 @@ class MailService {
     }
     sendResetPasswordEmail(email,link,callback) {
         let finalEmail = email ? email : config.gmailAccount;
-        this.#transporter.sendMail(this.constructor.#mailOptionsForResetPassword(finalEmail, link), (error, info) => {
+        MailService.#transporter.sendMail(this.#mailOptionsForResetPassword(finalEmail, link), (error, info) => {
             if (error) {
                 callback({
                     message: "Error", 
@@ -102,7 +104,7 @@ class MailService {
     sendEmailWithAttachments (email,message,title,attachmentPath,callback) {
         
         let finalEmail = email ? email : config.gmailAccount;
-        this.#transporter.sendMail(this.constructor.#mailOptionsWithAttachments(finalEmail,title,message,attachmentPath), (error, info) => {
+        MailService.#transporter.sendMail(this.constructor.#mailOptionsWithAttachments(finalEmail,title,message,attachmentPath), (error, info) => {
             if (error) {
                 callback({
                     message: "Error", 
