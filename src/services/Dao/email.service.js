@@ -24,7 +24,8 @@ class MailService {
             }
         });
     }
-    static #mailOptions = (receiver,title,message) => {
+    #mailOptions = (receiver,title,message) => {
+        console.log("llegué")
         return {
             from: "Coder Test " + config.gmailAccount,
             to: receiver,
@@ -33,7 +34,7 @@ class MailService {
             attachments: []
         }
     }
-    static #mailOptionsForResetPassword = (receiverMail,link) => {
+    #mailOptionsForResetPassword = (receiverMail,link) => {
         const token = generateJWToken(receiverMail,"1h")
         return {
             from: "Coder Test " + config.gmailAccount,
@@ -50,7 +51,7 @@ class MailService {
         }
         
     }
-    static #mailOptionsWithAttachments = (receiver,title,message,attachmentPath=__dirname+'/public/images/meme.png') => {
+    #mailOptionsWithAttachments = (receiver,title,message,attachmentPath=__dirname+'/public/images/meme.png') => {
         return {
             from: "Coder Test " + config.gmailAccount,
             to: receiver?receiver:config.gmailAccount,
