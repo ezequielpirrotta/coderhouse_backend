@@ -131,7 +131,7 @@ function ItemListContainer()
                             <option value="otros">Otros</option>
                         </select>
                         <input type="number" id="stock" class="swal2-input" placeholder="stock">
-                        <input type="url" id="image" class="swal2-input" placeholder="image">
+                        <input type="file" id="image" class="swal2-input" placeholder="image">
                     </div>`,
             confirmButtonText: 'Create',
             cancelButtonText: 'Cancel',

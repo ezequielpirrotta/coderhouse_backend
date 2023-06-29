@@ -53,6 +53,9 @@ export const logout = async (req, res) => {
     try{
         res.clearCookie('commerceCookieToken');
         res.clearCookie('cartCookie');
+        let user = req.user
+        user.last_connection = new Date();
+        await userService.updateUser(user.username, user);
         res.status(200).send({status:"success",code: 200, message:"Sesion cerrada correctamente!" })
     }
     catch(error) {

@@ -31,7 +31,19 @@ const schema = new mongoose.Schema({
                 ref: "tickets"       
             }   
         ]
-    }
+    },
+    documents: {
+        type: [
+            {
+                name: {
+                    type:String,
+                    unique: true
+                },
+                reference: String
+            }
+        ]
+    },
+    last_connection: String
 })
 
 const userModel = mongoose.model(collection,schema);
