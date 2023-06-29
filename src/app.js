@@ -181,9 +181,6 @@ else{
             }
         })
         /** User events **/
-        socket.on('event_logout_user', async () => {
-            
-        })
         /** Message Events **/
         socket.on("message", data => {
             messages.push(data);
@@ -206,4 +203,4 @@ else{
             console.log('Un usuario se ha desconectado');
         });
     })
-}
+ }

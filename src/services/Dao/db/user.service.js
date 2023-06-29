@@ -30,7 +30,6 @@ class UserService {
     }
     updateUser = async (filter, value) => {
         try {
-            console.log(filter)
             let result = await userModel.updateOne(filter, value);
             if(result.modifiedCount > 0) {
                 return result;

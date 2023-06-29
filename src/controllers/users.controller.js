@@ -32,27 +32,83 @@ export const saveUser = async (req, res, next) => {
         next(error)
     }
 }
-export const updateUser = async (req, res, next) => {
+export const changeUserRol = async (req, res, next) => {
     try {
-        const {username,uid} = req.params
+        const {uid} = req.params
         let user = {}
-        if(uid) {
-            let oldUser = await userService.getUserById(uid);
-            oldUser.role = req.body.role
-            user = oldUser;
-            console.log(oldUser)
+        
+        let oldUser = await userService.getUserById(uid);
+        if(oldUser.role === req.body.role){
+            throw { 
+                code: 409,
+                detail: "No puedes cambiar a un rol que ya tienes"
+            }
+        }
+        if(req.body.role==='premium'){
 
+            const docs = {
+                "identificacion": false,
+                "domicilio": false,
+                "cuenta": false,
+            }
+            for(let i = 0; i < oldUser.documents.length; i++){
+                for(const doc in docs){
+                    if((oldUser.documents[i].name).includes(doc)){
+                        console.log(doc)
+                        docs[doc] = true       
+                    }
+                }
+            }
+            let permission = false
+            for(const doc in docs){
+                permission = true;
+                if(!docs[doc]){
+                    permission = false;
+                }
+            }
+            if(permission){
+                oldUser.role = req.body.role
+                user = oldUser;
+                const result = await userService.updateUser({username: user.username},user);
+                res.send({code: 201, message: "Usuario actualizado correctamente", payload: result}); 
+            }
+            else {
+                throw { 
+                    code: 409,
+                    detail: "Falta documentación necesaria para cambiar de rol",
+                    payload: {...docs}
+                }
+            }
         }
         else {
-            user = req.body;
+            oldUser.role = req.body.role
+            user = oldUser;
+            const result = await userService.updateUser({username: user.username},user);
+            res.status(201).send({code: 201, message: "Usuario actualizado correctamente", payload: result});
         }
-        const result = await userService.updateUser(
-            {username: username? username : user.username}, user);
-        res.send({code: 201, message: "Usuario actualizado correctamente", payload: result});
     }
     catch(error) {
-        console.log(error)
-        res.status(error.code).send(error)
+        res.status(error.code?error.code:500).send(error)
+    }
+}
+export const saveDocuments = async (req, res, next) => {
+    try {
+        const {uid} = req.params
+        let user = {}
+        if(uid) {
+            user = await userService.getUserById(uid);
+            const files = req.files
+            for(const type of Object.keys(files)) {
+                for(let i = 0; i < files[type].length; i++){
+                    user.documents.push({name: files[type][i].originalname, reference: files[type][i].path})
+                }
+            } 
+            const result = await userService.updateUser({username: user.username}, user);
+            res.send({code: 201, message: "Usuario actualizado correctamente", payload: "llegué"});
+        }
+    }
+    catch(error) {
+        res.status(error.code?error.code:500).send(error)
     }
 }
 export const deleteUser = async (req,res,next) => {

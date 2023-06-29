@@ -5,7 +5,7 @@ import { UserContext } from "./UserContext";
 
 function Profile() 
 {
-    const {user, loading, changeRol} = useContext(UserContext);
+    const {user, loading, changeRol, uploadDocs} = useContext(UserContext);
     
     /*useEffect(  async () => {
         //let result  = await fetch(endpoint+server_port+'/api/sessions/current').then((response)=>response.json())
@@ -15,12 +15,14 @@ function Profile()
     
     return (
         <div className="container justify-content-center">
-            <div className="row profile justify-content-center">
-                <div className="col-sm-4 col-md-3">
-                    { loading ? 
-                        <h2>Loading user profile...</h2>
-                        : user ? 
-                        <div>
+            { loading ? 
+                <h2>Loading user profile...</h2>
+                : user ? 
+                <div>
+
+                    <div className="row profile justify-content-center">
+                        <div className="col-sm-4 col-md-3">
+                            
                             <h2 className="profile-heading">User Profile</h2>
                             <div className="profile-details">
                                 <div className="form-group">
@@ -60,16 +62,24 @@ function Profile()
                                     />
                                 </div>
                             </div>
-                            <div className="m-2 d-flex justify-content-evenly">
-                                <Link to={"/orders"} className="btn btn-secondary">Ir a órdenes</Link>
-                                <Link className="btn btn-secondary" onClick={changeRol}>Cambiar rol</Link>
-                            </div>
+                            
                         </div>
-                        : 
-                        <h2>No user profile found.</h2>
-                    }
+                    </div>
+                    <div className="m-2 row d-flex justify-content-center align-items-center">
+                        <div className="col d-flex flex-column ">
+                            <Link to={"/orders"} className="btn btn-secondary p-2">Ir a órdenes</Link>
+                        </div>
+                        <div className="col d-flex flex-column ">
+                            <Link className="btn btn-info p-2" onClick={uploadDocs}>Documentación</Link>
+                        </div>
+                        <div className="col d-flex flex-column justify-content-between">
+                            <Link className="btn btn-warning p-2" onClick={changeRol}>Cambiar rol</Link>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                : 
+                <h2>No user profile found.</h2>
+            }
         </div>
     )  
 }

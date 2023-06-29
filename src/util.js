@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 import passport from 'passport';
 import {faker} from '@faker-js/faker';
+import fs, { mkdir } from 'fs';
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync());
 
@@ -113,11 +114,29 @@ const __dirname = dirname(__filename).split(path.sep).join(path.posix.sep);
 
 const storage = multer.diskStorage({
     destination: (req,file,cb) => {
-        cb(null, __dirname+'/public/img');
+        let subDir = ""
+        switch(file.fieldname) {
+            case "avatar":
+                subDir = "/profiles";
+                break;
+            case "docs":
+                subDir = "/documents";
+                break;
+            case "product":
+                subDir = "/products";
+                break;
+        }
+        const dir = __dirname+'/public'+subDir;
+        
+        fs.mkdir(dir, (err) => {
+            if (err) console.log(err);
+        }); 
+        cb(null, dir);
     },
     filename: (req,file,cb) => {
-        cb(null, file.originalname)
+        cb(null, req.user._id.toString()+'_'+file.originalname)
     }
 })
-export const uploader = multer({storage})
+export const uploader = multer({storage});
+
 export default __dirname;
