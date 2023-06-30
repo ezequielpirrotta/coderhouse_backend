@@ -40,7 +40,7 @@ if(cluster.isPrimary) {
     console.log("Nro de cpus:")
     console.log(cpusNumber)
     for(let i = 0; i < cpusNumber-1; i++) {
-        cluster.fork()
+        cluster.fork().on('error', err => console.error({err, message: 'Ocurrió un error'}))
     }
 }
 else{
