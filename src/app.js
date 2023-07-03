@@ -120,8 +120,9 @@ else{
     });
     app.use(Express.static('react-layer'));
     let messages = [];
+    /*
     socketServer.on("connection",socket  => {
-        /** Products events **/
+        // Products events 
         socket.on("event_update_product", async (data) => {
             let change = {
                 field: data.field,
@@ -180,8 +181,8 @@ else{
                 socketServer.emit("event_product_created", {...result.data})
             }
         })
-        /** User events **/
-        /** Message Events **/
+        // User events 
+        // Message Events 
         socket.on("message", data => {
             messages.push(data);
             socketServer.emit("messageLogs", messages);
@@ -191,7 +192,7 @@ else{
             console.log("User connected: " + data.user);
             socket.broadcast.emit("userConnected", data.user);
         });
-        /*mensajes para implementación de react*/
+        //mensajes para implementación de react
         socket.on('send_message', (message) => {
             console.log('Mensaje recibido:', message);''
             // Emitir el mensaje a todos los clientes conectados
@@ -203,4 +204,5 @@ else{
             console.log('Un usuario se ha desconectado');
         });
     })
+    */
  }
