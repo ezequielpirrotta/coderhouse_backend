@@ -110,7 +110,7 @@ else{
     app.use('/mockingproducts', mockingRouter);
     app.use('/loggerTest', logRouter);
     /*** Server ***/
-    const httpServer = app.listen(8080);
+    const httpServer = app.listen(8081);
     const socketServer = new Server(httpServer,{
         cors: {
             origin: config.frontUrl,
@@ -204,5 +204,9 @@ else{
             console.log('Un usuario se ha desconectado');
         });
     })
+<<<<<<< Updated upstream
     */
  }
+=======
+}
+>>>>>>> Stashed changes
