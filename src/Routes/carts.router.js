@@ -2,7 +2,7 @@ import { Router } from "express";
 import {addProductToCart, createCart, deleteCart, deleteProductFromCart, deleteProducts, getCartById, getCarts,
         purchaseCart, replaceCart, updateProductFromCart} 
         from "../controllers/cart.controller.js";
-import { permissionsIsPremiumOrUser } from "../middlewares/permissions.midddleware.js";
+import { permissionsIsPremiumOrUser } from "../middlewares/permissions.middleware.js";
 import { passportCall } from "../util.js";
 
 const router = Router()
