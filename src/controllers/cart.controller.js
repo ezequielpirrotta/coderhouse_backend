@@ -76,6 +76,7 @@ export const addProductToCart = async (req, res, next) => {
     try {
         
         let result = await cartService.updateProduct(cart_id, product_id, quantity, true);
+        req.cookies['cartCookie'] = result;
         res.status(200).send(result)
     } 
     catch(error) {
@@ -88,7 +89,7 @@ export const addProductToCart = async (req, res, next) => {
 export const purchaseCart = async (req, res, next) => { 
     try {
         const {cid} = req.params;
-        const {username} = req.body
+        const {username,paymentMethod} = req.body
         let cart = await cartService.getCartById(cid)
         let availableCart = [];
         let notAvailableCart = []
@@ -97,7 +98,8 @@ export const purchaseCart = async (req, res, next) => {
         if(availableCart.length > 0){
             let data = {
                 username: username,
-                products: availableCart,
+                products: availableCart.map((element)=>{return {product: element.product._id, quantity: element.quantity}}),
+                paymentMethod: paymentMethod
             }
             let requestData = {
                 method:"POST",
@@ -125,8 +127,11 @@ export const purchaseCart = async (req, res, next) => {
                 });
             })
            cartService.replaceCart(cid,notAvailableCart)
+           res.status(200).send({notAvailableCart: notAvailableCart,order: result.payload});
         }
-        res.status(200).send({notAvailableCart,result});
+        else {
+            res.status(200).send({notAvailableCart});
+        }
     }
     catch(error) {
         req.logger.error(log(error.message,req));
@@ -164,8 +169,6 @@ export const deleteProducts = async (req, res, next) => {
     catch(error) {
         const error_message = error.name+": "+error.message
         req.logger.error(log(error_message,req));
-        console.log("Error: ")
-        console.log(error)
         const code = error.status_code? error.status_code : error.code? error.code : 500
         res.status(code).send(error)
     }

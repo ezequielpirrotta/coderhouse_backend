@@ -43,7 +43,6 @@ export const createProduct = async (req, res, next) => {
         }
         if(req.user.role === "premium"){
             product.owner = req.user.email;
-            console.log(product)
         }
         product.code = generarCadenaAlfanumerica(6);
         let resultProduct = await productService.create(product)
@@ -55,7 +54,6 @@ export const createProduct = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req))
-        console.log(error)
         res.status(error.code?error.code:500).send(error);
     }
 }
@@ -78,7 +76,20 @@ export const updateProduct = async (req, res, next) => {
 export const deleteProduct = async (req, res, next) => {
     let {id} = req.params;
     try {
-        await productService.deleteProduct(id)
+        let result = await productService.deleteProduct(id)
+        if(result) {
+            if(req.user.role === "premium"){
+                const message = `Hola ${req.user.name}!\nLe informamos que su producto con id: "${id}" a sido eliminado con éxito!\nSaludos!`
+                this.emailService.sendEmail(user.username, message, title, (error, result) => {
+                    if(error){
+                        throw {
+                            error:  result.error, 
+                            message: result.message
+                        }
+                    }
+                })
+            }
+        }
         res.status(200).send({
             status: 'OK',
             message: "Product deleted succesfully.",

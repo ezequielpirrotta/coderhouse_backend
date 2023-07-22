@@ -1,12 +1,19 @@
 import userModel from '../models/user.model.js';
 import CartService from './cart.service.js';
+import GetUserDTO from '../DTOs/getUserDTO.js';
+import MailService from '../email.service.js';
+import { dateValidator } from '../../../util.js';
 
-const cartService = new CartService();
+
 class UserService {
+    constructor(){
+        this.cartService = new CartService();
+        this.emailService = new MailService();
+    }
     
     getAll = async () => {
         let users = await userModel.find();
-        return users.map(user=>user.toObject());
+        return users.map(user=> new GetUserDTO(user.toObject()));
     };
     saveUser = async (user) => {
         try {
@@ -50,7 +57,7 @@ class UserService {
             let cartId = (await this.getUserByUsername(username)).cart;
             let result = await userModel.deleteOne({username: username});
             if(result.deletedCount > 0) {
-                if(cartId){await cartService.deleteCart(cartId);}
+                if(cartId){await this.cartService.deleteCart(cartId);}
                 return true;
             }
             else {
@@ -65,6 +72,35 @@ class UserService {
                     } 
                 }
             }
+        }
+    }
+    clearUsers = async () => {
+        try {
+            const users = await this.getAll();
+            let usersToBeDeleted = []
+            users.forEach(user => {
+                if(dateValidator(user.last_connection,'h',48)){
+                    usersToBeDeleted.push(user)
+                }
+            });
+            const title = "Aviso de eliminación de cuenta"
+            usersToBeDeleted.forEach(async (user) => {
+                await this.delete(user.username);
+                const message = `Hola ${user.name}!\nLe informamos que su cuenta a sido eliminada por inactividad.\nSepa disculpar las molestias.\nSaludos`
+                this.emailService.sendEmail(user.username, message, title, (error, result) => {
+                    if(error){
+                        throw {
+                            error:  result.error, 
+                            message: result.message
+                        }
+                    }
+                })
+                
+            })
+            return usersToBeDeleted;
+        }
+        catch(error) {
+            throw error;
         }
     }
 };

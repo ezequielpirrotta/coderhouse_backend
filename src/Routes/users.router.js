@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { deleteUser, getUserByUsername, getUsers, saveUser, changeUserRol, saveDocuments} from "../controllers/users.controller.js";
-import { permissionsIsPremiumOrAdmin } from "../middlewares/permissions.middleware.js";
+import { deleteUser, getUserByUsername, getUsers, saveUser, changeUserRol, saveDocuments, clearUsers} from "../controllers/users.controller.js";
+import { permissionsIsPremiumOrAdmin } from "../middlewares/permissions.midddleware.js";
 import { passportCall, uploader } from "../util.js";
 
 const router = Router();
@@ -14,5 +14,6 @@ router.post("/:uid/documents",passportCall("current"), uploader.fields([
 router.put("/premium/:uid", changeUserRol)
 router.get("/:username", getUserByUsername);
 router.delete("/:username", deleteUser);
+router.delete("/", clearUsers)
 
 export default router;

@@ -3,6 +3,7 @@ import { createHash, isValidPassword, generateJWToken } from '../util.js';
 import config from '../config/config.js';
 import UserService from '../services/Dao/db/user.service.js';
 import MailService from '../services/Dao/email.service.js';
+import moment from 'moment';
 
 const mailService = new MailService()
 const userService = new UserService()
@@ -54,8 +55,9 @@ export const logout = async (req, res) => {
         res.clearCookie('commerceCookieToken');
         res.clearCookie('cartCookie');
         let user = req.user
-        user.last_connection = new Date();
-        await userService.updateUser(user.username, user);
+        const date = moment().format();
+        user.last_connection = date;
+        await userService.updateUser({username:user.username}, user);
         res.status(200).send({status:"success",code: 200, message:"Sesion cerrada correctamente!" })
     }
     catch(error) {
