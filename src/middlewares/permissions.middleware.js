@@ -1,4 +1,4 @@
-import ProductService from "../services/Dao/db/product.service.js"
+import ProductService from "./services/Dao/db/product.service.js"
 
 export const permissionsIsUser = (req, res, next) => {
     if(req.user.role === "user") return next()
