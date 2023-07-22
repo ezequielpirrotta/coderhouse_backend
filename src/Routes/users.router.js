@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { deleteUser, getUserByUsername, getUsers, saveUser, changeUserRol, saveDocuments, clearUsers} from "../controllers/users.controller.js";
-import { permissionsIsPremiumOrAdmin } from "../middlewares/permissions.midddleware.js";
 import { passportCall, uploader } from "../util.js";
 
 const router = Router();
