@@ -16,6 +16,7 @@ export default {
     mongoUrlTest: process.env.MONGO_URL_TEST,
     adminUsername: process.env.ADMIN_USERNAME,
     adminPassword: process.env.ADMIN_PASSWORD,
+    privateKey: process.env.PRIVATE_KEY,
     gmailAccount: process.env.GMAIL_ACCOUNT,
     gmailAppPassword: process.env.GMAIL_APP_PASSWD,
     twilioAccountSID: process.env.TWILIO_ACCOUNT_SID,

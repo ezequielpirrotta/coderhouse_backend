@@ -1,14 +1,12 @@
 import TicketService from "../services/Dao/db/ticket.service.js";
 import UserService from "../services/Dao/db/user.service.js";
-import config from "../config/config.js";
 
 const ticketService = new TicketService();
-const userService = new UserService();
+const userService =  new UserService();
 
 export const getTickets = async (req, res) => {
     try {
         const tickets = await ticketService.getAll();
-        console.log(tickets)
         res.status(200).send({payload: tickets});
     }   
     catch(error) {
@@ -26,38 +24,21 @@ export const getTicketById = async (req, res, next) => {
         res.status(error.code).send(error)
     }
 }
+export const getTicketsByUsername = async (req, res, next) => {
+    try {
+        const {username} = req.params;
+        const tickets =  await ticketService.getTicketsByUsername(username)
+        res.send({status: 200, payload: tickets});
+    }   
+    catch(error) {
+        res.status(error.code?error.code:500).send(error)
+    }
+}
 export const createTicket = async (req, res, next) => {
     try {
-        const {username,products} = req.body;
-        const resultUser = await userService.getUserByUsername(username);
-        const resultProducts = await fetch(config.serverUrl+'/api/products/?limit=999')
-        .then( (response) => response.json());
-        let actualTickets = products.filter(product=> {
-            let flag = false;
-            resultProducts.payload.forEach(element => {
-                if(element._id == product.product._id){
-                    flag = true
-                }
-            });
-            return flag;
-        })
-        let sum = actualTickets.reduce((acc,prev)=>{
-            acc += prev.product.price * prev.quantity 
-            return acc;
-        },0)
-        let ticketNumber = Date.now() + Math.floor(Math.random()*10000+1)
-        
-        let ticket = {
-            code: ticketNumber,
-            purchaser: username,
-            purchase_datetime: new Date(),
-            products: actualTickets.map(product=>product.product._id),
-            amount: sum,
-        }
-
-        const ticketResult = await ticketService.createTicket(ticket);
-        resultUser.orders.push(ticketResult._id)
-        await userService.updateUser({username}, resultUser)
+        const {username,products,paymentMethod} = req.body;
+        const ticketResult = await ticketService.createTicket(username,products,paymentMethod)
+        const result = await ticketService.getTicketById(ticketResult.id)
         res.send({status: 200, payload: ticketResult});
     }   
     catch(error) {
@@ -65,14 +46,25 @@ export const createTicket = async (req, res, next) => {
     }
 }
 export const resolveTicket = async (req, res, next) => {
-    try {
-        const {resolve} = req.query;
-        let ticket = await ticketService.getTicketById(req.params.tid);
-        ticket.status=resolve;
-        await ticketService.resolveTicket(ticket._id, ticket);
+    try {        
+        await ticketService.resolveTicket(req.params.tid);
         res.send({status: 200, result: "Order solved"});
     }
     catch(error) {
-        next(error)
+        res.status(error.code?error.code:500).send(error)
+    }
+}
+export const deleteTicket = async (req, res, next) => {
+    try {
+        const {id} = req.params;
+        const ticket = await ticketService.getTicketById(id)
+        let user = await userService.getUserByUsername(ticket.purchaser);
+        user.orders = user.orders.filter(order =>!(order.equals(id)) )
+        await ticketService.deleteTicket(id);
+        await userService.updateUser({username: user.username},user)
+        res.send({status: 200, payload: "Deleted succesfully"});
+    }
+    catch(error) {
+        res.status(error.code?error.code:500).send(error)
     }
 }

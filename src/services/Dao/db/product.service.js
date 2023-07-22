@@ -1,8 +1,11 @@
 import productModel from "../models/product.model.js";
 import ProductDTO from "../DTOs/product.model.DTO.js";
+import MailService from "../email.service.js";
 
 class ProductService {
-    
+    constructor() {
+        this.emailService = new MailService();
+    }
     getProducts = async (params) => {
         try {
             let limit =  params.limit? parseInt(params.limit) : 10;

@@ -25,12 +25,11 @@ class MailService {
         });
     }
     #mailOptions = (receiver,title,message) => {
-        console.log("llegué")
         return {
             from: "Coder Test " + config.gmailAccount,
             to: receiver,
             subject: title? title : "Correo de prueba Coderhouse",
-            html: `<div><h1>${message? message : "Esto es un Test de envio de correos con Nodemailer!"}</h1></div>`,
+            html: `<div><h3>${message? message : "Esto es un Test de envio de correos con Nodemailer!"}</h3></div>`,
             attachments: []
         }
     }
@@ -71,7 +70,6 @@ class MailService {
         }
     }
     sendEmail (email,message,title,callback) {
-        
         let finalEmail = email ? email : config.gmailAccount;
         MailService.#transporter.sendMail(this.#mailOptions(finalEmail,title,message), (error, info) => {
             if (error) {

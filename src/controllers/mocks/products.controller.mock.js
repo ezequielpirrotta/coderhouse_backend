@@ -23,7 +23,6 @@ export const createProducts = async (req, res) => {
         for (let i = 0; i < amount; i++) {
             const product = generateProduct()
             const result = await productService.create(product)  
-            console.log(result)
             products.push(product);
         }
         res.send({status: "success", payload: products});

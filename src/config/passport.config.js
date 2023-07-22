@@ -3,7 +3,7 @@ import passportLocal from "passport-local";
 import jwtStrategy, { ExtractJwt } from "passport-jwt";
 import UserService from "../services/Dao/db/user.service.js";
 import GitHubStrategy from 'passport-github2';
-import { PRIVATE_KEY, createHash, isValidPassword } from "../util.js";
+import {createHash, isValidPassword } from "../util.js";
 import config from "./config.js";
 import CartService from "../services/Dao/db/cart.service.js";
 import UserDTO from '../services/Dao/DTOs/user.model.DTO.js';
@@ -58,10 +58,6 @@ const initializePassport = () => {
         {passReqToCallback: true}, async (req, username, password, done) => {
             try {
                 const { name, lastName, age, adminRole,premiumRole} = req.body;
-                /*if(!mail) {
-                    done(null, false, {status: "error", message: "Empty email"})
-                    //return res.status(400).send({status: "error", message: "Empty email"});
-                }*/
                 const exists = await userService.getUserByUsername(username);
                 if (exists){
                     req.logger.error(log("User already exists.",req));
@@ -97,7 +93,6 @@ const initializePassport = () => {
             try{
                 const user = await userService.getUserByUsername(username);
                 if(!user){
-                    console.log("estoy")
                     return done(null,false,{status:"error",message:"User not found"});
                 }
                 if(!isValidPassword(user,password)) {
@@ -112,7 +107,6 @@ const initializePassport = () => {
                 return done(null, {user: user, cart: cart})
             }
             catch(error) {
-                console.log("estoy en error")
                 req.logger.error(log(error,req));
                 return done(error)
             }
@@ -121,13 +115,12 @@ const initializePassport = () => {
     passport.use('jwtStrat', new JwtStrat(
         {
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
-            secretOrKey: PRIVATE_KEY
+            secretOrKey: config.privateKey
         },async(jwt_payload, next) => {
             try {
                 return next(null, jwt_payload.user);
             } 
             catch (error) {
-                console.log("estoy en jwt")
                 return next(error);
             }
         }
@@ -135,7 +128,7 @@ const initializePassport = () => {
     passport.use('current', new JwtStrat(
         {
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
-            secretOrKey: PRIVATE_KEY
+            secretOrKey: config.privateKey
         },async(jwt_payload, next) => {
             try {
                 let user = await userService.getUserByUsername(jwt_payload.user.email)

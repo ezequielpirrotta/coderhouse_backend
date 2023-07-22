@@ -7,7 +7,6 @@ export const sendEmail = (req, res) => {
     const {email,message,title} = req.body
     mailService.sendEmail(email,message,title, (error, result) => {
         if(error){
-            console.log(error)
             req.logger.error(log(error,req));
             res.status(error.code?error.code:500).send(error);
         }

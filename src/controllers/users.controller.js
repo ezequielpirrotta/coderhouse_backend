@@ -5,6 +5,7 @@ const userService = new UserService();
 export const getUsers = async (req, res, next) => {
     try {
         const users = await userService.getAll();
+
         res.send({status: 200, payload: users});
     }   
     catch(error) {
@@ -54,7 +55,6 @@ export const changeUserRol = async (req, res, next) => {
             for(let i = 0; i < oldUser.documents.length; i++){
                 for(const doc in docs){
                     if((oldUser.documents[i].name).includes(doc)){
-                        console.log(doc)
                         docs[doc] = true       
                     }
                 }
@@ -118,6 +118,18 @@ export const deleteUser = async (req,res,next) => {
         res.send({status: 200, payload: user});
     }
     catch(error) {
+        next(error)
+    }
+}
+
+export const clearUsers = async (req,res,next) => {
+    try {
+        const {username} = req.params;
+        const result = await userService.clearUsers(username);
+        res.send({status: 200, payload: result});
+    }
+    catch(error) {
+        req.logger.error(log(error,req));
         next(error)
     }
 }

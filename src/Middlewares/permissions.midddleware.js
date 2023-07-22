@@ -6,7 +6,6 @@ export const permissionsIsUser = (req, res, next) => {
 }
 export const permissionsIsPremiumOrAdmin = async (req, res, next) => {
     const productService = new ProductService();
-    console.log(req.user)
     if(req.user.role === "premium") {
         const {id} = req.params
         if(id){
@@ -30,15 +29,12 @@ export const permissionsIsPremiumOrUser = async (req, res, next) => {
         const bodyId = req.body.product_id
         if(id){
             const result = await productService.getProductById(id)
-            console.log(result)
             if(result.owner === req.user.email){
                 return res.status(403).send({status:"WRONG", message:"You own this product, so you can't buy it"})
             }
             return next()
         }else if(bodyId){
-            console.log("estoy acá")
             const result = await productService.getProductById(bodyId)
-            console.log(result)
             if(result.owner === req.user.email){
                 return res.status(403).send({status:"WRONG", message:"You own this product, so you can't buy it"})
             }

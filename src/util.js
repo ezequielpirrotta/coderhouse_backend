@@ -6,12 +6,21 @@ import jwt from 'jsonwebtoken'
 import passport from 'passport';
 import {faker} from '@faker-js/faker';
 import fs, { mkdir } from 'fs';
+import moment from 'moment';
+import config from './config/config.js';
+
+
+export const dateValidator = (date, type='m', amount=10) => {
+    const actualDate = moment();
+    const dateToValidate = moment(date)
+    const result = actualDate.diff(dateToValidate, type==='m'?"minutes":type==='d'?'days':hours) > amount
+    return result;
+}
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync());
 
 export const isValidPassword = (user, password) => bcrypt.compareSync(password, user.password);
 
-export const PRIVATE_KEY = "MyCommerceSecretKeyJWT";
 /**
  * Generate token JWT usando jwt.sign:
  * Primer argumento: objeto a cifrar dentro del JWT
@@ -19,7 +28,7 @@ export const PRIVATE_KEY = "MyCommerceSecretKeyJWT";
  * Tercer argumento: Tiempo de expiración del token.
  */
 export const generateJWToken = (user,time) => {
-    return jwt.sign({user}, PRIVATE_KEY, {expiresIn: time});
+    return jwt.sign({user}, config.privateKey, {expiresIn: time});
 };
 
 export const passportCall = (strategy) => {
@@ -27,7 +36,6 @@ export const passportCall = (strategy) => {
         passport.authenticate(strategy, (err, user, info) => {
             if (err) { return next(err);}
             if (!user) {
-                console.log("estoy acá en la call")
                 return res.status(401).send({error: info.messages?info.messages:typeof info === 'object'?info:info.toString()});
             }
             req.user = user;
