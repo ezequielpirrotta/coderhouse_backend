@@ -33,7 +33,7 @@ import swaggerUIExpress from "swagger-ui-express";
 import { cpus } from "os";
 
 
-if(cluster.isPrimary) {
+/*if(cluster.isPrimary) {
     
     const cpusNumber = cpus().length;
     console.log("Nro de cpus:")
@@ -41,8 +41,8 @@ if(cluster.isPrimary) {
     for(let i = 0; i < cpusNumber-1; i++) {
         cluster.fork().on('error', err => console.error({err, message: 'Ocurrió un error'}))
     }
-}
-else{
+}*/
+//else{
     console.log("Soy worker!, proceso: "+process.pid)
     const app = Express()
     app.use(cors({origin:config.frontUrl,methods:['GET','POST','PUT','DELETE'], credentials: true}))
@@ -118,4 +118,4 @@ else{
         }
     });
     app.use(Express.static('react-layer'));*/
-}
+//}
