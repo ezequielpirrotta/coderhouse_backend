@@ -9,8 +9,9 @@ dotenv.config({
 
 export default {
     environment: process.env.ENVIRONMENT,
-    serverPort: process.env.SERVER_PORT,
-    serverUrl: process.env.SERVER_URL,
+    serverPort: process.env.PORT,
+    serverHost: process.env.HOST, 
+    serverUrl: process.env.HOST+':'+process.env.PORT,
     frontUrl: process.env.FRONT_URL,
     mongoUrl: process.env.MONGO_URL,
     mongoUrlTest: process.env.MONGO_URL_TEST,

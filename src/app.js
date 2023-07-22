@@ -108,7 +108,7 @@ import { cpus } from "os";
     app.use('/mockingproducts', mockingRouter);
     app.use('/loggerTest', logRouter);
     /*** Server ***/
-    app.listen(config.serverPort);
+    app.listen(config.serverPort,config.serverHost);
     /*const httpServer = 
     const socketServer = new Server(httpServer,{
         cors: {
