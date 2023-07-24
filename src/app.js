@@ -43,9 +43,9 @@ import { cpus } from "os";
     }
 }*/
 //else{
-    console.log("Soy worker!, proceso: "+process.pid)
+    console.log(config.frontUrl)
     const app = Express()
-    app.use(cors({origin:'*',methods:['GET','POST','PUT','DELETE'], credentials: true}))
+    app.use(cors({origin: config.frontUrl,methods:['GET','POST','PUT','DELETE'], credentials: true}))
     /*** DB ***/
     const connectToMongoDB = async () => {
         try {
