@@ -45,7 +45,7 @@ import { cpus } from "os";
 //else{
     console.log("Soy worker!, proceso: "+process.pid)
     const app = Express()
-    app.use(cors({origin:config.frontUrl,methods:['GET','POST','PUT','DELETE'], credentials: true}))
+    app.use(cors({origin:'*',methods:['GET','POST','PUT','DELETE'], credentials: true}))
     /*** DB ***/
     const connectToMongoDB = async () => {
         try {
@@ -109,13 +109,12 @@ import { cpus } from "os";
     app.use('/loggerTest', logRouter);
     /*** Server ***/
     app.listen(config.serverPort,config.serverHost);
-    /*const httpServer = 
-    const socketServer = new Server(httpServer,{
+    /*const socketServer = new Server(httpServer,{
         cors: {
             origin: config.frontUrl,
-            methods: ["GET", "POST", "PUT", "DELETE"],
+            methods: ["GET",   "POST", "PUT", "DELETE"],
             credentials: true
         }
-    });
-    app.use(Express.static('react-layer'));*/
+    });*/
+    
 //}
