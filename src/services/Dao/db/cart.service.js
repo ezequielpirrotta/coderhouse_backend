@@ -6,7 +6,7 @@ import CustomError from "../../errors/CustomError.js";
 import { clearCartErrorInfo } from "../../errors/messages/cart_error.messages.js";
 import EErrors from "../../errors/errors-enum.js";
 
-const dbPm = new ProductService();
+const productService = new ProductService();
 class CartService {
     
     getCarts = async (limit) => {
@@ -137,7 +137,7 @@ class CartService {
                 }
             }
             
-            if(await dbPm.getProductById(pid)) {
+            if(await productService.getProductById(pid)) {
                 let newProduct = {product: pid, quantity: quantity}
                 let cart = await this.getCartById(cid)
                 if(newPdt) {

@@ -38,7 +38,6 @@ export const createTicket = async (req, res, next) => {
     try {
         const {username,products,paymentMethod} = req.body;
         const ticketResult = await ticketService.createTicket(username,products,paymentMethod)
-        const result = await ticketService.getTicketById(ticketResult.id)
         res.send({status: 200, payload: ticketResult});
     }   
     catch(error) {

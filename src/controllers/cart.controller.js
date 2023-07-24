@@ -108,8 +108,7 @@ export const purchaseCart = async (req, res, next) => {
                     'Content-type': 'application/json; charset=UTF-8',
                 }
             }
-            let request = new Request(config.serverUrl+'/api/tickets/', requestData) 
-            let result = await fetch(request)
+            let result = await fetch(config.serverUrl+'/api/tickets/', requestData)
             .then( (response) => response.json());
             if(result.code === "WRONG"){
                 throw {
