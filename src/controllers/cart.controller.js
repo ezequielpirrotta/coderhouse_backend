@@ -2,6 +2,7 @@ import CartService from '../services/Dao/db/cart.service.js'
 import config from '../config/config.js';
 import ProductService from '../services/Dao/db/product.service.js';
 import { log } from '../config/logger.js';
+import fetch from 'node-fetch';
 
 const productService = new ProductService()
 const cartService = new CartService();
