@@ -10,7 +10,7 @@ export const getTickets = async (req, res) => {
         res.status(200).send({payload: tickets});
     }   
     catch(error) {
-        res.status(error.code).send(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 
@@ -21,7 +21,7 @@ export const getTicketById = async (req, res, next) => {
         res.send({status: 200, payload: ticket});
     }   
     catch(error) {
-        res.status(error.code).send(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 export const getTicketsByUsername = async (req, res, next) => {
@@ -41,7 +41,7 @@ export const createTicket = async (req, res, next) => {
         res.send({status: 200, payload: ticketResult});
     }   
     catch(error) {
-        next(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 export const resolveTicket = async (req, res, next) => {

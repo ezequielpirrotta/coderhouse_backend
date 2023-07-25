@@ -43,7 +43,6 @@ import { cpus } from "os";
     }
 }*/
 //else{
-    console.log(config.frontUrl)
     const app = Express()
     app.use(cors({origin: config.frontUrl,methods:['GET','POST','PUT','DELETE'], credentials: true}))
     /*** DB ***/

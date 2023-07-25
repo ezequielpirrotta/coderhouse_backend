@@ -11,7 +11,7 @@ export default {
     environment: process.env.ENVIRONMENT,
     serverPort: process.env.PORT,
     serverHost: process.env.HOST, 
-    serverUrl: process.env.HOST+':'+process.env.PORT,
+    serverUrl: process.env.ENVIRONMENT==="DEV"?process.env.SERVER_URL:process.env.HOST+':'+process.env.PORT,
     frontUrl: process.env.FRONT_URL,
     mongoUrl: process.env.MONGO_URL,
     mongoUrlTest: process.env.MONGO_URL_TEST,

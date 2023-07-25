@@ -111,7 +111,7 @@ export const purchaseCart = async (req, res, next) => {
             }
             let result = await fetch(config.serverUrl+'/api/tickets/', requestData)
             .then( (response) => response.json());
-            if(result.code === "WRONG"){
+            if(result.code === "WRONG" || result.status != 200){
                 throw {
                     message: "Fail to purhase cart",
                     detail: result.message ? result.message : ""
