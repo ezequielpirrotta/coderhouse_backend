@@ -102,7 +102,7 @@ class MailService {
     sendEmailWithAttachments (email,message,title,attachmentPath,callback) {
         
         let finalEmail = email ? email : config.gmailAccount;
-        MailService.#transporter.sendMail(this.constructor.#mailOptionsWithAttachments(finalEmail,title,message,attachmentPath), (error, info) => {
+        MailService.#transporter.sendMail(this.#mailOptionsWithAttachments(finalEmail,title,message,attachmentPath), (error, info) => {
             if (error) {
                 callback({
                     message: "Error", 

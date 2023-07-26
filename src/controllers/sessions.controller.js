@@ -78,7 +78,7 @@ export const resetPasswordConfirm = async (req,res) => {
             }
             else {
                 req.logger.info(log(("Message sent: %s", result.payload.messageId),req));
-                res.status(201).send({status: "success",code: 201, message: "Mail to reset password sended"});;
+                res.status(201).send({status: "success",code: 201, message: "Mail to reset password sended"});
             }
         })
     }
