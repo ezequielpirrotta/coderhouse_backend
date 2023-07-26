@@ -135,7 +135,7 @@ export const purchaseCart = async (req, res, next) => {
     }
     catch(error) {
         req.logger.error(log(error.message,req));
-        const code = error.status_code? error.status_code : error.code? error.code : 500
+        const code = error.status_code&&!isNaN(error.status_code)? error.status_code : error.code&&!isNaN(error.code)? error.code : 500
         res.status(code).send(error)
     }
 }
