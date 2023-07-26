@@ -15,6 +15,10 @@ class UserService {
         let users = await userModel.find();
         return users.map(user=> new GetUserDTO(user.toObject()));
     };
+    getAllRaw = async () => {
+        let users = await userModel.find();
+        return users.map(user=> user.toObject());
+    }
     saveUser = async (user) => {
         try {
             if(!user.username || !user.password){
@@ -74,9 +78,9 @@ class UserService {
             }
         }
     }
-    clearUsers = async () => {
+    clearUsers = async (username) => {
         try {
-            const users = await this.getAll();
+            const users = await this.getAllRaw();
             let usersToBeDeleted = []
             users.forEach(user => {
                 if(dateValidator(user.last_connection,'h',48)){
@@ -85,17 +89,18 @@ class UserService {
             });
             const title = "Aviso de eliminación de cuenta"
             usersToBeDeleted.forEach(async (user) => {
-                await this.delete(user.username);
-                const message = `Hola ${user.name}!\nLe informamos que su cuenta a sido eliminada por inactividad.\nSepa disculpar las molestias.\nSaludos`
-                this.emailService.sendEmail(user.username, message, title, (error, result) => {
-                    if(error){
-                        throw {
-                            error:  result.error, 
-                            message: result.message
+                if(user.username !== username) {
+                    await this.delete(user.username);
+                    const message = `Hola ${user.name}!\nLe informamos que su cuenta a sido eliminada por inactividad.\nSepa disculpar las molestias.\nSaludos`
+                    this.emailService.sendEmail(user.username, message, title, (error, result) => {
+                        if(error){
+                            throw {
+                                error:  result.error, 
+                                message: result.message
+                            }
                         }
-                    }
-                })
-                
+                    })
+                }
             })
             return usersToBeDeleted;
         }

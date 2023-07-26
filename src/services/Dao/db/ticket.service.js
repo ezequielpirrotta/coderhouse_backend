@@ -1,10 +1,9 @@
 import GetTicketDTO from "../DTOs/getTicketDTO.js";
 import ticketModel  from "../models/ticket.model.js";
 import UserService from "./user.service.js";
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 import moment from "moment";
 import ProductService from "./product.service.js";
-
 
 const userService = new UserService();
 const productService =  new ProductService

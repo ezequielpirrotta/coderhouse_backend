@@ -1,4 +1,5 @@
 import UserService from "../services/Dao/db/user.service.js";
+import {log } from "../config/logger.js"
 
 const userService = new UserService();
 
@@ -91,7 +92,7 @@ export const changeUserRol = async (req, res) => {
         res.status(error.code?error.code:500).send(error)
     }
 }
-export const saveDocuments = async (req, res, next) => {
+export const saveDocuments = async (req, res) => {
     try {
         const {uid} = req.params
         let user = {}
@@ -111,25 +112,25 @@ export const saveDocuments = async (req, res, next) => {
         res.status(error.code?error.code:500).send(error)
     }
 }
-export const deleteUser = async (req,res,next) => {
+export const deleteUser = async (req,res) => {
     try {
         const {username} = req.params;
         const user = await userService.delete(username);
         res.send({status: 200, payload: user});
     }
     catch(error) {
-        next(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }
 
-export const clearUsers = async (req,res,next) => {
+export const clearUsers = async (req,res) => {
     try {
-        const {username} = req.params;
+        const {username} = req.body;
         const result = await userService.clearUsers(username);
         res.send({status: 200, payload: result});
     }
     catch(error) {
         req.logger.error(log(error,req));
-        next(error)
+        res.status(error.code?error.code:500).send(error)
     }
 }

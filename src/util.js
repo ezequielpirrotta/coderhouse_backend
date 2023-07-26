@@ -12,8 +12,7 @@ import config from './config/config.js';
 
 export const dateValidator = (date, type='m', amount=10) => {
     const actualDate = moment();
-    const dateToValidate = moment(date)
-    const result = actualDate.diff(dateToValidate, type==='m'?"minutes":type==='d'?'days':hours) > amount
+    const result = actualDate.diff(date, type==='m'?"minutes":type==='d'?'days':"hours") > amount
     return result;
 }
 
