@@ -49,7 +49,7 @@ export const createProduct = async (req, res, next) => {
         res.status(201).send({
             status: 'OK',
             message: "Product created succesfully. ",
-            data: resultProduct
+            payload: resultProduct
         });
     }
     catch(error) {

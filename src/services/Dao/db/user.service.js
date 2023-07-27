@@ -47,7 +47,7 @@ class UserService {
             }
             else {
                 throw {
-                    code: 401,
+                    code: 500,
                     detail: "No se pudo actualizar el usuario"
                 }
             }

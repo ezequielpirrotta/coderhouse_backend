@@ -99,13 +99,15 @@ export const saveDocuments = async (req, res) => {
         if(uid) {
             user = await userService.getUserById(uid);
             const files = req.files
+            let docsResult = [];
             for(const type of Object.keys(files)) {
                 for(let i = 0; i < files[type].length; i++){
                     user.documents.push({name: files[type][i].originalname, reference: files[type][i].path})
+                    docsResult.push({name: files[type][i].originalname, reference: files[type][i].path})
                 }
             } 
-            const result = await userService.updateUser({username: user.username}, user);
-            res.send({code: 201, message: "Usuario actualizado correctamente", payload: "llegué"});
+            await userService.updateUser({username: user.username}, user);
+            res.send({code: 201, message: "Usuario actualizado correctamente", payload: docsResult});
         }
     }
     catch(error) {

@@ -105,8 +105,7 @@ class ProductService {
             let result = await productModel.updateOne({_id: pid}, {...productUpdated});
             if(result.modifiedCount > 0){
                 let product = await this.getProductById(pid);
-
-                return {fieldUpdated: data.field, newValue: data.newValue, ...product._doc};
+                return product;
             }
             else {
                 throw Error("El valor elegido es el mismo al que intenta cambiar, intente con uno diferente.")
