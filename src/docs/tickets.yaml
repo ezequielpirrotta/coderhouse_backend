@@ -1,3 +1,258 @@
 paths:
-  /api/products/:
+  /api/tickets/:
+    get:
+      summary: Obtiene todos los tickets disponibles
+      tags: 
+        - Tickets
+      parameters:
+        - in: query
+          name: category
+          required: false
+          description: product category
+          explode: true
+          schema:
+            type: string
+            default: otros
+            enum:
+              - comida
+              - ropa
+              - otros
+        - in: query
+          name: limit
+          required: false
+          description: product limit per page
+          schema:
+            type : integer
+        - in: query
+          name: available
+          required: false
+          description: product availability (true or false)
+          schema:
+            type : boolean
+        - name: sort
+          in: query
+          required: false
+          description: sort products, asc or desc
+          schema:
+            type : string
+        - name: page
+          in: query
+          required: false
+          description: number of page you are standing in
+          schema:
+            type : string
+      
+      responses:
+        "200":
+          description: Operación exitosa, hay productos en la BBDD en base a los filtros proporcionados
+        "404":
+          description: Operación fallida, no hay productos en la BBDD en base a los filtros proporcionados
+        "500":
+          description: Operación fallida, ocurrió un error inesperado
+    post:
+      summary: Crea un producto en base a ciertos campos pasados por el body
+      tags: 
+        - Products
+      requestBody:
+        description: Crea un producto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductNew"
+      responses:
+          "200":
+            description: Operación exitosa, producto creado exitosamente
+  /api/tickets/{tid}:
+    get:
+      tags: 
+        - Products
+      summary: Encuentra un producto en base a un ID
+      description: Devuelve un objeto Producto
+      parameters:
+        - name: pid
+          in: path
+          description: ID del objeto a retornar
+          required: true
+          schema:
+            type: string
+            format: string
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product' 
+        '404':
+          description: Product not found
+    put:
+      tags: 
+        - Products
+      summary: Actualiza un producto en base a un ID
+      description: Actualiza un objeto Producto y devuelve el estado
+      
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                newValue:
+                  type: string
+                field:    
+                  type: string
+              required:
+                - newValue
+                - field
+      parameters:
+        - name: pid
+          in: path
+          description: ID del objeto a retornar
+          required: true
+          schema:
+            type: string
+            format: string
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Product not found
+    delete:
+      tags: 
+        - Products
+      summary: Elimina un producto en base a un ID
+      description: Devuelve el id del Producto y un estado OK
+      parameters:
+        - name: pid
+          in: path
+          description: ID del objeto a retornar
+          required: true
+          schema:
+            type: string
+            format: string
+        - $ref: '#/components/parameters/sortParam'
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Product not found
+components:
+  examples:
+    productIdExample:
+      value:
+        pid: 6418d63d3e7632f846cc6a72
+  schemas:
+    Product:
+      type: object
+      properties:
+        owner:
+          type: string
+          description: Tipo de usuario que creó el producto
+        _id:
+          type: ObjectId
+          description: Id autogenerado de Mongo
+        title:
+          type: string
+          description: Nombre del producto
+        description: 
+          type: string
+          description: Descripción del producto
+        price: 
+          type: integer
+          description: Precio del producto
+        code: 
+          type: string
+          description: Código de identificación del productoalfanumerico generado aleatoriamente 
+        available: 
+          type: string
+          description: Disponibilidad del producto
+        stock: 
+          type: string
+          description: Cantidad de unidades disponibles del producto
+        category: 
+          type: string
+          description: Categoría del producto
+        thumbnail: 
+          type: string
+          description: Imagen del producto
+      example:
+          owner: admin
+          _id: ObjectId("6418d5e5421da9b90db906a6")
+          title: producto_prueba_6
+          description: Este es un producto prueba
+          price: 45
+          code: abc1236
+          available: true
+          stock: 25
+          category: otros
+          thumbnail: Sin imagen
+    ProductNew:
+      type: object
+      properties:
+        owner:
+          type: string
+          description: Tipo de usuario que creó el producto
+          default: admin
+        title:
+          type: string
+          description: Nombre del producto
+        description: 
+          type: string
+          description: Descripción del producto
+        price: 
+          type: integer
+          description: Precio del producto
+        code: 
+          type: string
+          description: Código de identificación del productoalfanumerico generado aleatoriamente 
+        available: 
+          type: string
+          description: Disponibilidad del producto
+        stock: 
+          type: string
+          description: Cantidad de unidades disponibles del producto
+        category: 
+          type: string
+          description: Categoría del producto
+        thumbnail: 
+          type: string
+          description: Imagen del producto
+      example:
+          owner: admin
+          title: producto_prueba_6
+          description: Este es un producto prueba
+          price: 45
+          code: abc1236
+          available: true
+          stock: 25
+          category: otros
+          thumbnail: Sin imagen
     
